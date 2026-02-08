@@ -469,6 +469,18 @@
                                     <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-accent"></div>
                                 </label>
                              </div>
+
+                             <!-- Demo Mode -->
+                             <div class="flex items-center justify-between p-4 bg-orange-50 rounded-xl border border-orange-100 mt-6">
+                                 <div>
+                                     <h4 class="font-bold text-orange-800 flex items-center gap-2"><ion-icon name="flask"></ion-icon> Demo Data Mode</h4>
+                                     <p class="text-sm text-orange-600">Fill system with sample data for testing. <strong>This hides real data safely.</strong></p>
+                                 </div>
+                                 <div class="flex gap-2">
+                                     <button onclick="enableDemoMode()" id="btn-enable-demo" class="px-4 py-2 bg-orange-600 text-white rounded-lg font-bold text-xs shadow hover:bg-orange-700 transition">Enable Demo</button>
+                                     <button onclick="disableDemoMode()" id="btn-disable-demo" class="px-4 py-2 bg-white text-orange-600 border border-orange-200 rounded-lg font-bold text-xs shadow-sm hover:bg-orange-50 transition hidden">Reset / Disable</button>
+                                 </div>
+                             </div>
                         </div>
                          <div class="mt-8 pt-6 border-t border-gray-100 flex justify-end">
                             <button onclick="saveSystemSettings()" class="bg-accent text-white px-6 py-3 rounded-xl font-bold hover:bg-blue-600 transition shadow-lg">Update System</button>
@@ -764,6 +776,7 @@
     <script src="js/data.js"></script>
     <script src="js/app.js"></script>
     <script src="js/settings.js"></script>
+    <script src="js/demo.js"></script>
     <script>
         checkAuth(['admin']);
         const data = getSchoolData();
