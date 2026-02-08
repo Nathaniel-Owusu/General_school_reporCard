@@ -132,6 +132,38 @@
                         </div>
                     </div>
 
+                    <!-- Summary Cards -->
+                    <div id="entry-summary" class="hidden grid-cols-1 md:grid-cols-4 gap-4 mb-6 animate-fade-in">
+                        <div class="bg-blue-50 border border-blue-100 p-4 rounded-xl flex items-center justify-between">
+                            <div>
+                                <p class="text-xs font-bold text-blue-400 uppercase">Students</p>
+                                <p class="text-xl font-bold text-blue-900" id="summary-count">0</p>
+                            </div>
+                            <ion-icon name="people" class="text-2xl text-blue-200"></ion-icon>
+                        </div>
+                        <div class="bg-green-50 border border-green-100 p-4 rounded-xl flex items-center justify-between">
+                            <div>
+                                <p class="text-xs font-bold text-green-400 uppercase">Class Avg</p>
+                                <p class="text-xl font-bold text-green-900" id="summary-avg">0.0</p>
+                            </div>
+                            <ion-icon name="stats-chart" class="text-2xl text-green-200"></ion-icon>
+                        </div>
+                         <div class="bg-orange-50 border border-orange-100 p-4 rounded-xl flex items-center justify-between">
+                            <div>
+                                <p class="text-xs font-bold text-orange-400 uppercase">Pending</p>
+                                <p class="text-xl font-bold text-orange-900" id="summary-pending">0</p>
+                            </div>
+                            <ion-icon name="time" class="text-2xl text-orange-200"></ion-icon>
+                        </div>
+                         <div class="bg-purple-50 border border-purple-100 p-4 rounded-xl flex items-center justify-between">
+                            <div>
+                                <p class="text-xs font-bold text-purple-400 uppercase">Submitted</p>
+                                <p class="text-xl font-bold text-purple-900" id="summary-approved">0</p>
+                            </div>
+                            <ion-icon name="checkmark-circle" class="text-2xl text-purple-200"></ion-icon>
+                        </div>
+                    </div>
+
                     <!-- Gradebook Table -->
                     <div class="bg-white rounded-xl shadow-sm border border-gray-100 flex-1 overflow-hidden flex flex-col table-container relative">
                         <div class="overflow-auto flex-1">
@@ -341,6 +373,36 @@
                 saveBtn.classList.remove('opacity-50', 'cursor-not-allowed', 'bg-red-500');
                 saveBtn.classList.add('bg-primary');
             }
+
+            updateSummary(students, subject.name);
+        }
+
+        function updateSummary(students, subjectName) {
+            const summaryDiv = document.getElementById('entry-summary');
+            summaryDiv.classList.remove('hidden');
+            summaryDiv.classList.add('grid');
+
+            let totalScore = 0;
+            let scoreCount = 0;
+            let pendingCount = 0;
+            let approvedCount = 0;
+
+            students.forEach(s => {
+                const scoreData = (s.scores || []).find(sc => sc.subject === subjectName);
+                if(scoreData) {
+                    const total = (scoreData.class || 0) + (scoreData.exam || 0);
+                    totalScore += total;
+                    scoreCount++;
+
+                    if(scoreData.status === 'Approved') approvedCount++;
+                    else if(scoreData.status === 'Pending') pendingCount++;
+                }
+            });
+
+            document.getElementById('summary-count').innerText = students.length;
+            document.getElementById('summary-avg').innerText = scoreCount > 0 ? (totalScore / scoreCount).toFixed(1) : "0.0";
+            document.getElementById('summary-pending').innerText = pendingCount;
+            document.getElementById('summary-approved').innerText = approvedCount;
         }
 
         function calculateRow(input) {
@@ -378,6 +440,9 @@
 
             if(!subject) return;
 
+            const cls = data.classes.find(c => c.id === currentClassId);
+            if(!cls) return;
+
             let updatedCount = 0;
 
             rows.forEach(row => {
@@ -408,6 +473,10 @@
 
             saveSchoolData(data);
             
+            // Refund Summary
+            const studentsInClass = data.students.filter(s => s.class === cls.name);
+            updateSummary(studentsInClass, subject.name);
+
             // Feedback
             const btn = document.getElementById('btn-save-all');
             const oldHtml = btn.innerHTML;

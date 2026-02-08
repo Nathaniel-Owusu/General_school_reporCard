@@ -86,9 +86,12 @@
                 <button type="submit" class="w-full bg-accent text-white py-3.5 rounded-xl font-bold hover:bg-black shadow-lg shadow-gray-900/20 transform hover:-translate-y-0.5 transition-all">Login to Dashboard</button>
             </form>
 
-            <div class="mt-8 text-center">
-                <p class="text-xs text-center text-gray-300">
-                    Demo: Student (ST001) <br> Teacher (teacher@school.com / password)
+            <div class="mt-8 text-center space-y-4">
+                <button onclick="enableDemoMode()" id="btn-start-demo" class="text-xs font-bold text-orange-500 hover:text-orange-600 transition uppercase tracking-wide border-b border-orange-200 pb-0.5">
+                    Start Demo Mode (No Login Required)
+                </button>
+                <p class="text-xs text-center text-gray-300" id="login-hints">
+                    Mock: Student (ST001) <br> Teacher (teacher@school.com / password)
                 </p>
             </div>
         </div>
@@ -155,6 +158,22 @@
         const urlParams = new URLSearchParams(window.location.search);
         if(urlParams.get('role') === 'staff') {
             toggleTab('staff');
+        }
+
+        // Demo Control on Login Page
+        const startDemoBtn = document.getElementById('btn-start-demo');
+        const loginHints = document.getElementById('login-hints');
+
+        if(typeof isDemoMode === 'function' && isDemoMode()) {
+            startDemoBtn.innerText = "Exit Demo Mode";
+            startDemoBtn.onclick = disableDemoMode;
+            startDemoBtn.classList.replace('text-orange-500', 'text-gray-400');
+            startDemoBtn.classList.replace('hover:text-orange-600', 'hover:text-gray-600');
+            startDemoBtn.classList.replace('border-orange-200', 'border-gray-300');
+            // Hints are updated by demo.js
+        } else {
+             // Ensure hints are hidden or default if NOT demo mode
+             // The HTML default is Mock: ...
         }
     </script>
 </body>
