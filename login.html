@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | General School</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: { colors: { primary: '#1e3a8a', accent: '#0f172a' }, fontFamily: { sans: ['Outfit', 'sans-serif'] } }
+            }
+        }
+    </script>
+    <style>
+        .fade-in { animation: fadeIn 0.6s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center p-4 bg-[url('https://images.unsplash.com/photo-1523050854058-8df90110c9f1?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80')] bg-cover bg-center">
+    
+    <div class="absolute inset-0 bg-primary/80 backdrop-blur-sm"></div>
+
+    <div class="bg-white rounded-3xl shadow-2xl overflow-hidden w-full max-w-4xl flex flex-col md:flex-row min-h-[550px] relative z-10 fade-in">
+        
+        <!-- Left Side: Brand -->
+        <div class="md:w-1/2 bg-accent relative p-12 text-white flex flex-col justify-between overflow-hidden">
+            <div class="absolute inset-0 bg-gradient-to-br from-primary to-accent opacity-90"></div>
+            <div class="absolute -right-10 -bottom-10 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
+            
+            <div class="relative z-10">
+                <a href="index.html" class="flex items-center gap-3 mb-8 hover:opacity-80 transition">
+                    <span class="text-xl">&larr; Back</span>
+                </a>
+                <div class="w-16 h-16 bg-white/10 rounded-2xl flex items-center justify-center text-3xl mb-6 backdrop-blur-sm">🎓</div>
+                <h1 class="text-4xl font-bold mb-2">Welcome Back</h1>
+                <p class="text-blue-200 text-lg">Access your academic dashboard using the credentials provided by the school.</p>
+            </div>
+
+            <div class="relative z-10">
+                <div class="flex items-center gap-4 text-sm text-blue-200/60">
+                    <span>Secure Access</span>
+                    <span>•</span>
+                    <span>24/7 Availability</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Side: Forms -->
+        <div class="md:w-1/2 p-8 md:p-12 flex flex-col justify-center bg-white">
+            <div class="flex justify-center mb-10 bg-gray-100 rounded-xl p-1 w-fit mx-auto">
+                <button onclick="toggleTab('student')" id="tab-student" class="px-8 py-2.5 rounded-lg text-sm font-bold transition-all shadow-sm bg-white text-primary ring-1 ring-black/5">Student</button>
+                <button onclick="toggleTab('staff')" id="tab-staff" class="px-8 py-2.5 rounded-lg text-sm font-bold text-gray-400 transition hover:text-gray-600">Staff</button>
+            </div>
+
+            <!-- Student Login -->
+            <form id="student-form" class="space-y-6" onsubmit="handleLogin(event, 'student')">
+                <div class="text-center mb-6">
+                    <h2 class="text-2xl font-bold text-gray-800">Student Access</h2>
+                    <p class="text-gray-400 text-sm">Enter your index number</p>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">Index Number</label>
+                    <input type="text" id="student-id" placeholder="e.g. ST001" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all font-medium">
+                </div>
+                <button type="submit" class="w-full bg-primary text-white py-3.5 rounded-xl font-bold hover:bg-blue-800 shadow-lg shadow-blue-900/20 transform hover:-translate-y-0.5 transition-all">View My Report</button>
+            </form>
+
+            <!-- Staff Login -->
+            <form id="staff-form" class="space-y-6 hidden" onsubmit="handleLogin(event, 'staff')">
+                <div class="text-center mb-6">
+                    <h2 class="text-2xl font-bold text-gray-800">Staff Portal</h2>
+                    <p class="text-gray-400 text-sm">Secure login for faculty & administrators</p>
+                </div>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">Email Address</label>
+                        <input type="email" id="staff-email" placeholder="name@school.com" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all font-medium">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">Password</label>
+                        <input type="password" id="staff-pass" placeholder="••••••••" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all font-medium">
+                    </div>
+                </div>
+                <button type="submit" class="w-full bg-accent text-white py-3.5 rounded-xl font-bold hover:bg-black shadow-lg shadow-gray-900/20 transform hover:-translate-y-0.5 transition-all">Login to Dashboard</button>
+            </form>
+
+            <div class="mt-8 text-center">
+                <p class="text-xs text-center text-gray-300">
+                    Demo: Student (ST001) <br> Teacher (teacher@school.com / password)
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/data.js"></script>
+    <script src="js/app.js"></script>
+    <script>
+        function toggleTab(type) {
+            const studentForm = document.getElementById('student-form');
+            const staffForm = document.getElementById('staff-form');
+            const tabStudent = document.getElementById('tab-student');
+            const tabStaff = document.getElementById('tab-staff');
+
+            if(type === 'student') {
+                studentForm.classList.remove('hidden');
+                staffForm.classList.add('hidden');
+                
+                tabStudent.classList.add('bg-white', 'text-primary', 'shadow-sm', 'ring-1', 'ring-black/5');
+                tabStudent.classList.remove('text-gray-400', 'hover:text-gray-600');
+                
+                tabStaff.classList.remove('bg-white', 'text-primary', 'shadow-sm', 'ring-1', 'ring-black/5');
+                tabStaff.classList.add('text-gray-400', 'hover:text-gray-600');
+            } else {
+                studentForm.classList.add('hidden');
+                staffForm.classList.remove('hidden');
+
+                tabStaff.classList.add('bg-white', 'text-primary', 'shadow-sm', 'ring-1', 'ring-black/5');
+                tabStaff.classList.remove('text-gray-400', 'hover:text-gray-600');
+
+                tabStudent.classList.remove('bg-white', 'text-primary', 'shadow-sm', 'ring-1', 'ring-black/5');
+                tabStudent.classList.add('text-gray-400', 'hover:text-gray-600');
+            }
+        }
+
+        function handleLogin(e, type) {
+            e.preventDefault();
+            let result;
+            if(type === 'student') {
+                const id = document.getElementById('student-id').value;
+                result = login('student', { id });
+            } else {
+                const email = document.getElementById('staff-email').value;
+                const password = document.getElementById('staff-pass').value;
+                result = login('staff', { email, password });
+            }
+
+            if(result.success) {
+                // Add button loading state
+                const btn = e.submitter;
+                const originalText = btn.innerText;
+                btn.innerText = 'Redirecting...';
+                btn.classList.add('opacity-80', 'cursor-not-allowed');
+                
+                setTimeout(() => {
+                   window.location.href = result.redirect;
+                }, 800);
+            } else {
+                alert('Login Failed: ' + result.message);
+            }
+        }
+
+        const urlParams = new URLSearchParams(window.location.search);
+        if(urlParams.get('role') === 'staff') {
+            toggleTab('staff');
+        }
+    </script>
+</body>
+</html>

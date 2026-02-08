@@ -1,0 +1,1415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | General School</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: { colors: { primary: '#0f172a', accent: '#3b82f6', secondary: '#f59e0b' }, fontFamily: { sans: ['Outfit', 'sans-serif'] } }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-50 h-screen flex overflow-hidden font-sans text-gray-800">
+
+    <!-- Sidebar -->
+    <aside class="w-72 bg-primary text-white hidden md:flex flex-col shadow-2xl relative z-20">
+        <div class="h-20 flex items-center gap-3 px-8 border-b border-gray-800 bg-gray-900/50">
+            <div class="w-8 h-8 rounded-lg bg-accent flex items-center justify-center text-white">
+                <ion-icon name="school" class="text-xl"></ion-icon>
+            </div>
+            <span class="font-bold text-lg tracking-wide">Admin Panel</span>
+        </div>
+
+        <nav class="flex-1 py-6 px-4 space-y-2">
+            <button onclick="switchView('dashboard')" id="nav-dashboard" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-accent text-white font-medium shadow-lg shadow-blue-900/20 transition-all">
+                <ion-icon name="grid-outline" class="text-xl"></ion-icon> Dashboard
+            </button>
+            <button onclick="switchView('classes')" id="nav-classes" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-400 hover:bg-gray-800 hover:text-white font-medium transition-all">
+                <ion-icon name="easel-outline" class="text-xl"></ion-icon> Manage Classes
+            </button>
+            <button onclick="switchView('teachers')" id="nav-teachers" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-400 hover:bg-gray-800 hover:text-white font-medium transition-all">
+                <ion-icon name="people-outline" class="text-xl"></ion-icon> Manage Teachers
+            </button>
+            <button onclick="switchView('subjects')" id="nav-subjects" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-400 hover:bg-gray-800 hover:text-white font-medium transition-all">
+                <ion-icon name="book-outline" class="text-xl"></ion-icon> Manage Subjects
+            </button>
+            <button onclick="switchView('settings')" id="nav-settings" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-400 hover:bg-gray-800 hover:text-white font-medium transition-all">
+                <ion-icon name="settings-outline" class="text-xl"></ion-icon> System Settings
+            </button>
+            <button onclick="switchView('results')" id="nav-results" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-400 hover:bg-gray-800 hover:text-white font-medium transition-all">
+                <ion-icon name="checkmark-done-circle-outline" class="text-xl"></ion-icon> Review Results
+            </button>
+            <a href="teacher-portal.html" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-400 hover:bg-gray-800 hover:text-white font-medium transition-all">
+                <ion-icon name="key-outline" class="text-xl"></ion-icon> Teacher View
+            </a>
+        </nav>
+
+        <div class="p-6 border-t border-gray-800">
+            <button onclick="logout()" class="flex items-center gap-2 text-red-400 hover:text-red-300 transition w-full px-4 py-2 hover:bg-gray-800 rounded-lg">
+                <ion-icon name="log-out-outline" class="text-xl"></ion-icon> <span class="font-medium">Sign Out</span>
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="flex-1 flex flex-col bg-gray-50 h-screen overflow-hidden">
+        
+        <!-- Header -->
+        <header class="h-20 bg-white border-b border-gray-200 flex items-center justify-between px-8 shadow-sm z-10">
+            <div>
+                <h2 class="text-2xl font-bold text-gray-800" id="page-title">Dashboard</h2>
+                <p class="text-sm text-gray-400">Welcome back, Admin</p>
+            </div>
+            <div class="flex items-center gap-4">
+                 <div class="md:hidden">
+                    <button class="text-2xl text-gray-600"><ion-icon name="menu-outline"></ion-icon></button>
+                </div>
+                <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-accent font-bold">A</div>
+            </div>
+        </header>
+
+        <!-- Scrollable Area -->
+        <main class="flex-1 overflow-x-hidden overflow-y-auto p-8">
+            
+            <!-- VIEW: DASHBOARD -->
+            <div id="view-dashboard" class="space-y-8 animate-fade-in">
+                <!-- Data Management Bar -->
+                <div class="bg-gray-900 rounded-2xl p-6 text-white flex flex-col md:flex-row justify-between items-center shadow-xl mask-pattern relative overflow-hidden">
+                     <div class="absolute inset-0 bg-accent opacity-10 pattern-dots"></div>
+                     <div class="relative z-10 flex flex-col md:flex-row items-center gap-6 w-full justify-between">
+                         <div class="flex items-center gap-4">
+                             <div class="w-12 h-12 rounded-xl bg-white/10 flex items-center justify-center text-2xl">💾</div>
+                             <div>
+                                 <h3 class="font-bold text-lg">System Data Control</h3>
+                                 <p class="text-blue-200 text-sm">Backup or restore your database safely.</p>
+                             </div>
+                         </div>
+                         <div class="flex gap-4">
+                             <button onclick="backupData()" class="px-4 py-2 bg-accent hover:bg-blue-600 rounded-lg font-bold shadow-lg transition flex items-center gap-2">
+                                 <ion-icon name="cloud-download-outline"></ion-icon> Backup
+                             </button>
+                             <label class="px-4 py-2 bg-white/10 hover:bg-white/20 border border-white/20 rounded-lg font-bold transition flex items-center gap-2 cursor-pointer">
+                                 <ion-icon name="cloud-upload-outline"></ion-icon> Restore
+                                 <input type="file" id="restore-file" accept=".json" class="hidden" onchange="restoreData(this)">
+                             </label>
+                             <button onclick="hardResetSystem()" class="px-4 py-2 bg-red-500/80 hover:bg-red-600 rounded-lg font-bold transition flex items-center gap-2" title="Reset to Factory Settings">
+                                <ion-icon name="refresh-circle-outline" class="text-xl"></ion-icon> Reset
+                            </button>
+                         </div>
+                     </div>
+                </div>
+
+                <!-- Stats Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4 hover:shadow-md transition">
+                        <div class="w-16 h-16 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-3xl">
+                            <ion-icon name="people"></ion-icon>
+                        </div>
+                        <div>
+                            <p class="text-gray-400 text-sm font-bold uppercase tracking-wider">Total Students</p>
+                            <h3 class="text-3xl font-bold text-gray-900" id="count-students">0</h3>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4 hover:shadow-md transition">
+                        <div class="w-16 h-16 rounded-xl bg-green-50 text-green-600 flex items-center justify-center text-3xl">
+                            <ion-icon name="briefcase"></ion-icon>
+                        </div>
+                        <div>
+                            <p class="text-gray-400 text-sm font-bold uppercase tracking-wider">Teachers</p>
+                            <h3 class="text-3xl font-bold text-gray-900" id="count-teachers">0</h3>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4 hover:shadow-md transition">
+                        <div class="w-16 h-16 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center text-3xl">
+                            <ion-icon name="library"></ion-icon>
+                        </div>
+                        <div>
+                            <p class="text-gray-400 text-sm font-bold uppercase tracking-wider">Classes</p>
+                            <h3 class="text-3xl font-bold text-gray-900" id="count-classes">0</h3>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Chart & Student Management Section -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <!-- Student Table -->
+                    <div class="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+                        <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+                            <h3 class="font-bold text-lg text-gray-800">Student Directory</h3>
+                             <button onclick="openAddStudentModal()" class="bg-gray-900 hover:bg-black text-white px-4 py-2 rounded-lg text-sm font-bold transition flex items-center gap-2">
+                                <ion-icon name="add"></ion-icon> Add Student
+                            </button>
+                        </div>
+                        
+                        <!-- Filter Bar -->
+                        <div class="flex gap-4 mb-4">
+                            <div class="relative flex-1">
+                                <ion-icon name="search-outline" class="absolute left-3 top-3 text-gray-400"></ion-icon>
+                                <input type="text" id="search-input" onkeyup="renderStudents()" placeholder="Search Name or ID..." class="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-accent">
+                            </div>
+                            <select id="filter-class" onchange="renderStudents()" class="px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-accent w-1/3">
+                                <option value="">All Classes</option>
+                            </select>
+                        </div>
+
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-sm">
+                                <thead class="bg-gray-50 text-gray-400 font-bold uppercase text-xs">
+                                    <tr>
+                                        <th class="px-4 py-3">ID</th>
+                                        <th class="px-4 py-3">Name</th>
+                                        <th class="px-4 py-3">Class</th>
+                                        <th class="px-4 py-3">Status</th>
+                                        <th class="px-4 py-3 text-right">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-100" id="student-table-body">
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="mt-4 flex justify-between items-center text-xs text-gray-400">
+                            <span id="showing-count">Showing 0 students</span>
+                            <div class="flex gap-2">
+                                <button class="p-2 bg-gray-100 rounded hover:bg-gray-200 disabled:opacity-50"><ion-icon name="chevron-back"></ion-icon></button>
+                                <button class="p-2 bg-gray-100 rounded hover:bg-gray-200 disabled:opacity-50"><ion-icon name="chevron-forward"></ion-icon></button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Simple Chart -->
+                    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 h-fit">
+                        <h3 class="font-bold text-lg text-gray-800 mb-6">Enrollment Overview</h3>
+                        <canvas id="enrollmentChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW: SUBJECTS -->
+             <div id="view-subjects" class="space-y-8 hidden animate-fade-in">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    
+                    <!-- Subject Master List -->
+                    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+                        <div class="flex justify-between items-center mb-6">
+                             <div>
+                                <h3 class="font-bold text-xl text-gray-800">All Subjects</h3>
+                                <p class="text-gray-400 text-sm">Manage the school's curriculum.</p>
+                            </div>
+                            <button onclick="openAddSubjectModal()" class="bg-primary hover:bg-gray-800 text-white px-4 py-2 rounded-lg text-sm font-bold shadow-lg transition flex items-center gap-2">
+                                <ion-icon name="add"></ion-icon> New Subject
+                            </button>
+                        </div>
+                        <div class="overflow-y-auto max-h-[500px]">
+                            <table class="w-full text-left">
+                                <thead class="bg-gray-50 text-gray-500 font-bold uppercase text-xs sticky top-0">
+                                    <tr>
+                                        <th class="px-4 py-3">Code</th>
+                                        <th class="px-4 py-3">Subject</th>
+                                        <th class="px-4 py-3">Status</th>
+                                        <th class="px-4 py-3 text-right">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-50" id="subject-table-body"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Class Assignment -->
+                    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex flex-col">
+                        <div class="mb-6 border-b border-gray-100 pb-4">
+                            <h3 class="font-bold text-xl text-gray-800">Class Assignments</h3>
+                            <p class="text-gray-400 text-sm">Control which subjects are taught in each class.</p>
+                        </div>
+                        
+                        <div class="space-y-4 flex-1">
+                            <div class="space-y-2">
+                                <label class="text-xs font-bold text-gray-500 uppercase">Select Class</label>
+                                <select id="assign-class-select" onchange="loadClassSubjects()" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-accent"></select>
+                            </div>
+
+                            <div class="relative bg-gray-50 rounded-xl border border-gray-200 p-4 flex-1 overflow-hidden flex flex-col">
+                                <div class="flex justify-between items-center mb-3">
+                                    <label class="text-xs font-bold text-gray-500 uppercase">Available Subjects</label>
+                                    <div class="space-x-2">
+                                         <button type="button" onclick="toggleAllSubjects(true)" class="text-xs font-bold text-accent hover:underline">Select All</button>
+                                         <span class="text-gray-300">|</span>
+                                         <button type="button" onclick="toggleAllSubjects(false)" class="text-xs font-bold text-gray-400 hover:underline">Clear</button>
+                                    </div>
+                                </div>
+                                <div id="assignment-checkboxes" class="space-y-2 overflow-y-auto max-h-[350px] pr-2">
+                                    <!-- Checkboxes -->
+                                    <p class="text-gray-400 text-sm italic text-center py-10">Select a class to configure subjects.</p>
+                                </div>
+                            </div>
+                            
+                            <button onclick="saveClassSubjects()" class="w-full py-3 bg-secondary text-white rounded-xl font-bold hover:bg-amber-600 shadow-lg transition">
+                                <ion-icon name="save"></ion-icon> Save Assignments
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- VIEW: CLASSES -->
+             <div id="view-classes" class="space-y-8 hidden animate-fade-in">
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+                    <div class="flex justify-between items-center mb-6">
+                        <div>
+                            <h3 class="font-bold text-xl text-gray-800">Class Management</h3>
+                            <p class="text-gray-400 text-sm">Create classes and assign teachers.</p>
+                        </div>
+                        <button onclick="openAddClassModal()" class="bg-secondary hover:bg-amber-600 text-white px-5 py-2.5 rounded-lg font-bold shadow-lg shadow-amber-500/20 transition flex items-center gap-2">
+                            <ion-icon name="add-circle"></ion-icon> New Class
+                        </button>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="class-grid">
+                        <!-- Classes Cards will go here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW: TEACHERS -->
+             <div id="view-teachers" class="space-y-8 hidden animate-fade-in">
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+                    <div class="flex justify-between items-center mb-6">
+                         <div>
+                            <h3 class="font-bold text-xl text-gray-800">Faculty Staff</h3>
+                            <p class="text-gray-400 text-sm">Manage teacher access and assignments.</p>
+                        </div>
+                        <button onclick="openAddTeacherModal()" class="bg-accent hover:bg-blue-600 text-white px-5 py-2.5 rounded-lg font-bold shadow-lg shadow-blue-500/20 transition flex items-center gap-2">
+                            <ion-icon name="person-add"></ion-icon> New Teacher
+                        </button>
+                    </div>
+                    <table class="w-full text-left">
+                        <thead class="bg-gray-50 text-gray-500 font-bold uppercase text-xs">
+                            <tr>
+                                <th class="px-6 py-4 rounded-l-lg">ID</th>
+                                <th class="px-6 py-4">Teacher</th>
+                                <th class="px-6 py-4">Classes</th>
+                                <th class="px-6 py-4 rounded-r-lg text-right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-50" id="teacher-table-body"></tbody>
+                    </table>
+                </div>
+            </div>
+            <!-- VIEW: SETTINGS -->
+            <div id="view-settings" class="space-y-6 hidden animate-fade-in">
+                <!-- Settings Navigation -->
+                <div class="flex gap-2 overflow-x-auto pb-2 border-b border-gray-200">
+                    <button onclick="switchSettingsTab('general')" id="tab-general" class="px-4 py-2 rounded-lg font-bold text-sm bg-accent text-white shadow-md transition whitespace-nowrap">General Info</button>
+                    <button onclick="switchSettingsTab('grading')" id="tab-grading" class="px-4 py-2 rounded-lg font-bold text-sm text-gray-500 hover:bg-gray-100 transition whitespace-nowrap">Grading System</button>
+                    <button onclick="switchSettingsTab('attendance')" id="tab-attendance" class="px-4 py-2 rounded-lg font-bold text-sm text-gray-500 hover:bg-gray-100 transition whitespace-nowrap">Attendance</button>
+                    <button onclick="switchSettingsTab('system')" id="tab-system" class="px-4 py-2 rounded-lg font-bold text-sm text-gray-500 hover:bg-gray-100 transition whitespace-nowrap">System</button>
+                    <button onclick="switchSettingsTab('academic')" id="tab-academic" class="px-4 py-2 rounded-lg font-bold text-sm text-gray-500 hover:bg-gray-100 transition whitespace-nowrap">Academic Year</button>
+                </div>
+
+                <!-- TAB: GENERAL -->
+                <div id="set-general" class="settings-tab">
+                    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 max-w-4xl">
+                        <h3 class="font-bold text-xl text-gray-800 mb-6">School Identity</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <!-- Data Fields -->
+                            <div class="space-y-4">
+                                 <div>
+                                    <label class="block text-xs font-bold text-gray-400 uppercase mb-1">School Name</label>
+                                    <input type="text" id="set-school-name" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-accent">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Motto</label>
+                                    <input type="text" id="set-school-motto" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-accent">
+                                </div>
+                                 <div>
+                                    <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Address</label>
+                                    <textarea id="set-school-address" rows="2" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-accent"></textarea>
+                                </div>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Phone</label>
+                                        <input type="text" id="set-contact-phone" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-accent">
+                                    </div>
+                                    <div>
+                                         <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Email</label>
+                                        <input type="email" id="set-contact-email" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-accent">
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Logo Upload -->
+                            <div class="flex flex-col items-center justify-center bg-gray-50 border-2 border-dashed border-gray-200 rounded-xl p-8">
+                                 <div id="logo-preview-area" class="mb-4 w-40 h-40 flex items-center justify-center">
+                                     <div class="w-24 h-24 bg-white rounded-full flex items-center justify-center shadow-sm">
+                                         <ion-icon name="image-outline" class="text-3xl text-gray-300"></ion-icon>
+                                     </div>
+                                 </div>
+                                 <label class="cursor-pointer bg-white border border-gray-200 px-4 py-2 rounded-lg font-bold text-sm text-gray-600 hover:bg-gray-50 shadow-sm transition">
+                                     Upload Logo
+                                     <input type="file" id="set-logo-upload" accept="image/*" class="hidden" onchange="handleLogoUpload(this)">
+                                 </label>
+                                 <p class="text-xs text-gray-400 mt-2 text-center">PNG, JPG up to 1MB.<br>Will be auto-resized.</p>
+                            </div>
+                        </div>
+                        <div class="mt-8 pt-6 border-t border-gray-100 flex justify-end">
+                            <button onclick="saveGeneralSettings()" class="bg-accent text-white px-6 py-3 rounded-xl font-bold hover:bg-blue-600 transition shadow-lg">Save Changes</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB: GRADING -->
+                <div id="set-grading" class="settings-tab hidden">
+                    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+                         <div class="flex justify-between items-center mb-6">
+                            <h3 class="font-bold text-xl text-gray-800">Grading System</h3>
+                            <button onclick="addGradingRow()" class="px-3 py-1.5 bg-gray-900 text-white rounded-lg text-sm font-bold hover:bg-black transition flex items-center gap-2">
+                                <ion-icon name="add"></ion-icon> Add Range
+                            </button>
+                        </div>
+                        
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left">
+                                <thead class="bg-gray-50 text-gray-500 font-bold uppercase text-xs">
+                                    <tr>
+                                        <th class="px-4 py-3 w-24">Min %</th>
+                                        <th class="px-4 py-3 w-24">Max %</th>
+                                        <th class="px-4 py-3 w-24">Grade</th>
+                                        <th class="px-4 py-3">Remark</th>
+                                        <th class="px-4 py-3 w-24 text-right">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="grading-table-body" class="divide-y divide-gray-100">
+                                    <!-- JS Injected -->
+                                </tbody>
+                            </table>
+                        </div>
+                         <div class="mt-8 pt-6 border-t border-gray-100 flex justify-end">
+                            <button onclick="saveGradingSettings()" class="bg-accent text-white px-6 py-3 rounded-xl font-bold hover:bg-blue-600 transition shadow-lg">Save Rules</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB: ATTENDANCE -->
+                <div id="set-attendance" class="settings-tab hidden">
+                     <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 max-w-xl">
+                         <h3 class="font-bold text-xl text-gray-800 mb-6">Attendance Configuration</h3>
+                         <div class="space-y-4">
+                             <div>
+                                <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Total School Days (Term)</label>
+                                <input type="number" id="set-att-days" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-accent">
+                            </div>
+                             <div>
+                                <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Default Present Days</label>
+                                <input type="number" id="set-att-default" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-accent">
+                                <p class="text-xs text-gray-400 mt-1">This will be the initial value for new students.</p>
+                            </div>
+                         </div>
+                          <div class="mt-8 pt-6 border-t border-gray-100 flex justify-end">
+                            <button onclick="saveAttendanceSettings()" class="bg-accent text-white px-6 py-3 rounded-xl font-bold hover:bg-blue-600 transition shadow-lg">Save Settings</button>
+                        </div>
+                     </div>
+                </div>
+
+                <!-- TAB: SYSTEM -->
+                <div id="set-system" class="settings-tab hidden">
+                    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 max-w-2xl">
+                        <h3 class="font-bold text-xl text-gray-800 mb-6">System Toggles</h3>
+                        <div class="space-y-6">
+                             <!-- Teacher Edit -->
+                             <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl border border-gray-100">
+                                 <div>
+                                     <h4 class="font-bold text-gray-800">Teacher Editing</h4>
+                                     <p class="text-sm text-gray-400">Allow teachers to edit results after submission.</p>
+                                 </div>
+                                 <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" id="toggle-teacher-edit" class="sr-only peer">
+                                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-accent"></div>
+                                </label>
+                             </div>
+                             
+                             <!-- Position -->
+                             <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl border border-gray-100">
+                                 <div>
+                                     <h4 class="font-bold text-gray-800">Show Class Position</h4>
+                                     <p class="text-sm text-gray-400">Display "1st", "2nd" etc. on report cards.</p>
+                                 </div>
+                                 <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" id="toggle-show-pos" class="sr-only peer">
+                                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-accent"></div>
+                                </label>
+                             </div>
+
+                             <!-- Attendance -->
+                             <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl border border-gray-100">
+                                 <div>
+                                     <h4 class="font-bold text-gray-800">Show Attendance</h4>
+                                     <p class="text-sm text-gray-400">Display attendance section on report cards.</p>
+                                 </div>
+                                 <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" id="toggle-show-att" class="sr-only peer">
+                                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-accent"></div>
+                                </label>
+                             </div>
+
+                             <!-- Watermark -->
+                             <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl border border-gray-100">
+                                 <div>
+                                     <h4 class="font-bold text-gray-800">Print Watermark</h4>
+                                     <p class="text-sm text-gray-400">Add faint school logo watermark to backgrounds.</p>
+                                 </div>
+                                 <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" id="toggle-show-watermark" class="sr-only peer">
+                                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-accent"></div>
+                                </label>
+                             </div>
+                        </div>
+                         <div class="mt-8 pt-6 border-t border-gray-100 flex justify-end">
+                            <button onclick="saveSystemSettings()" class="bg-accent text-white px-6 py-3 rounded-xl font-bold hover:bg-blue-600 transition shadow-lg">Update System</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB: ACADEMIC (Existing +) -->
+                <div id="set-academic" class="settings-tab hidden">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <!-- Term Management Card (COPIED FROM ORIGINAL) -->
+                        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex flex-col relative overflow-hidden">
+                            <div class="absolute top-0 right-0 w-32 h-32 bg-secondary/10 rounded-full -mr-10 -mt-10 blur-2xl"></div>
+                             <div class="flex items-start justify-between mb-6 relative z-10">
+                                <div>
+                                    <h3 class="font-bold text-xl text-gray-800">Current Term</h3>
+                                    <p class="text-gray-400 text-sm">Set the active term for the whole school.</p>
+                                </div>
+                                <div class="w-10 h-10 rounded-xl bg-orange-100 text-orange-600 flex items-center justify-center text-xl">
+                                    <ion-icon name="calendar-outline"></ion-icon>
+                                </div>
+                            </div>
+                             <div class="space-y-4 flex-1 relative z-10">
+                                <div class="bg-gray-50 rounded-xl p-4 border border-gray-200">
+                                    <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Select Active Term</label>
+                                    <div class="grid grid-cols-3 gap-2">
+                                        <button onclick="setActiveTerm('1st Term')" id="btn-term-1" class="term-btn px-2 py-2 rounded-lg text-sm font-bold border transition">1st Term</button>
+                                        <button onclick="setActiveTerm('2nd Term')" id="btn-term-2" class="term-btn px-2 py-2 rounded-lg text-sm font-bold border transition">2nd Term</button>
+                                        <button onclick="setActiveTerm('3rd Term')" id="btn-term-3" class="term-btn px-2 py-2 rounded-lg text-sm font-bold border transition">3rd Term</button>
+                                    </div>
+                                </div>
+                                <div class="bg-red-50 rounded-xl p-4 border border-red-100 flex items-center justify-between">
+                                    <div>
+                                        <h4 class="font-bold text-red-900 text-sm">Lock Results Entry</h4>
+                                        <p class="text-red-700 text-xs mt-0.5">Prevent teachers from editing scores.</p>
+                                    </div>
+                                    <label class="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" id="term-lock-toggle" class="sr-only peer" onchange="toggleTermLock()">
+                                        <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-500"></div>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Academic Year Management (COPIED) -->
+                        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex flex-col relative overflow-hidden">
+                            <div class="absolute top-0 right-0 w-32 h-32 bg-accent/10 rounded-full -mr-10 -mt-10 blur-2xl"></div>
+                            <div class="flex items-start justify-between mb-6 relative z-10">
+                                <div>
+                                    <h3 class="font-bold text-xl text-gray-800">Academic Year</h3>
+                                    <p class="text-gray-400 text-sm">Manage school years and archiving.</p>
+                                </div>
+                                <button onclick="openAddYearModal()" class="px-3 py-1.5 bg-accent hover:bg-blue-600 text-white text-xs font-bold rounded-lg shadow transition flex items-center gap-1">
+                                    <ion-icon name="add"></ion-icon> New Year
+                                </button>
+                            </div>
+                            <div class="overflow-y-auto max-h-[300px] space-y-3 relative z-10" id="years-list">
+                                <!-- Injected JS -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            
+            <!-- VIEW: RESULTS REVIEW -->
+            <div id="view-results" class="space-y-8 hidden animate-fade-in">
+                <!-- Stats -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                    <div class="bg-white p-5 rounded-xl border border-gray-100 shadow-sm flex items-center justify-between">
+                        <div>
+                            <p class="text-xs font-bold text-gray-400 uppercase">Total Entries</p>
+                            <h3 class="text-2xl font-bold text-gray-800" id="res-total">0</h3>
+                        </div>
+                        <div class="text-3xl text-gray-200"><ion-icon name="documents"></ion-icon></div>
+                    </div>
+                    <div class="bg-yellow-50 p-5 rounded-xl border border-yellow-100 shadow-sm flex items-center justify-between">
+                        <div>
+                            <p class="text-xs font-bold text-yellow-600 uppercase">Pending</p>
+                            <h3 class="text-2xl font-bold text-yellow-800" id="res-pending">0</h3>
+                        </div>
+                        <div class="text-3xl text-yellow-200"><ion-icon name="time"></ion-icon></div>
+                    </div>
+                    <div class="bg-green-50 p-5 rounded-xl border border-green-100 shadow-sm flex items-center justify-between">
+                        <div>
+                            <p class="text-xs font-bold text-green-600 uppercase">Approved</p>
+                            <h3 class="text-2xl font-bold text-green-800" id="res-approved">0</h3>
+                        </div>
+                        <div class="text-3xl text-green-200"><ion-icon name="checkmark-circle"></ion-icon></div>
+                    </div>
+                    <div class="bg-red-50 p-5 rounded-xl border border-red-100 shadow-sm flex items-center justify-between">
+                        <div>
+                            <p class="text-xs font-bold text-red-600 uppercase">Rejected</p>
+                            <h3 class="text-2xl font-bold text-red-800" id="res-rejected">0</h3>
+                        </div>
+                        <div class="text-3xl text-red-200"><ion-icon name="close-circle"></ion-icon></div>
+                    </div>
+                </div>
+
+                <!-- Filters & Table -->
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+                    <div class="flex flex-col md:flex-row justify-between items-end md:items-center mb-6 gap-4">
+                        <div>
+                            <h3 class="font-bold text-lg text-gray-800">Results Approval Queue</h3>
+                            <p class="text-gray-400 text-sm">Review student scores before publishing.</p>
+                        </div>
+                        <div class="flex gap-2">
+                             <button onclick="approveAllVisible()" class="px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-bold shadow hover:bg-green-700 transition flex items-center gap-2">
+                                <ion-icon name="checkmark-done"></ion-icon> Approve All Listed
+                             </button>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6 bg-gray-50 p-4 rounded-xl border border-gray-200">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Class</label>
+                            <select id="res-filter-class" onchange="renderResults()" class="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-accent"></select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Subject</label>
+                             <select id="res-filter-subject" onchange="renderResults()" class="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-accent"></select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Status</label>
+                             <select id="res-filter-status" onchange="renderResults()" class="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-accent">
+                                 <option value="Pending">Pending Review</option>
+                                 <option value="Approved">Approved</option>
+                                 <option value="Rejected">Rejected</option>
+                                 <option value="">All Statuses</option>
+                             </select>
+                        </div>
+                         <div>
+                            <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Search</label>
+                            <input type="text" id="res-search" onkeyup="renderResults()" placeholder="Student Name/ID..." class="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-accent">
+                        </div>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm">
+                            <thead class="bg-gray-50 text-gray-500 font-bold uppercase text-xs">
+                                <tr>
+                                    <th class="px-4 py-3">Student</th>
+                                    <th class="px-4 py-3">Class & Subject</th>
+                                    <th class="px-4 py-3 text-center">Class (30)</th>
+                                    <th class="px-4 py-3 text-center">Exam (70)</th>
+                                    <th class="px-4 py-3 text-center">Total</th>
+                                    <th class="px-4 py-3 text-center">Status</th>
+                                    <th class="px-4 py-3 text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-100" id="results-table-body">
+                                <tr><td colspan="7" class="text-center py-8 text-gray-400">Loading results...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                     <div class="mt-4 flex justify-between items-center">
+                        <p class="text-xs text-gray-400 italic" id="res-count-display">Showing 0 entries</p>
+                     </div>
+                </div>
+            </div>
+
+    <!-- Modals -->
+    <!-- Add/Edit Student Modal -->
+    <div id="add-student-modal" class="fixed inset-0 bg-gray-900/50 backdrop-blur-sm hidden flex items-center justify-center z-50 transition-opacity">
+        <div class="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md mx-4 transform transition-all scale-100 animate-fade-in">
+            <h2 class="text-2xl font-bold mb-6 text-gray-800" id="modal-title">Register New Student</h2>
+            <form id="add-student-form" onsubmit="handleSaveStudent(event)" class="space-y-4">
+                <input type="hidden" name="editModeId" id="edit-mode-id">
+                
+                <div class="space-y-1">
+                    <label class="text-xs font-bold text-gray-500 uppercase">Full Name</label>
+                    <input type="text" name="name" id="input-name" required placeholder="e.g. John Doe" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-accent outline-none">
+                </div>
+                
+                <div class="space-y-1">
+                    <label class="text-xs font-bold text-gray-500 uppercase">Index Number</label>
+                    <input type="text" name="id" id="input-id" required placeholder="e.g. ST005" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-accent outline-none">
+                </div>
+
+                <div class="space-y-1">
+                     <label class="text-xs font-bold text-gray-500 uppercase">Class Assignment</label>
+                    <div class="grid grid-cols-2 gap-4">
+                        <select name="class" id="student-class-select" required class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none"></select>
+                        <select name="term" required class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none">
+                            <option value="1st Term">1st Term</option>
+                            <option value="2nd Term">2nd Term</option>
+                            <option value="3rd Term">3rd Term</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="space-y-1">
+                        <label class="text-xs font-bold text-gray-500 uppercase">Gender</label>
+                        <select name="gender" id="input-gender" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none">
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                        </select>
+                    </div>
+                    <div class="space-y-1">
+                        <label class="text-xs font-bold text-gray-500 uppercase">Status</label>
+                        <select name="status" id="input-status" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none">
+                            <option value="Active">Active</option>
+                            <option value="Inactive">Inactive</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="pt-4 flex gap-3">
+                    <button type="button" onclick="closeModal('add-student-modal')" class="flex-1 py-3 border border-gray-200 rounded-xl font-bold hover:bg-gray-50 text-gray-600">Cancel</button>
+                    <button type="submit" class="flex-1 py-3 bg-accent text-white rounded-xl font-bold hover:bg-blue-600 shadow-lg shadow-blue-500/30 transition-all">Save Student</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="delete-modal" class="fixed inset-0 bg-gray-900/50 backdrop-blur-sm hidden flex items-center justify-center z-50">
+        <div class="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-sm mx-4 text-center">
+            <div class="w-16 h-16 bg-red-100 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl">
+                <ion-icon name="warning-outline"></ion-icon>
+            </div>
+            <h3 class="text-xl font-bold text-gray-900 mb-2">Delete Student?</h3>
+            <p class="text-gray-500 mb-6">Are you sure you want to delete this student? This action cannot be undone.</p>
+            <div class="flex gap-3">
+                <button onclick="closeModal('delete-modal')" class="flex-1 py-2.5 border border-gray-200 rounded-xl font-bold hover:bg-gray-50 text-gray-600">Cancel</button>
+                <button onclick="confirmDeleteStudent()" class="flex-1 py-2.5 bg-red-500 text-white rounded-xl font-bold hover:bg-red-600 shadow-lg shadow-red-500/30">Delete</button>
+            </div>
+        </div>
+    </div>
+
+     <!-- Add Class Modal -->
+    <div id="add-class-modal" class="fixed inset-0 bg-gray-900/50 backdrop-blur-sm hidden flex items-center justify-center z-50">
+        <div class="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md mx-4">
+            <h2 class="text-2xl font-bold mb-6 text-gray-800">New Class</h2>
+             <form onsubmit="handleAddClass(event)" class="space-y-4">
+                <input type="text" name="name" required placeholder="Class Name (e.g. JHS 1 A)" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-secondary outline-none">
+                <label class="block text-xs font-bold text-gray-400 uppercase">Assign Teachers (Hold Ctrl)</label>
+                <select name="teachers" multiple id="class-teacher-select" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl h-32 outline-none"></select>
+                <div class="pt-4 flex gap-3">
+                    <button type="button" onclick="closeModal('add-class-modal')" class="flex-1 py-3 border border-gray-200 rounded-xl font-bold hover:bg-gray-50">Cancel</button>
+                    <button type="submit" class="flex-1 py-3 bg-secondary text-white rounded-xl font-bold hover:bg-amber-600 shadow-lg shadow-amber-500/30">Create Class</button>
+                </div>
+             </form>
+        </div>
+    </div>
+
+     <!-- Add Teacher Modal -->
+    <div id="add-teacher-modal" class="fixed inset-0 bg-gray-900/50 backdrop-blur-sm hidden flex items-center justify-center z-50">
+        <div class="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md mx-4">
+            <h2 class="text-2xl font-bold mb-6 text-gray-800">New Teacher</h2>
+             <form onsubmit="handleAddTeacher(event)" class="space-y-4">
+                <input type="text" name="name" required placeholder="Full Name" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none">
+                <input type="email" name="email" required placeholder="Login Email" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none">
+                <input type="text" name="password" required value="password123" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none">
+                <div class="pt-4 flex gap-3">
+                    <button type="button" onclick="closeModal('add-teacher-modal')" class="flex-1 py-3 border border-gray-200 rounded-xl font-bold hover:bg-gray-50">Cancel</button>
+                    <button type="submit" class="flex-1 py-3 bg-accent text-white rounded-xl font-bold hover:bg-blue-600 shadow-lg shadow-blue-500/30">Add Faculty</button>
+                </div>
+             </form>
+        </div>
+    </div>
+
+    <!-- Add/Edit Subject Modal -->
+    <div id="add-subject-modal" class="fixed inset-0 bg-gray-900/50 backdrop-blur-sm hidden flex items-center justify-center z-50">
+        <div class="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md mx-4">
+            <h2 class="text-2xl font-bold mb-6 text-gray-800" id="subject-modal-title">New Subject</h2>
+             <form onsubmit="handleSaveSubject(event)" class="space-y-4">
+                <input type="hidden" name="id">
+                <div class="space-y-1">
+                    <label class="text-xs font-bold text-gray-500 uppercase">Subject Name</label>
+                    <input type="text" name="name" required placeholder="e.g. Mathematics" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none">
+                </div>
+                <div class="space-y-1">
+                    <label class="text-xs font-bold text-gray-500 uppercase">Short Code</label>
+                    <input type="text" name="code" required placeholder="e.g. MATH" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none font-mono">
+                </div>
+                <div class="space-y-1">
+                    <label class="text-xs font-bold text-gray-500 uppercase">Status</label>
+                    <select name="status" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none">
+                        <option value="Active">Active</option>
+                        <option value="Inactive">Inactive</option>
+                    </select>
+                </div>
+                <div class="pt-4 flex gap-3">
+                    <button type="button" onclick="closeModal('add-subject-modal')" class="flex-1 py-3 border border-gray-200 rounded-xl font-bold hover:bg-gray-50">Cancel</button>
+                    <button type="submit" class="flex-1 py-3 bg-primary text-white rounded-xl font-bold hover:bg-gray-800 shadow-lg">Save Subject</button>
+                </div>
+             </form>
+        </div>
+    </div>
+
+    <script src="js/data.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/settings.js"></script>
+    <script>
+        checkAuth(['admin']);
+        const data = getSchoolData();
+        
+        // Auto-initialize subjects for existing installations
+        if ((!data.subjects || data.subjects.length === 0) && typeof MOCK_DATA !== 'undefined' && MOCK_DATA.subjects) {
+            data.subjects = MOCK_DATA.subjects;
+            saveSchoolData(data);
+        } else if (!data.subjects) {
+            data.subjects = [];
+        }
+
+        let studentToDelete = null;
+
+        // Populate Filter Dropdown
+        function initFilters() {
+            const filter = document.getElementById('filter-class');
+            const classes = data.classes || [];
+            // Keep "All Classes" option
+            filter.innerHTML = '<option value="">All Classes</option>' + 
+                classes.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
+        }
+
+        // Chart
+        function initChart() {
+            const ctx = document.getElementById('enrollmentChart').getContext('2d');
+            if(window.myChart) window.myChart.destroy();
+            window.myChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Students', 'Teachers', 'Classes'],
+                    datasets: [{
+                        data: [data.students.length, data.teachers.length, data.classes ? data.classes.length : 0],
+                        backgroundColor: ['#3b82f6', '#10b981', '#f59e0b'],
+                        borderWidth: 0
+                    }]
+                },
+                options: { cutout: '70%', responsive: true, plugins: { legend: { position: 'bottom' } } }
+            });
+        }
+
+        function updateStats() {
+            document.getElementById('count-students').innerText = data.students.length;
+            document.getElementById('count-teachers').innerText = data.teachers.length;
+            document.getElementById('count-classes').innerText = data.classes ? data.classes.length : 0;
+            initChart();
+        }
+
+        // Logic
+        function switchView(view) {
+            ['dashboard', 'classes', 'teachers', 'subjects', 'settings', 'results'].forEach(v => {
+                const el = document.getElementById(`view-${v}`);
+                if(el) el.classList.add('hidden');
+                
+                const nav = document.getElementById(`nav-${v}`);
+                if(nav) {
+                    nav.classList.remove('bg-accent', 'text-white', 'shadow-lg');
+                    nav.classList.add('text-gray-400');
+                }
+            });
+            const viewEl = document.getElementById(`view-${view}`);
+            if(viewEl) viewEl.classList.remove('hidden');
+
+            const active = document.getElementById(`nav-${view}`);
+            if(active) {
+                active.classList.add('bg-accent', 'text-white', 'shadow-lg');
+                active.classList.remove('text-gray-400');
+            }
+            
+            if(view === 'classes') renderClasses();
+            if(view === 'teachers') renderTeachers();
+            if(view === 'subjects') initSubjectView();
+            if(view === 'settings') initSettingsView();
+            if(view === 'results') initResultsView();
+        }
+
+        // --- RESULTS REVIEW LOGIC ---
+        
+        let currentResultsList = [];
+
+        function initResultsView() {
+            // Populate Dropdowns
+            const classSelect = document.getElementById('res-filter-class');
+            classSelect.innerHTML = '<option value="">All Classes</option>' + (data.classes || []).map(c => `<option value="${c.name}">${c.name}</option>`).join('');
+
+            const subjectSelect = document.getElementById('res-filter-subject');
+            subjectSelect.innerHTML = '<option value="">All Subjects</option>' + (data.subjects || []).map(s => `<option value="${s.name}">${s.name}</option>`).join('');
+
+            renderResults();
+        }
+
+        function renderResults() {
+            const classFilter = document.getElementById('res-filter-class').value;
+            const subjectFilter = document.getElementById('res-filter-subject').value;
+            const statusFilter = document.getElementById('res-filter-status').value;
+            const search = document.getElementById('res-search').value.toLowerCase();
+
+            // Flatten all scores into a single iterable list
+            let flatScores = [];
+            let counts = { total: 0, Pending: 0, Approved: 0, Rejected: 0 };
+
+            data.students.forEach(student => {
+                const scores = student.scores || [];
+                scores.forEach((score, index) => {
+                    const status = score.status || 'Pending'; // Default
+                    counts.total++;
+                    counts[status] = (counts[status] || 0) + 1;
+
+                    // Filtering
+                    if (classFilter && student.class !== classFilter) return;
+                    if (subjectFilter && score.subject !== subjectFilter) return;
+                    if (statusFilter && status !== statusFilter) return;
+                    if (search && !(student.name.toLowerCase().includes(search) || student.id.toLowerCase().includes(search))) return;
+
+                    flatScores.push({
+                        studentId: student.id,
+                        studentName: student.name,
+                        class: student.class,
+                        subject: score.subject,
+                        scoreMatches: score, 
+                        scoreIndex: index,
+                        total: (parseInt(score.class)||0) + (parseInt(score.exam)||0)
+                    });
+                });
+            });
+
+            // Update Counts
+            document.getElementById('res-total').innerText = counts.total;
+            document.getElementById('res-pending').innerText = counts.Pending;
+            document.getElementById('res-approved').innerText = counts.Approved;
+            document.getElementById('res-rejected').innerText = counts.Rejected;
+
+            currentResultsList = flatScores; // Store for bulk actions
+
+            // Render Table
+            const tbody = document.getElementById('results-table-body');
+            if(flatScores.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" class="text-center py-10 text-gray-400 italic">No results found matching your filters.</td></tr>`;
+                document.getElementById('res-count-display').innerText = `Showing 0 entries`;
+                return;
+            }
+
+            tbody.innerHTML = flatScores.map(item => {
+                const s = item.scoreMatches;
+                const status = s.status || 'Pending';
+                let statusBadge = '';
+                if(status === 'Pending') statusBadge = '<span class="px-2 py-1 bg-yellow-100 text-yellow-700 text-xs font-bold rounded">Pending</span>';
+                if(status === 'Approved') statusBadge = '<span class="px-2 py-1 bg-green-100 text-green-700 text-xs font-bold rounded">Approved</span>';
+                if(status === 'Rejected') statusBadge = '<span class="px-2 py-1 bg-red-100 text-red-700 text-xs font-bold rounded">Rejected</span>';
+
+                return `
+                    <tr class="hover:bg-gray-50 border-b border-gray-50">
+                        <td class="px-4 py-3">
+                            <div class="font-bold text-gray-800">${escapeHtml(item.studentName)}</div>
+                            <div class="text-[10px] text-gray-400 font-mono">${item.studentId}</div>
+                        </td>
+                        <td class="px-4 py-3 text-xs">
+                            <div class="font-bold text-gray-600">${escapeHtml(item.subject)}</div>
+                            <div class="text-gray-400">${item.class}</div>
+                        </td>
+                        <td class="px-4 py-3 text-center font-mono text-gray-600">${s.class}</td>
+                        <td class="px-4 py-3 text-center font-mono text-gray-600">${s.exam}</td>
+                        <td class="px-4 py-3 text-center font-bold text-gray-800">${item.total}</td>
+                        <td class="px-4 py-3 text-center">${statusBadge}</td>
+                        <td class="px-4 py-3 text-right space-x-1">
+                            ${status !== 'Approved' ? `
+                                <button onclick="updateResultStatus('${item.studentId}', '${escapeHtml(item.subject)}', 'Approved')" class="p-1 text-green-600 hover:bg-green-50 rounded" title="Approve">
+                                    <ion-icon name="checkmark-circle-outline" class="text-xl"></ion-icon>
+                                </button>
+                            ` : ''}
+                            ${status !== 'Rejected' ? `
+                                <button onclick="updateResultStatus('${item.studentId}', '${escapeHtml(item.subject)}', 'Rejected')" class="p-1 text-red-600 hover:bg-red-50 rounded" title="Reject">
+                                    <ion-icon name="close-circle-outline" class="text-xl"></ion-icon>
+                                </button>
+                            ` : ''}
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+
+            document.getElementById('res-count-display').innerText = `Showing ${flatScores.length} entries`;
+        }
+
+        function updateResultStatus(studentId, subjectName, newStatus) {
+            const student = data.students.find(s => s.id === studentId);
+            if(!student) return;
+
+            const score = student.scores.find(s => s.subject === subjectName);
+            if(score) {
+                score.status = newStatus;
+                saveSchoolData(data);
+                
+                // Optimistic UI update or re-render
+                renderResults();
+            }
+        }
+
+        function approveAllVisible() {
+            if(!confirm('Are you sure you want to Approve ALL currently listed results?')) return;
+            
+            let count = 0;
+            currentResultsList.forEach(item => {
+                const student = data.students.find(s => s.id === item.studentId);
+                if(student) {
+                    const score = student.scores.find(s => s.subject === item.subject);
+                    if(score && score.status !== 'Approved') {
+                        score.status = 'Approved';
+                        count++;
+                    }
+                }
+            });
+
+            if(count > 0) {
+                saveSchoolData(data);
+                renderResults();
+                alert(`Successfully approved ${count} results.`);
+            } else {
+                alert('No pending results to approve in current view.');
+            }
+        }
+
+        // --- STUDENT MANAGEMENT LOGIC ---
+
+        function renderStudents() {
+            const searchQuery = document.getElementById('search-input').value.toLowerCase();
+            const classFilter = document.getElementById('filter-class').value;
+
+            const filteredStudents = data.students.filter(s => {
+                const matchesSearch = (s.name.toLowerCase().includes(searchQuery) || s.id.toLowerCase().includes(searchQuery));
+                const matchesClass = classFilter === "" || s.class === classFilter;
+                return matchesSearch && matchesClass;
+            });
+
+            document.getElementById('student-table-body').innerHTML = filteredStudents.slice(0, 50).map(s => `
+                <tr class="hover:bg-gray-50 group transition align-middle">
+                    <td class="px-4 py-3 font-mono text-gray-500 text-xs">${escapeHtml(s.id)}</td>
+                    <td class="px-4 py-3 font-bold text-gray-800">${escapeHtml(s.name)}</td>
+                    <td class="px-4 py-3"><span class="px-2 py-1 bg-blue-50 text-blue-600 rounded text-xs font-bold">${escapeHtml(s.class)}</span></td>
+                    <td class="px-4 py-3">
+                        <span class="px-2 py-1 rounded-full text-xs font-bold ${s.status === 'Inactive' ? 'bg-red-100 text-red-600' : 'bg-green-100 text-green-600'}">
+                            ${s.status || 'Active'}
+                        </span>
+                    </td>
+                    <td class="px-4 py-3 text-right space-x-2">
+                        <button onclick="viewAsStudent('${s.id}')" title="View Report" class="text-gray-400 hover:text-accent"><ion-icon name="eye-outline"></ion-icon></button>
+                        <button onclick="openEditStudentModal('${s.id}')" title="Edit" class="text-gray-400 hover:text-secondary"><ion-icon name="create-outline"></ion-icon></button>
+                        <button onclick="promptDeleteStudent('${s.id}')" title="Delete" class="text-gray-400 hover:text-red-500"><ion-icon name="trash-outline"></ion-icon></button>
+                    </td>
+                </tr>
+            `).join('');
+            
+            document.getElementById('showing-count').innerText = `Showing ${filteredStudents.length} students`;
+        }
+
+        // --- MODAL & FORM HANDLERS ---
+
+        function openAddStudentModal() {
+             resetStudentForm();
+             document.getElementById('modal-title').innerText = "Register New Student";
+             document.getElementById('input-id').readOnly = false; // Allow ID editing for new
+             
+             // Populate classes
+             const select = document.getElementById('student-class-select');
+             select.innerHTML = (data.classes || []).map(c => `<option value="${c.name}">${c.name}</option>`).join('');
+             
+             document.getElementById('add-student-modal').classList.remove('hidden');
+        }
+
+        function openEditStudentModal(id) {
+            const student = data.students.find(s => s.id === id);
+            if (!student) return;
+
+            resetStudentForm();
+            document.getElementById('modal-title').innerText = "Edit Student Details";
+            
+            // Fill Data
+            document.getElementById('edit-mode-id').value = student.id;
+            document.getElementById('input-name').value = student.name;
+            document.getElementById('input-id').value = student.id;
+            document.getElementById('input-id').readOnly = true; // Prevent ID change to avoid chaos
+            document.getElementById('input-gender').value = student.gender || 'Male';
+            document.getElementById('input-status').value = student.status || 'Active';
+
+            // Populate classes and select current
+            const select = document.getElementById('student-class-select');
+            select.innerHTML = (data.classes || []).map(c => `<option value="${c.name}" ${c.name === student.class ? 'selected' : ''}>${c.name}</option>`).join('');
+
+            document.getElementById('add-student-modal').classList.remove('hidden');
+        }
+
+        function handleSaveStudent(e) {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const editId = formData.get('editModeId');
+            
+            // Prepare Student Object
+            const studentData = {
+                id: formData.get('id'),
+                name: formData.get('name'),
+                class: formData.get('class'),
+                gender: formData.get('gender'),
+                status: formData.get('status'),
+                term: formData.get('term') // Preserved for new users, but arguably should be global setting
+            };
+
+            if (editId) {
+                // EDIT MODE
+                const index = data.students.findIndex(s => s.id === editId);
+                if (index !== -1) {
+                    // Update only specific fields, preserve scores/attendance
+                    const existing = data.students[index];
+                    data.students[index] = { ...existing, ...studentData };
+                }
+            } else {
+                // ADD MODE
+                if(data.students.find(s => s.id === studentData.id)) { 
+                    alert('Index Number already exists!'); 
+                    return; 
+                }
+                // Determine new student default structure
+                const newStudent = {
+                    ...studentData,
+                    year: "2024/2025",
+                    attendance: { present: 0, total: 60 },
+                    conduct: "Good",
+                    image: "",
+                    scores: [
+                         { subject: "English Language", class: 0, exam: 0 }, { subject: "Mathematics", class: 0, exam: 0 }, { subject: "Integrated Science", class: 0, exam: 0 }, 
+                         { subject: "Social Studies", class: 0, exam: 0 }, { subject: "I.C.T.", class: 0, exam: 0 }, { subject: "R.M.E.", class: 0, exam: 0 }, 
+                         { subject: "B.D.T.", class: 0, exam: 0 }, { subject: "French", class: 0, exam: 0 }, { subject: "Ghanaian Language", class: 0, exam: 0 }
+                    ]
+                };
+                data.students.unshift(newStudent);
+            }
+
+            saveSchoolData(data);
+            renderStudents();
+            updateStats();
+            closeModal('add-student-modal');
+        }
+
+        function promptDeleteStudent(id) {
+            studentToDelete = id;
+            document.getElementById('delete-modal').classList.remove('hidden');
+        }
+
+        function confirmDeleteStudent() {
+            if (studentToDelete) {
+                data.students = data.students.filter(s => s.id !== studentToDelete);
+                saveSchoolData(data);
+                renderStudents();
+                updateStats();
+                studentToDelete = null;
+                closeModal('delete-modal');
+            }
+        }
+
+        function resetStudentForm() {
+            document.getElementById('add-student-form').reset();
+            document.getElementById('edit-mode-id').value = "";
+        }
+
+        // --- OTHER LOGIC SAME AS BEFORE ---
+
+        // --- CLASS MANAGEMENT ---
+
+         // --- CLASS MANAGEMENT ---
+
+         // --- CLASS MANAGEMENT ---
+
+         function renderClasses() {
+             const levels = {
+                 'Kindergarten': (data.classes || []).filter(c => c.name.startsWith('KG')),
+                 'Primary School': (data.classes || []).filter(c => c.name.startsWith('Basic')),
+                 'Junior High': (data.classes || []).filter(c => c.name.startsWith('JHS')),
+                 'Other Classes': (data.classes || []).filter(c => !c.name.startsWith('KG') && !c.name.startsWith('Basic') && !c.name.startsWith('JHS'))
+             };
+
+             const styles = { 
+                 'Kindergarten': { iconBg: 'bg-rose-100', iconText: 'text-rose-600', border: 'border-l-4 border-l-rose-500', title: 'text-rose-900', bg: 'bg-rose-50/50' },
+                 'Primary School': { iconBg: 'bg-sky-100', iconText: 'text-sky-600', border: 'border-l-4 border-l-sky-500', title: 'text-sky-900', bg: 'bg-sky-50/50' },
+                 'Junior High': { iconBg: 'bg-violet-100', iconText: 'text-violet-600', border: 'border-l-4 border-l-violet-500', title: 'text-violet-900', bg: 'bg-violet-50/50' },
+                 'Other Classes': { iconBg: 'bg-gray-100', iconText: 'text-gray-600', border: 'border-l-4 border-gray-500', title: 'text-gray-900', bg: 'bg-gray-50' }
+             };
+
+             let html = '';
+
+             for (const [level, classes] of Object.entries(levels)) {
+                 if(classes.length === 0) continue;
+
+                 const style = styles[level] || styles['Other Classes'];
+
+                 html += `
+                    <div class="col-span-full mt-6 mb-3 flex items-center gap-3">
+                        <div class="h-px bg-gray-200 flex-1"></div>
+                        <h4 class="text-sm font-bold uppercase tracking-wider ${style.iconText} px-4 py-1 rounded-full ${style.iconBg}">${level}</h4>
+                        <div class="h-px bg-gray-200 flex-1"></div>
+                    </div>
+                 `;
+
+                 html += classes.map(c => {
+                     const teachers = data.teachers.filter(t => t.assigned_classes && t.assigned_classes.includes(c.id));
+                     return `
+                        <div class="bg-white p-5 rounded-xl border border-gray-100 shadow-sm hover:shadow-lg hover:-translate-y-1 transition relative group flex flex-col justify-between ${style.border} overflow-hidden">
+                            <div class="absolute inset-0 ${style.bg} opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                            <div class="relative z-10">
+                                <div class="flex justify-between items-start mb-3">
+                                    <div class="w-10 h-10 rounded-lg ${style.iconBg} ${style.iconText} flex items-center justify-center text-lg font-bold shadow-sm">
+                                        ${c.name.split(' ').pop().charAt(0)}
+                                    </div>
+                                    <div class="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <button onclick="openEditClassModal('${c.id}')" class="w-8 h-8 flex items-center justify-center bg-white rounded-lg shadow-sm text-gray-400 hover:text-secondary hover:shadow-md transition"><ion-icon name="create-outline"></ion-icon></button>
+                                        <button onclick="deleteClass('${c.id}')" class="w-8 h-8 flex items-center justify-center bg-white rounded-lg shadow-sm text-gray-400 hover:text-red-500 hover:shadow-md transition"><ion-icon name="trash-outline"></ion-icon></button>
+                                    </div>
+                                </div>
+                                <h4 class="font-bold text-lg mb-0.5 ${style.title}">${escapeHtml(c.name)}</h4>
+                                <p class="text-[10px] text-gray-400 font-mono mb-4 uppercase tracking-wide">ID: ${escapeHtml(c.id)}</p>
+                            </div>
+                            
+                            <div class="relative z-10 flex items-center gap-2 pt-3 border-t border-gray-100/50">
+                                 <div class="flex -space-x-2">
+                                    ${teachers.length ? teachers.map((t, i) => i < 3 ? `<div class="w-7 h-7 rounded-full bg-white border-2 border-white shadow-sm flex items-center justify-center text-[9px] font-bold text-gray-600 ring-1 ring-gray-100" title="${t.name}">${t.name.charAt(0)}</div>` : '').join('') : '<span class="text-xs text-gray-300 italic pl-1">No Teacher Assigned</span>'}
+                                    ${teachers.length > 3 ? `<div class="w-7 h-7 rounded-full bg-gray-50 border-2 border-white shadow-sm flex items-center justify-center text-[9px] font-bold text-gray-500 ring-1 ring-gray-100">+${teachers.length-3}</div>` : ''}
+                                 </div>
+                            </div>
+                        </div>
+                     `;
+                 }).join('');
+             }
+             
+             document.getElementById('class-grid').innerHTML = html;
+        }
+
+        function openEditClassModal(id) {
+            const cls = data.classes.find(c => c.id === id);
+            if(!cls) return;
+            // Reuse Add Class Modal but populate it
+            document.getElementById('add-class-modal').classList.remove('hidden');
+            const form = document.querySelector('#add-class-modal form');
+            form.name.value = cls.name;
+            form.dataset.editId = cls.id; // Store editing ID
+            document.querySelector('#add-class-modal h2').innerText = "Edit Class";
+            
+            // Set assigned teachers
+            const tIds = data.teachers.filter(t => t.assigned_classes && t.assigned_classes.includes(id)).map(t => t.id);
+            const options = document.getElementById('class-teacher-select').options;
+            for(let i=0; i<options.length; i++) {
+                options[i].selected = tIds.includes(options[i].value);
+            }
+        }
+
+        function handleAddClass(e){
+            e.preventDefault(); 
+            const fd = new FormData(e.target);
+            const editId = e.target.dataset.editId;
+            
+            if (editId) {
+                // Edit Existing
+                const cls = data.classes.find(c => c.id === editId);
+                if(cls) cls.name = fd.get('name');
+                // Update teachers: First clear this class from all teachers, then re-assign
+                data.teachers.forEach(t => {
+                   if(t.assigned_classes) t.assigned_classes = t.assigned_classes.filter(cid => cid !== editId);
+                });
+            } else {
+                // Create New
+                const cid = "C" + Date.now().toString().slice(-4);
+                if(!data.classes) data.classes=[];
+                data.classes.push({id: cid, name: fd.get('name')});
+                e.target.dataset.tempId = cid; // Valid only for immediate teacher assignment below
+            }
+
+            const targetId = editId || e.target.dataset.tempId;
+            const tIds = Array.from(e.target.teachers.selectedOptions).map(o=>o.value);
+            
+            tIds.forEach(tid => { 
+                const t = data.teachers.find(x => x.id === tid); 
+                if(t) { 
+                    if(!t.assigned_classes) t.assigned_classes = []; 
+                    if(!t.assigned_classes.includes(targetId)) t.assigned_classes.push(targetId); 
+                }
+            });
+
+            delete e.target.dataset.editId;
+            delete e.target.dataset.tempId;
+            document.querySelector('#add-class-modal h2').innerText = "New Class";
+            saveSchoolData(data); renderClasses(); updateStats(); closeModal('add-class-modal'); e.target.reset();
+        }
+
+        function backupData() {
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(new Blob([JSON.stringify(data,null,2)], {type:'application/json'}));
+            a.download = `backup_${new Date().toISOString().slice(0,10)}.json`;
+            a.click();
+        }
+        function restoreData(input) {
+            const r = new FileReader();
+            r.onload = e => { try { saveSchoolData(JSON.parse(e.target.result)); location.reload(); } catch(x){alert('Invalid File');} };
+            r.readAsText(input.files[0]);
+        }
+        function hardResetSystem() {
+            if(confirm('⚠️ FACTORY RESET WARNING ⚠️\n\nThis will Delete ALL data (Students, Teachers, Classes) and reset the system to the default GES structure.\n\nAre you sure completely?')) {
+                localStorage.removeItem('schoolData');
+                location.reload();
+            }
+        }
+
+        // Init
+        initFilters();
+        updateStats();
+        renderStudents();
+        setTimeout(initChart, 500);
+        // --- SUBJECT MANAGEMENT LOGIC ---
+        
+        // --- SETTINGS MANAGEMENT LOGIC ---
+        // Logic moved to js/settings.js
+
+
+        function initSubjectView() {
+            renderSubjects();
+            populateSubjectAssignmentDropdown();
+        }
+
+        function renderSubjects() {
+            const tbody = document.getElementById('subject-table-body');
+            tbody.innerHTML = (data.subjects || []).map(s => `
+                <tr class="hover:bg-gray-50 transition border-b border-gray-50">
+                    <td class="px-4 py-3 font-mono text-xs text-gray-400">${escapeHtml(s.code)}</td>
+                    <td class="px-4 py-3 font-bold text-gray-800">${escapeHtml(s.name)}</td>
+                    <td class="px-4 py-3">
+                         <span class="px-2 py-1 rounded text-[10px] font-bold uppercase ${s.status === 'Inactive' ? 'bg-gray-100 text-gray-400' : 'bg-green-100 text-green-600'}">${s.status}</span>
+                    </td>
+                    <td class="px-4 py-3 text-right">
+                        <button onclick="openEditSubjectModal('${s.id}')" class="text-gray-300 hover:text-secondary p-1"><ion-icon name="create-outline"></ion-icon></button>
+                         <button onclick="deleteSubject('${s.id}')" class="text-gray-300 hover:text-red-500 p-1"><ion-icon name="trash-outline"></ion-icon></button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function openAddSubjectModal() {
+            document.querySelector('#add-subject-modal form').reset();
+            document.querySelector('#add-subject-modal form').id.value = "";
+            document.getElementById('subject-modal-title').innerText = "New Subject";
+            document.getElementById('add-subject-modal').classList.remove('hidden');
+        }
+
+        function openEditSubjectModal(id) {
+            const sub = data.subjects.find(s => s.id === id);
+            if(!sub) return;
+            const form = document.querySelector('#add-subject-modal form');
+            form.id.value = sub.id;
+            form.name.value = sub.name;
+            form.code.value = sub.code;
+            form.status.value = sub.status || 'Active';
+            document.getElementById('subject-modal-title').innerText = "Edit Subject";
+            document.getElementById('add-subject-modal').classList.remove('hidden');
+        }
+
+        function handleSaveSubject(e) {
+            e.preventDefault();
+            const fd = new FormData(e.target);
+            const id = fd.get('id');
+            const sub = {
+                id: id || "SUB_" + Date.now(),
+                name: fd.get('name'),
+                code: fd.get('code'),
+                status: fd.get('status')
+            };
+
+            if(id) {
+                const idx = data.subjects.findIndex(s => s.id === id);
+                if(idx !== -1) data.subjects[idx] = sub;
+            } else {
+                if(!data.subjects) data.subjects = [];
+                data.subjects.push(sub);
+            }
+            
+            saveSchoolData(data);
+            renderSubjects();
+            closeModal('add-subject-modal');
+        }
+
+        function deleteSubject(id) {
+            if(confirm('Delete this subject? This will not remove existing grades, but will stop it appearing in new entries.')) {
+                data.subjects = data.subjects.filter(s => s.id !== id);
+                saveSchoolData(data);
+                renderSubjects();
+            }
+        }
+
+        // --- CLASS SUBJECT ASSIGNMENT ---
+
+        function populateSubjectAssignmentDropdown() {
+             const select = document.getElementById('assign-class-select');
+             select.innerHTML = '<option value="">-- Select Class to Configure --</option>' + 
+                (data.classes || []).map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+        }
+
+        function loadClassSubjects() {
+            const classId = document.getElementById('assign-class-select').value;
+            const container = document.getElementById('assignment-checkboxes');
+            
+            if(!classId) {
+                container.innerHTML = '<p class="text-gray-400 text-sm italic text-center py-10">Select a class to configure subjects.</p>';
+                return;
+            }
+
+            const cls = data.classes.find(c => c.id === classId);
+            const assigned = cls && cls.subjects ? cls.subjects : [];
+
+            container.innerHTML = (data.subjects || []).map(s => `
+                <label class="flex items-center gap-3 p-3 hover:bg-white rounded-lg cursor-pointer transition border border-transparent hover:border-gray-100">
+                    <input type="checkbox" name="class_subject" value="${s.id}" ${assigned.includes(s.id) ? 'checked' : ''} class="w-5 h-5 text-accent rounded focus:ring-accent border-gray-300">
+                    <div>
+                        <div class="font-bold text-gray-700 text-sm">${escapeHtml(s.name)}</div>
+                        <div class="text-[10px] text-gray-400 font-mono">${escapeHtml(s.code)}</div>
+                    </div>
+                     ${s.status === 'Inactive' ? '<span class="ml-auto text-[10px] bg-gray-100 text-gray-400 px-1 rounded">Inactive</span>' : ''}
+                </label>
+            `).join('');
+        }
+
+        function toggleAllSubjects(check) {
+            document.querySelectorAll('#assignment-checkboxes input[type="checkbox"]').forEach(cb => cb.checked = check);
+        }
+
+        function saveClassSubjects() {
+            const classId = document.getElementById('assign-class-select').value;
+            if(!classId) return;
+
+            const selected = Array.from(document.querySelectorAll('#assignment-checkboxes input[type="checkbox"]:checked')).map(cb => cb.value);
+            
+            const idx = data.classes.findIndex(c => c.id === classId);
+            if(idx !== -1) {
+                data.classes[idx].subjects = selected;
+                saveSchoolData(data);
+                
+                // Visual Feedback
+                const btn = document.querySelector('button[onclick="saveClassSubjects()"]');
+                const prev = btn.innerHTML;
+                btn.innerHTML = '<ion-icon name="checkmark-circle"></ion-icon> Saved!';
+                btn.classList.add('bg-green-600');
+                setTimeout(() => { btn.innerHTML = prev; btn.classList.remove('bg-green-600'); }, 1500);
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Report Card | General School</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: { primary: '#1e3a8a', secondary: '#d97706', paper: '#f8fafc' },
+                    fontFamily: { sans: ['Outfit', 'sans-serif'], serif: ['Playfair Display', 'serif'] }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-100 min-h-screen p-4 print:p-0 print:bg-white">
+
+    <!-- Top Bar -->
+    <div class="max-w-[210mm] mx-auto mb-6 flex justify-between items-center print:hidden">
+        <a href="index.html" class="flex items-center gap-2 text-primary font-bold">
+            <span>&larr; Back Home</span>
+        </a>
+        <button onclick="logout()" class="text-red-500 hover:text-red-700 font-medium">Logout</button>
+    </div>
+
+    <!-- Report Card Container -->
+    <div id="report-card" class="w-full max-w-[210mm] mx-auto bg-white shadow-xl rounded-xl overflow-hidden print:shadow-none print:w-full print:max-w-none">
+        <!-- Content will be injected via JS -->
+    </div>
+
+    <div class="max-w-[210mm] mx-auto mt-8 text-center print:hidden">
+        <button onclick="window.print()" class="bg-primary text-white px-8 py-3 rounded-full shadow-lg hover:bg-blue-800 transition flex items-center gap-2 mx-auto font-bold">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+            Print Report
+        </button>
+    </div>
+
+    <script src="js/data.js"></script>
+    <script src="js/app.js"></script>
+    <script>
+        // Protect Page
+        const user = checkAuth(['student']);
+        const schoolData = getSchoolData();
+        
+        // Render Report
+        function renderReport() {
+            const container = document.getElementById('report-card');
+            
+            // Calculate Totals and Grades
+            let totalScore = 0;
+            let approvedCount = 0;
+
+            const rows = user.scores.map(s => {
+                const isApproved = s.status === 'Approved';
+                
+                if(isApproved) {
+                    const total = (s.class || 0) + (s.exam || 0);
+                    totalScore += total;
+                    approvedCount++;
+                    const gradeInfo = calculateGrade(total, schoolData.settings.gradingSystem);
+                    
+                    return `
+                        <tr class="border-b border-gray-100 group hover:bg-gray-50">
+                            <td class="px-6 py-4 font-medium text-gray-800">${s.subject}</td>
+                            <td class="px-6 py-4 text-center text-gray-500 font-mono">${s.class}</td>
+                            <td class="px-6 py-4 text-center text-gray-500 font-mono">${s.exam}</td>
+                            <td class="px-6 py-4 text-center font-bold text-gray-800 font-mono">${total}</td>
+                            <td class="px-6 py-4 text-center"><span class="${gradeInfo.bg} ${gradeInfo.color} px-2.5 py-1 rounded-lg text-xs font-bold shadow-sm">${gradeInfo.grade}</span></td>
+                            <td class="px-6 py-4 text-right text-sm text-gray-500 italic font-serif">${gradeInfo.remark}</td>
+                        </tr>
+                    `;
+                } else {
+                    return `
+                        <tr class="border-b border-gray-100 bg-gray-50/50">
+                            <td class="px-6 py-4 font-medium text-gray-400">${s.subject}</td>
+                            <td colspan="5" class="px-6 py-4 text-center text-xs font-bold text-orange-400 uppercase tracking-wider">
+                                <span class="flex items-center justify-center gap-2"><ion-icon name="time"></ion-icon> Results Pending Approval</span>
+                            </td>
+                        </tr>
+                    `;
+                }
+            }).join('');
+
+            const average = approvedCount > 0 ? (totalScore / approvedCount).toFixed(1) : "0.0";
+
+            container.innerHTML = `
+                <!-- Decorative Header -->
+                <div class="h-2 bg-gradient-to-r from-primary via-blue-600 to-secondary print:block"></div>
+                
+                <header class="p-8 border-b border-gray-100 flex justify-between items-center relative overflow-hidden">
+                    <div class="flex items-center gap-4 relative z-10">
+                        ${schoolData.settings.schoolLogo ? 
+                            `<img src="${schoolData.settings.schoolLogo}" class="w-20 h-20 object-contain">` : 
+                            `<div class="w-20 h-20 bg-blue-50 rounded-full flex items-center justify-center border-2 border-primary/10">
+                                <span class="text-4xl">🎓</span>
+                            </div>`
+                        }
+                        <div>
+                            <h1 class="font-serif text-3xl font-bold text-gray-900">${escapeHtml(schoolData.settings.schoolName || 'General School')}</h1>
+                            <p class="text-xs uppercase tracking-widest text-gray-500 mt-1">${escapeHtml(schoolData.settings.schoolMotto || 'Excellence in Education')}</p>
+                            <p class="text-xs text-gray-400 mt-1">${escapeHtml(schoolData.settings.schoolAddress || '')}</p>
+                            <p class="text-xs text-gray-400">${escapeHtml(schoolData.settings.contactPhone || '')} | ${escapeHtml(schoolData.settings.contactEmail || '')}</p>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <h2 class="text-2xl font-bold text-gray-800">${user.year}</h2>
+                        <p class="text-gray-500">${user.term} Report</p>
+                    </div>
+                </header>
+
+                <div class="bg-paper p-8 border-b border-gray-100 relative">
+                     ${schoolData.settings.toggles?.showWatermark && schoolData.settings.schoolLogo ? 
+                        `<div class="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.03]">
+                            <img src="${schoolData.settings.schoolLogo}" class="w-96 h-96 object-contain grayscale">
+                        </div>` : ''
+                     }
+
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-6 relative z-10">
+                        <div>
+                            <p class="text-xs font-bold text-gray-400 uppercase">Student Name</p>
+                            <p class="font-bold text-lg text-gray-800">${user.name}</p>
+                        </div>
+                        <div>
+                            <p class="text-xs font-bold text-gray-400 uppercase">Student ID</p>
+                            <p class="font-mono text-lg text-gray-800">${user.id}</p>
+                        </div>
+                        <div>
+                            <p class="text-xs font-bold text-gray-400 uppercase">Class</p>
+                            <p class="font-bold text-lg text-primary">${user.class}</p>
+                        </div>
+                         ${schoolData.settings.toggles?.showPosition !== false ? `
+                            <div>
+                                <p class="text-xs font-bold text-gray-400 uppercase">Position</p>
+                                <p class="font-bold text-lg text-secondary">${user.position} <span class="text-sm font-normal text-gray-400">/ ${user.total_students}</span></p>
+                            </div>
+                        ` : ''}
+                    </div>
+                </div>
+
+                <div class="p-8 relative">
+                     <!-- Summary Cards -->
+                    <div class="grid grid-cols-3 gap-4 mb-8">
+                        ${schoolData.settings.toggles?.showAttendance !== false ? `
+                            <div class="border border-blue-100 bg-blue-50 p-4 rounded-xl">
+                                <p class="text-blue-600 text-xs font-bold uppercase">Attendance</p>
+                                <p class="text-2xl font-bold text-gray-800">${user.attendance.present}/${schoolData.settings.attendance?.totalDays || user.attendance.total}</p>
+                            </div>
+                        ` : ''}
+                        <div class="border border-green-100 bg-green-50 p-4 rounded-xl">
+                            <p class="text-green-600 text-xs font-bold uppercase">Average</p>
+                            <p class="text-2xl font-bold text-gray-800">${average}</p>
+                        </div>
+                         <div class="border border-purple-100 bg-purple-50 p-4 rounded-xl">
+                            <p class="text-purple-600 text-xs font-bold uppercase">Conduct</p>
+                            <p class="text-lg font-bold text-gray-800">${user.conduct}</p>
+                        </div>
+                    </div>
+
+                    <!-- Table -->
+                    <table class="w-full text-left mb-8 border-collapse">
+                        <thead class="bg-gray-50 text-gray-500 text-xs uppercase font-bold border-y border-gray-200">
+                            <tr>
+                                <th class="px-6 py-3 border-b border-gray-200">Subject</th>
+                                <th class="px-6 py-3 text-center border-b border-gray-200">Class (30)</th>
+                                <th class="px-6 py-3 text-center border-b border-gray-200">Exam (70)</th>
+                                <th class="px-6 py-3 text-center border-b border-gray-200">Total (100)</th>
+                                <th class="px-6 py-3 text-center border-b border-gray-200">Grade</th>
+                                <th class="px-6 py-3 text-right border-b border-gray-200">Remarks</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-100">${rows}</tbody>
+                    </table>
+
+                     <!-- Signatures -->
+                     <div class="grid grid-cols-2 gap-8 mt-12 bg-gray-50 p-6 rounded-xl border border-gray-100 print:bg-transparent print:border-none print:p-0">
+                        <div class="print:border-t print:border-gray-400 print:pt-2">
+                            <h4 class="text-sm font-bold text-gray-500 uppercase mb-2">Class Teacher's Remark</h4>
+                            <p class="italic text-gray-800 font-serif mb-4">"${user.teacher_remark}"</p>
+                            <div class="w-32 py-2 border-t border-gray-400 text-xs text-gray-500 print:hidden">Signature</div>
+                        </div>
+                        <div class="print:border-t print:border-gray-400 print:pt-2">
+                            <h4 class="text-sm font-bold text-gray-500 uppercase mb-2">Headteacher's Remark</h4>
+                            <p class="italic text-gray-800 font-serif mb-4">"${user.head_remark}"</p>
+                            <div class="w-32 py-2 border-t border-gray-400 text-xs text-gray-500 print:hidden">Signature & Stamp</div>
+                        </div>
+                     </div>
+                </div>
+
+                <footer class="bg-gray-900 text-gray-400 text-center py-4 text-xs print:bg-white print:text-gray-600 print:border-t">
+                    ${escapeHtml(schoolData.settings.schoolName)} Assessment System • Generated Electronically on ${new Date().toLocaleDateString()}
+                </footer>
+            `;
+        }
+
+        renderReport();
+    </script>
+</body>
+</html>

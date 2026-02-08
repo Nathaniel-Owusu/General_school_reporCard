@@ -1,0 +1,52 @@
+/* Custom Styles and Print Overrides */
+
+/* Google Font: Signature style for "Signatures" */
+@import url("https://fonts.googleapis.com/css2?family=Mrs+Saint+Delafield&display=swap");
+
+.font-signature {
+  font-family: "Mrs Saint Delafield", cursive;
+}
+
+/* Glassmorphism utility not fully covered by basic Tailwind config */
+.glass {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+/* Print Specific Styles */
+@media print {
+  @page {
+    margin: 0;
+    size: auto;
+  }
+
+  body {
+    margin: 0;
+    padding: 0;
+    background: white;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Force background colors to print */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Remove interactive elements */
+  button,
+  .no-print {
+    display: none !important;
+  }
+
+  /* Ensure layout fits A4 */
+  .w-full {
+    width: 100% !important;
+    max-width: none !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+  }
+}

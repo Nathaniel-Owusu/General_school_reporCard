@@ -1,0 +1,492 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Student Progress Report | Front Page</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              primary: "#1e3a8a", // Dark Blue
+              secondary: "#d97706", // Amber/Gold
+              accent: "#0f172a", // Slate Dark
+              paper: "#f8fafc",
+            },
+            fontFamily: {
+              sans: ["Outfit", "sans-serif"],
+              serif: ["Playfair Display", "serif"],
+            },
+          },
+        },
+      };
+    </script>
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="style.css" />
+
+    <!-- Ions -->
+    <script
+      type="module"
+      src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"
+    ></script>
+    <script
+      nomodule
+      src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"
+    ></script>
+  </head>
+  <body
+    class="bg-gray-100 min-h-screen flex items-center justify-center p-4 print:p-0 print:bg-white"
+  >
+    <!-- Main Container (A4 Proportions approx) -->
+    <div
+      class="w-full max-w-[210mm] bg-white shadow-2xl rounded-2xl overflow-hidden relative print:shadow-none print:w-full print:max-w-none print:rounded-none"
+    >
+      <!-- Decorative Top Bar -->
+      <div
+        class="h-2 bg-gradient-to-r from-primary via-blue-600 to-secondary"
+      ></div>
+
+      <!-- Header Section -->
+      <header
+        class="p-8 pb-6 border-b border-gray-100 relative overflow-hidden"
+      >
+        <!-- Background Watermark/Pattern -->
+        <div
+          class="absolute top-0 right-0 w-64 h-64 bg-blue-50 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 opacity-50 pointer-events-none"
+        ></div>
+
+        <div
+          class="relative z-10 flex flex-col md:flex-row justify-between items-center gap-6"
+        >
+          <!-- Logo Area -->
+          <div class="flex items-center gap-4">
+            <div
+              class="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center border-2 border-primary/20"
+            >
+              <ion-icon name="school" class="text-4xl text-primary"></ion-icon>
+            </div>
+            <div class="text-center md:text-left">
+              <h1
+                class="font-serif text-3xl font-bold text-accent tracking-wide"
+              >
+                General School
+              </h1>
+              <p
+                class="text-gray-500 font-medium tracking-widest text-xs uppercase mt-1"
+              >
+                Excellence in Education • Est. 1985
+              </p>
+            </div>
+          </div>
+
+          <!-- Report Details -->
+          <div class="text-center md:text-right">
+            <div
+              class="inline-block bg-blue-50 px-4 py-1 rounded-full border border-blue-100 mb-2"
+            >
+              <span
+                class="text-primary font-bold text-sm tracking-wider uppercase"
+                >End of Term Report</span
+              >
+            </div>
+            <h2 class="text-2xl font-sans font-bold text-gray-800">
+              2024 - 2025
+            </h2>
+            <p class="text-gray-500 text-sm">Term 1 • Academic Year</p>
+          </div>
+        </div>
+      </header>
+
+      <!-- Student Profile Section -->
+      <section class="bg-paper px-8 py-6 border-b border-gray-100">
+        <div class="flex flex-col md:flex-row gap-6 items-center">
+          <!-- Avatar -->
+          <div class="relative group cursor-pointer">
+            <div
+              class="w-24 h-24 rounded-full bg-gray-300 ring-4 ring-white shadow-lg overflow-hidden flex items-center justify-center bg-cover bg-center"
+              style="
+                background-image: url(&quot;https://api.dicebear.com/7.x/avataaars/svg?seed=Felix&quot;);
+              "
+            >
+              <!-- Fallback if img fails -->
+            </div>
+            <div
+              class="absolute bottom-0 right-0 bg-green-500 w-6 h-6 rounded-full border-2 border-white"
+              title="Active Student"
+            ></div>
+          </div>
+
+          <!-- Info Grid -->
+          <div class="flex-1 w-full">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div
+                class="p-3 bg-white rounded-lg shadow-sm border border-gray-100"
+              >
+                <p
+                  class="text-xs text-gray-400 uppercase font-bold tracking-wider mb-1"
+                >
+                  Student Name
+                </p>
+                <h3 class="font-bold text-gray-800 text-lg truncate">
+                  Emmanuel Mensah
+                </h3>
+              </div>
+              <div
+                class="p-3 bg-white rounded-lg shadow-sm border border-gray-100"
+              >
+                <p
+                  class="text-xs text-gray-400 uppercase font-bold tracking-wider mb-1"
+                >
+                  Student ID
+                </p>
+                <h3 class="font-mono text-gray-800 text-lg">TK-2024-001</h3>
+              </div>
+              <div
+                class="p-3 bg-white rounded-lg shadow-sm border border-gray-100"
+              >
+                <p
+                  class="text-xs text-gray-400 uppercase font-bold tracking-wider mb-1"
+                >
+                  Class
+                </p>
+                <h3 class="font-bold text-primary text-lg">JHS 2 A</h3>
+              </div>
+              <div
+                class="p-3 bg-white rounded-lg shadow-sm border border-gray-100"
+              >
+                <p
+                  class="text-xs text-gray-400 uppercase font-bold tracking-wider mb-1"
+                >
+                  Position
+                </p>
+                <h3
+                  class="font-bold text-secondary text-lg flex items-center gap-1"
+                >
+                  4th
+                  <span class="text-xs text-gray-400 font-normal">/ 45</span>
+                </h3>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Main Content Area -->
+      <main class="p-8">
+        <!-- Summary Stats -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <!-- Attendance Card -->
+          <div
+            class="bg-gradient-to-br from-blue-50 to-white p-5 rounded-xl border border-blue-100 shadow-sm relative overflow-hidden group hover:shadow-md transition-all"
+          >
+            <div
+              class="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity"
+            >
+              <ion-icon
+                name="calendar"
+                class="text-6xl text-primary"
+              ></ion-icon>
+            </div>
+            <h4 class="text-primary font-bold text-lg mb-1">Attendance</h4>
+            <div class="flex items-end gap-2">
+              <span class="text-3xl font-bold text-gray-800">58</span>
+              <span class="text-sm text-gray-500 mb-1">/ 60 Days</span>
+            </div>
+            <div
+              class="w-full bg-gray-200 h-1.5 rounded-full mt-3 overflow-hidden"
+            >
+              <div
+                class="bg-primary h-full rounded-full"
+                style="width: 96%"
+              ></div>
+            </div>
+            <p class="text-xs text-blue-600 font-medium mt-2">
+              Excellent Attendance
+            </p>
+          </div>
+
+          <!-- Conduct Card -->
+          <div
+            class="bg-gradient-to-br from-green-50 to-white p-5 rounded-xl border border-green-100 shadow-sm relative overflow-hidden group hover:shadow-md transition-all"
+          >
+            <div
+              class="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity"
+            >
+              <ion-icon
+                name="ribbon"
+                class="text-6xl text-green-600"
+              ></ion-icon>
+            </div>
+            <h4 class="text-green-700 font-bold text-lg mb-1">Conduct</h4>
+            <div class="flex items-center gap-2 mt-1">
+              <span
+                class="px-3 py-1 bg-green-100 text-green-700 rounded-md font-bold text-sm"
+                >Exemplary</span
+              >
+            </div>
+            <p class="text-gray-600 text-sm mt-3 leading-tight line-clamp-2">
+              Consistent, polite, and helps other students regularly.
+            </p>
+          </div>
+
+          <!-- Overall Grade Card -->
+          <div
+            class="bg-gradient-to-br from-amber-50 to-white p-5 rounded-xl border border-amber-100 shadow-sm relative overflow-hidden group hover:shadow-md transition-all"
+          >
+            <div
+              class="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity"
+            >
+              <ion-icon
+                name="trophy"
+                class="text-6xl text-secondary"
+              ></ion-icon>
+            </div>
+            <h4 class="text-amber-700 font-bold text-lg mb-1">Overall Grade</h4>
+            <div class="flex items-end gap-2">
+              <span class="text-4xl font-serif font-black text-gray-800"
+                >A</span
+              >
+              <span class="text-sm text-gray-500 mb-2">Distinction</span>
+            </div>
+            <p class="text-xs text-amber-600 font-medium mt-2">
+              Top 10% of class
+            </p>
+          </div>
+        </div>
+
+        <!-- Academic Performance Table -->
+        <div class="mb-8">
+          <div class="flex justify-between items-center mb-4">
+            <h3
+              class="text-lg font-bold text-gray-800 border-l-4 border-primary pl-3"
+            >
+              Academic Performance
+            </h3>
+            <div class="text-xs text-gray-500 flex gap-4">
+              <span class="flex items-center gap-1"
+                ><div class="w-2 h-2 rounded-full bg-green-500"></div>
+                Pass</span
+              >
+              <span class="flex items-center gap-1"
+                ><div class="w-2 h-2 rounded-full bg-red-400"></div>
+                Fail (< 50)</span
+              >
+            </div>
+          </div>
+
+          <div
+            class="overflow-x-auto rounded-xl shadow-sm border border-gray-200"
+          >
+            <table class="w-full text-sm text-left">
+              <thead
+                class="text-xs text-gray-500 uppercase bg-gray-50 border-b border-gray-200"
+              >
+                <tr>
+                  <th scope="col" class="px-6 py-4 font-bold">Subject</th>
+                  <th scope="col" class="px-6 py-4 text-center">
+                    Class Score (30%)
+                  </th>
+                  <th scope="col" class="px-6 py-4 text-center">
+                    Exam Score (70%)
+                  </th>
+                  <th scope="col" class="px-6 py-4 text-center">
+                    Total (100%)
+                  </th>
+                  <th scope="col" class="px-6 py-4 text-center">Grade</th>
+                  <th scope="col" class="px-6 py-4">Remarks</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-gray-100">
+                <tr class="bg-white hover:bg-gray-50 transition-colors">
+                  <td class="px-6 py-4 font-medium text-gray-800">
+                    Mathematics
+                  </td>
+                  <td class="px-6 py-4 text-center text-gray-600">26</td>
+                  <td class="px-6 py-4 text-center text-gray-600">62</td>
+                  <td class="px-6 py-4 text-center font-bold text-gray-800">
+                    88
+                  </td>
+                  <td class="px-6 py-4 text-center">
+                    <span
+                      class="px-2 py-1 rounded bg-green-100 text-green-700 text-xs font-bold"
+                      >A</span
+                    >
+                  </td>
+                  <td class="px-6 py-4 text-gray-500">Excellent performance</td>
+                </tr>
+                <tr class="bg-white hover:bg-gray-50 transition-colors">
+                  <td class="px-6 py-4 font-medium text-gray-800">
+                    English Language
+                  </td>
+                  <td class="px-6 py-4 text-center text-gray-600">24</td>
+                  <td class="px-6 py-4 text-center text-gray-600">58</td>
+                  <td class="px-6 py-4 text-center font-bold text-gray-800">
+                    82
+                  </td>
+                  <td class="px-6 py-4 text-center">
+                    <span
+                      class="px-2 py-1 rounded bg-green-100 text-green-700 text-xs font-bold"
+                      >A</span
+                    >
+                  </td>
+                  <td class="px-6 py-4 text-gray-500">
+                    Very good command of grammar
+                  </td>
+                </tr>
+                <tr class="bg-white hover:bg-gray-50 transition-colors">
+                  <td class="px-6 py-4 font-medium text-gray-800">
+                    Integrated Science
+                  </td>
+                  <td class="px-6 py-4 text-center text-gray-600">22</td>
+                  <td class="px-6 py-4 text-center text-gray-600">53</td>
+                  <td class="px-6 py-4 text-center font-bold text-gray-800">
+                    75
+                  </td>
+                  <td class="px-6 py-4 text-center">
+                    <span
+                      class="px-2 py-1 rounded bg-blue-100 text-blue-700 text-xs font-bold"
+                      >B</span
+                    >
+                  </td>
+                  <td class="px-6 py-4 text-gray-500">Good, keep it up</td>
+                </tr>
+                <tr class="bg-white hover:bg-gray-50 transition-colors">
+                  <td class="px-6 py-4 font-medium text-gray-800">
+                    Social Studies
+                  </td>
+                  <td class="px-6 py-4 text-center text-gray-600">25</td>
+                  <td class="px-6 py-4 text-center text-gray-600">60</td>
+                  <td class="px-6 py-4 text-center font-bold text-gray-800">
+                    85
+                  </td>
+                  <td class="px-6 py-4 text-center">
+                    <span
+                      class="px-2 py-1 rounded bg-green-100 text-green-700 text-xs font-bold"
+                      >A</span
+                    >
+                  </td>
+                  <td class="px-6 py-4 text-gray-500">
+                    Outstanding understanding
+                  </td>
+                </tr>
+                <tr class="bg-white hover:bg-gray-50 transition-colors">
+                  <td class="px-6 py-4 font-medium text-gray-800">I.C.T.</td>
+                  <td class="px-6 py-4 text-center text-gray-600">28</td>
+                  <td class="px-6 py-4 text-center text-gray-600">65</td>
+                  <td class="px-6 py-4 text-center font-bold text-gray-800">
+                    93
+                  </td>
+                  <td class="px-6 py-4 text-center">
+                    <span
+                      class="px-2 py-1 rounded bg-green-100 text-green-700 text-xs font-bold"
+                      >A</span
+                    >
+                  </td>
+                  <td class="px-6 py-4 text-gray-500">
+                    Exceptional practical skills
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Remarks & Signatures -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-12 mb-8">
+          <!-- Class Teacher -->
+          <div
+            class="relative p-6 rounded-lg border border-gray-200 bg-gray-50"
+          >
+            <h5
+              class="text-sm font-bold text-gray-500 uppercase tracking-wider mb-4"
+            >
+              Class Teacher's Remarks
+            </h5>
+            <p class="font-serif italic text-gray-800 text-lg mb-6">
+              "Emmanuel has shown remarkable improvement this term. He is a
+              disciplined and focused student."
+            </p>
+            <div class="flex items-end justify-between mt-auto">
+              <div class="flex flex-col">
+                <span class="font-signature text-2xl text-blue-900"
+                  >Mr. John Doe</span
+                >
+                <span class="text-xs text-gray-500">Signature</span>
+              </div>
+              <div class="text-xs text-gray-400">Date: 12/12/2024</div>
+            </div>
+          </div>
+
+          <!-- Headmaster -->
+          <div
+            class="relative p-6 rounded-lg border border-gray-200 bg-gray-50"
+          >
+            <h5
+              class="text-sm font-bold text-gray-500 uppercase tracking-wider mb-4"
+            >
+              Headmaster's Remarks
+            </h5>
+            <p class="font-serif italic text-gray-800 text-lg mb-6">
+              "Promoted to next class. An excellent result overall."
+            </p>
+            <div class="flex items-end justify-between mt-auto">
+              <div class="flex flex-col">
+                <span class="font-signature text-2xl text-blue-900"
+                  >Mrs. Sarah Smith</span
+                >
+                <span class="text-xs text-gray-500"
+                  >Principal / Headmaster</span
+                >
+              </div>
+              <div
+                class="w-16 h-16 rounded-full border-4 border-double border-gray-300 flex items-center justify-center opacity-50 rotate-12"
+              >
+                <span
+                  class="text-[0.6rem] font-bold text-gray-400 uppercase text-center leading-none"
+                  >Official<br />Stamp</span
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Footer -->
+        <footer
+          class="text-center text-gray-400 text-xs mt-8 pt-6 border-t border-gray-100"
+        >
+          <p>
+            General School • P.O. Box 123, City, Country • +000 00 000 0000
+
+          </p>
+          <div class="mt-2 text-[10px] text-gray-300 uppercase tracking-widest">
+            Generated on 06 Feb 2026
+          </div>
+        </footer>
+      </main>
+
+      <!-- Print Button (Fixed) -->
+      <button
+        onclick="window.print()"
+        class="fixed bottom-8 right-8 bg-primary text-white p-4 rounded-full shadow-xl hover:bg-blue-800 hover:scale-110 transition-all z-50 print:hidden group flex items-center justify-center gap-2 pr-6"
+      >
+        <ion-icon name="print" class="text-2xl"></ion-icon>
+        <span class="font-bold">Print Report</span>
+      </button>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>
