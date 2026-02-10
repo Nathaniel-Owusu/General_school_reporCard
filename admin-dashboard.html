@@ -19,8 +19,16 @@
 </head>
 <body class="bg-gray-50 h-screen flex overflow-hidden font-sans text-gray-800">
 
+    <!-- Mobile Menu Toggle -->
+    <button onclick="toggleMobileMenu()" class="md:hidden fixed top-4 left-4 z-50 bg-primary text-white p-3 rounded-xl shadow-lg">
+        <ion-icon name="menu" class="text-2xl"></ion-icon>
+    </button>
+
+    <!-- Mobile Overlay -->
+    <div id="mobile-overlay" class="hidden md:hidden fixed inset-0 bg-black/50 z-30" onclick="toggleMobileMenu()"></div>
+
     <!-- Sidebar -->
-    <aside class="w-72 bg-primary text-white hidden md:flex flex-col shadow-2xl relative z-20">
+    <aside id="mobile-sidebar" class="w-72 bg-primary text-white flex flex-col shadow-2xl relative z-40 fixed md:relative h-full transform -translate-x-full md:translate-x-0 transition-transform duration-300">
         <div class="h-20 flex items-center gap-3 px-8 border-b border-gray-800 bg-gray-900/50">
             <div class="w-8 h-8 rounded-lg bg-accent flex items-center justify-center text-white">
                 <ion-icon name="school" class="text-xl"></ion-icon>
@@ -63,21 +71,27 @@
     <div class="flex-1 flex flex-col bg-gray-50 h-screen overflow-hidden">
         
         <!-- Header -->
-        <header class="h-20 bg-white border-b border-gray-200 flex items-center justify-between px-8 shadow-sm z-10">
-            <div>
-                <h2 class="text-2xl font-bold text-gray-800" id="page-title">Dashboard</h2>
-                <p class="text-sm text-gray-400">Welcome back, Admin</p>
+        <header class="h-16 md:h-20 bg-white border-b border-gray-200 flex items-center justify-between px-4 md:px-8 shadow-sm z-10">
+            <div class="ml-12 md:ml-0">
+                <h2 class="text-lg md:text-2xl font-bold text-gray-800" id="page-title">Dashboard</h2>
+                <p class="text-xs md:text-sm text-gray-400 hidden sm:block">Welcome back, Admin</p>
             </div>
-            <div class="flex items-center gap-4">
+            <div class="flex items-center gap-2 md:gap-4">
                  <div class="md:hidden">
-                    <button class="text-2xl text-gray-600"><ion-icon name="menu-outline"></ion-icon></button>
+                     <button onclick="logout()" class="p-2 rounded-lg hover:bg-gray-100 text-red-500">
+                         <ion-icon name="log-out-outline" class="text-xl"></ion-icon>
+                     </button>
+                 </div>
+                <div class="hidden md:flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-accent flex items-center justify-center text-white font-bold">
+                        A
+                    </div>
                 </div>
-                <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-accent font-bold">A</div>
             </div>
         </header>
 
-        <!-- Scrollable Area -->
-        <main class="flex-1 overflow-x-hidden overflow-y-auto p-8">
+        <!-- Page Content Container -->
+        <div class="flex-1 overflow-y-auto px-3 md:px-8 py-4 md:py-8">
             
             <!-- VIEW: DASHBOARD -->
             <div id="view-dashboard" class="space-y-8 animate-fade-in">
@@ -108,7 +122,7 @@
                 </div>
 
                 <!-- Stats Grid -->
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
                     <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4 hover:shadow-md transition">
                         <div class="w-16 h-16 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-3xl">
                             <ion-icon name="people"></ion-icon>
@@ -882,6 +896,22 @@
 
     <script>
         checkAuth(['admin']);
+        
+        // Mobile Menu Toggle
+        function toggleMobileMenu() {
+            const sidebar = document.getElementById('mobile-sidebar');
+            const overlay = document.getElementById('mobile-overlay');
+            
+            if (sidebar.classList.contains('-translate-x-full')) {
+                sidebar.classList.remove('-translate-x-full');
+                sidebar.classList.add('translate-x-0');
+                overlay.classList.remove('hidden');
+            } else {
+                sidebar.classList.add('-translate-x-full');
+                sidebar.classList.remove('translate-x-0');
+                overlay.classList.add('hidden');
+            }
+        }
         
         let allStudents = []; 
  
