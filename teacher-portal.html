@@ -86,7 +86,7 @@
                                  <span class="px-2 py-0.5 bg-green-100 text-green-700 text-xs font-bold rounded-full">FACULTY</span>
                              </div>
                              <p class="text-gray-500 mb-4" id="dash-email">teacher@school.com</p>
-                             <div class="flex gap-4">
+                             <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 w-full md:w-auto">
                                  <div class="px-4 py-2 bg-gray-50 rounded-lg border border-gray-100">
                                      <span class="block text-xs font-bold text-gray-400 uppercase">Classes</span>
                                      <span class="text-xl font-bold text-gray-800" id="dash-class-count">0</span>
@@ -94,6 +94,14 @@
                                  <div class="px-4 py-2 bg-gray-50 rounded-lg border border-gray-100">
                                      <span class="block text-xs font-bold text-gray-400 uppercase">Subjects</span>
                                      <span class="text-xl font-bold text-gray-800" id="dash-subject-count">0</span>
+                                 </div>
+                                  <div class="px-4 py-2 bg-gray-50 rounded-lg border border-gray-100">
+                                     <span class="block text-xs font-bold text-gray-400 uppercase">Students</span>
+                                     <span class="text-xl font-bold text-gray-800" id="dash-student-count">0</span>
+                                 </div>
+                                 <div class="px-4 py-2 bg-gray-50 rounded-lg border border-gray-100">
+                                     <span class="block text-xs font-bold text-gray-400 uppercase">Pending</span>
+                                     <span class="text-xl font-bold text-gray-800" id="dash-pending-count">0</span>
                                  </div>
                              </div>
                          </div>
@@ -196,45 +204,41 @@
         </div>
     </div>
 
-    <script src="js/data.js"></script>
+    <script src="js/storage.js"></script>
     <script src="js/app.js"></script>
-    <script src="js/demo.js"></script>
     <script>
         // Auth Check
         const currentUser = checkAuth(['teacher', 'admin']);
         
         // Init Data & Settings
-        const data = getSchoolData();
-        const settings = data.settings || { academicYears: [{name: "2024/2025", active: true}], currentTerm: "1st Term", termLocked: false };
+        const settings = { academicYears: [{name: "2024/2025", active: true}], currentTerm: "1st Term", termLocked: false };
         const activeYear = settings.academicYears.find(y => y.active) || settings.academicYears[0];
         
-        // Render Header
-        document.getElementById('term-badge').innerHTML = `${settings.currentTerm} · ${activeYear.name} ${settings.termLocked ? '<br><span class="text-red-600 flex items-center gap-1 justify-center mt-1"><ion-icon name="lock-closed"></ion-icon> LOCKED</span>' : ''}`;
-        if(settings.termLocked) {
-             document.getElementById('term-badge').classList.replace('bg-blue-50', 'bg-red-50');
-             document.getElementById('term-badge').classList.replace('border-blue-100', 'border-red-100');
-        }
-
         // Global State
         let currentClassId = null;
         let currentSubjectId = null;
         let assignedClasses = [];
+        let currentStudents = []; // Store students for current view
 
         // --- DASHBOARD LOGIC ---
 
-        function initDashboard() {
-            // Get Assigned Classes
-            if (currentUser.type === 'admin') {
-                assignedClasses = data.classes || [];
-            } else {
-                const teacher = data.teachers.find(t => t.id === currentUser.id);
-                assignedClasses = (data.classes || []).filter(c => teacher && teacher.assigned_classes && teacher.assigned_classes.includes(c.id));
-            }
-
+        async function initDashboard() {
             // Update Profile
             document.getElementById('dash-name').innerText = currentUser.name;
-            document.getElementById('dash-email').innerText = currentUser.email;
-            document.getElementById('dash-class-count').innerText = assignedClasses.length;
+            document.getElementById('dash-email').innerText = currentUser.email || '';
+
+            // Load Stats
+            const stats = await fetchTeacherData('stats');
+            if(stats) {
+                document.getElementById('dash-class-count').innerText = stats.classes || 0;
+                document.getElementById('dash-subject-count').innerText = stats.subjects || 0;
+                document.getElementById('dash-student-count').innerText = stats.students || 0;
+                document.getElementById('dash-pending-count').innerText = stats.pending || 0;
+            }
+
+            // Get Assigned Classes from API
+            // Local engine returns list of class objects assigned to teacher
+            assignedClasses = await fetchTeacherData('classes') || [];
 
             // Render Classes Grid
             const grid = document.getElementById('assigned-classes-grid');
@@ -242,9 +246,9 @@
                 grid.innerHTML = `<div class="col-span-full text-center py-10 text-gray-400">No classes assigned. Please contact the administrator.</div>`;
             } else {
                 let totalSubjects = 0;
-                grid.innerHTML = assignedClasses.map(c => {
-                    const subjects = (data.subjects || []).filter(s => c.subjects && c.subjects.includes(s.id));
-                    totalSubjects += subjects.length;
+                document.getElementById('assigned-classes-grid').innerHTML = assignedClasses.map(c => {
+                    // In local engine, 'subjects' property of the returned class object contains the Subject Objects directly
+                    const subjects = c.subjects || [];
                     return `
                         <div class="bg-white p-6 rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition group cursor-pointer" onclick="goToEntry('${c.name}')">
                             <div class="flex justify-between items-start mb-4">
@@ -258,13 +262,13 @@
                             <h4 class="font-bold text-lg text-gray-800">${c.name}</h4>
                             <p class="text-sm text-gray-500 mb-4">${subjects.length} Subjects Assigned</p>
                             <div class="flex flex-wrap gap-1">
-                                ${subjects.slice(0, 3).map(s => `<span class="px-2 py-1 bg-gray-50 text-gray-600 text-[10px] rounded font-mono">${s.code}</span>`).join('')}
+                                ${subjects.slice(0, 3).map(s => `<span class="px-2 py-1 bg-gray-50 text-gray-600 text-[10px] rounded font-mono">${s.code || s.name.substring(0,3).toUpperCase()}</span>`).join('')}
                                 ${subjects.length > 3 ? `<span class="px-2 py-1 bg-gray-50 text-gray-400 text-[10px] rounded font-mono">+${subjects.length - 3}</span>` : ''}
                             </div>
                         </div>
                     `;
                 }).join('');
-                document.getElementById('dash-subject-count').innerText = totalSubjects;
+                // document.getElementById('dash-subject-count').innerText = totalSubjects; // Handled by stats action
             }
             
             // Populate Entry Dropdown
@@ -285,6 +289,7 @@
         // --- ENTRY & GRADEBOOK LOGIC ---
 
         function loadEntrySubjects() {
+            // Using loose equality for ID matching just in case (string vs int)
             const classId = document.getElementById('entry-class-select').value;
             const subjectSelect = document.getElementById('entry-subject-select');
             
@@ -296,15 +301,15 @@
 
             if(!classId) return;
 
-            const cls = assignedClasses.find(c => c.id === classId);
+            const cls = assignedClasses.find(c => c.id == classId);
             if(cls && cls.subjects) {
-                const subjects = (data.subjects || []).filter(s => cls.subjects.includes(s.id) && s.status !== 'Inactive');
-                subjectSelect.innerHTML += subjects.map(s => `<option value="${s.id}">${s.name} (${s.code})</option>`).join('');
+                // Return all subjects assigned to class (as per API)
+                subjectSelect.innerHTML += cls.subjects.map(s => `<option value="${s.id}">${s.name} (${s.code || ''})</option>`).join('');
                 subjectSelect.disabled = false;
             }
         }
 
-        function loadGradebook() {
+        async function loadGradebook() {
             const classId = document.getElementById('entry-class-select').value;
             const subjectId = document.getElementById('entry-subject-select').value;
             
@@ -313,25 +318,26 @@
             currentClassId = classId;
             currentSubjectId = subjectId;
 
-            const cls = data.classes.find(c => c.id === classId);
-            const subject = data.subjects.find(s => s.id === subjectId);
-            
-            // Filter Students
-            const students = data.students.filter(s => s.class === cls.name); // Note: Student data uses Name not ID for class currently
-
+            // Show loading
             const tbody = document.getElementById('gradebook-body');
-            
-            if(students.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="8" class="text-center py-20 text-gray-400">No students found in ${cls.name}.</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="8" class="text-center py-20 text-gray-400">Loading students...</td></tr>`;
+
+            // Fetch Students from API
+            // Local engine 'students' action maps students of that class, and merges existing grades if any
+            currentStudents = await fetchTeacherData('students', { class_id: classId, subject_id: subjectId }) || [];
+
+            if(currentStudents.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="8" class="text-center py-20 text-gray-400">No students found.</td></tr>`;
                 return;
             }
 
             const isLocked = settings.termLocked;
 
-            tbody.innerHTML = students.map((s, i) => {
-                const scoreData = (s.scores || []).find(sc => sc.subject === subject.name) || { class: 0, exam: 0 };
-                const total = (scoreData.class || 0) + (scoreData.exam || 0);
-                // Use shared function
+            tbody.innerHTML = currentStudents.map((s, i) => {
+                const classScore = parseFloat(s.class_score) || 0;
+                const examScore = parseFloat(s.exam_score) || 0;
+                const total = classScore + examScore;
+                
                 const gradeInfo = calculateGrade(total);
 
                 return `
@@ -340,13 +346,13 @@
                         <td class="px-4 py-3 font-mono font-bold text-gray-600 text-xs">${s.id}</td>
                         <td class="px-4 py-3 font-bold text-gray-800">${s.name}</td>
                         <td class="px-4 py-3 text-center bg-blue-50/20 p-0">
-                            <input type="number" min="0" max="30" value="${scoreData.class}" 
+                            <input type="number" min="0" max="30" value="${classScore}" 
                                 onchange="calculateRow(this)" data-type="class"
                                 ${isLocked ? 'disabled' : ''}
                                 class="w-20 px-2 py-1 text-center font-mono font-bold bg-white border border-gray-200 rounded focus:ring-2 focus:ring-primary outline-none mx-auto block disabled:bg-gray-100 disabled:text-gray-400">
                         </td>
                         <td class="px-4 py-3 text-center bg-yellow-50/20 p-0">
-                            <input type="number" min="0" max="70" value="${scoreData.exam}" 
+                            <input type="number" min="0" max="70" value="${examScore}" 
                                 onchange="calculateRow(this)" data-type="exam"
                                 ${isLocked ? 'disabled' : ''}
                                 class="w-20 px-2 py-1 text-center font-mono font-bold bg-white border border-gray-200 rounded focus:ring-2 focus:ring-secondary outline-none mx-auto block disabled:bg-gray-100 disabled:text-gray-400">
@@ -374,10 +380,19 @@
                 saveBtn.classList.add('bg-primary');
             }
 
-            updateSummary(students, subject.name);
+            updateSummary(currentStudents);
         }
 
-        function updateSummary(students, subjectName) {
+        function calculateGrade(score) {
+            if (score >= 80) return { grade: 'A', remark: 'Excellent', bg: 'bg-green-100', color: 'text-green-700' };
+            if (score >= 70) return { grade: 'B', remark: 'Very Good', bg: 'bg-blue-100', color: 'text-blue-700' };
+            if (score >= 60) return { grade: 'C', remark: 'Good', bg: 'bg-yellow-100', color: 'text-yellow-700' };
+            if (score >= 50) return { grade: 'D', remark: 'Credit', bg: 'bg-orange-100', color: 'text-orange-700' };
+            if (score >= 45) return { grade: 'E', remark: 'Pass', bg: 'bg-gray-100', color: 'text-gray-700' };
+            return { grade: 'F', remark: 'Fail', bg: 'bg-red-100', color: 'text-red-700' };
+        }
+
+        function updateSummary(students) {
             const summaryDiv = document.getElementById('entry-summary');
             summaryDiv.classList.remove('hidden');
             summaryDiv.classList.add('grid');
@@ -388,15 +403,17 @@
             let approvedCount = 0;
 
             students.forEach(s => {
-                const scoreData = (s.scores || []).find(sc => sc.subject === subjectName);
-                if(scoreData) {
-                    const total = (scoreData.class || 0) + (scoreData.exam || 0);
+                const classScore = parseFloat(s.class_score) || 0;
+                const examScore = parseFloat(s.exam_score) || 0;
+                const total = classScore + examScore;
+                
+                if (total > 0 || s.status) {
                     totalScore += total;
                     scoreCount++;
-
-                    if(scoreData.status === 'Approved') approvedCount++;
-                    else if(scoreData.status === 'Pending') pendingCount++;
                 }
+
+                if(s.status === 'Approved') approvedCount++;
+                else if(s.status === 'Pending') pendingCount++;
             });
 
             document.getElementById('summary-count').innerText = students.length;
@@ -420,7 +437,6 @@
             if (examScore < 0) { examScore = 0; examInput.value = 0; }
 
             const total = classScore + examScore;
-            // Use shared function
             const gradeInfo = calculateGrade(total);
 
             // Update UI
@@ -431,61 +447,46 @@
             row.querySelector('.cell-remark').innerText = gradeInfo.remark;
         }
 
-        function saveAllGrades() {
+        async function saveAllGrades() {
             if(settings.termLocked) return;
 
             const tbody = document.getElementById('gradebook-body');
             const rows = tbody.querySelectorAll('tr');
-            const subject = data.subjects.find(s => s.id === currentSubjectId);
-
-            if(!subject) return;
-
-            const cls = data.classes.find(c => c.id === currentClassId);
-            if(!cls) return;
-
-            let updatedCount = 0;
-
+            
+            const grades = [];
             rows.forEach(row => {
                 const studentId = row.dataset.studentId;
-                const student = data.students.find(s => s.id === studentId);
+                const classScore = parseInt(row.querySelector('input[data-type="class"]').value) || 0;
+                const examScore = parseInt(row.querySelector('input[data-type="exam"]').value) || 0;
                 
-                if(student) {
-                    const classScore = parseInt(row.querySelector('input[data-type="class"]').value) || 0;
-                    const examScore = parseInt(row.querySelector('input[data-type="exam"]').value) || 0;
-                    
-                    if(!student.scores) student.scores = [];
-                    
-                    let scoreEntry = student.scores.find(sc => sc.subject === subject.name);
-                    if(!scoreEntry) {
-                        scoreEntry = { subject: subject.name, class: 0, exam: 0 };
-                        student.scores.push(scoreEntry);
-                    }
-                    
-                    scoreEntry.class = classScore;
-                    scoreEntry.exam = examScore;
-
-                    // Update Meta
-                    student.term = settings.currentTerm;
-                    student.year = activeYear.name;
-                    updatedCount++;
-                }
+                grades.push({
+                    student_id: studentId,
+                    class_score: classScore,
+                    exam_score: examScore
+                });
             });
 
-            saveSchoolData(data);
-            
-            // Refund Summary
-            const studentsInClass = data.students.filter(s => s.class === cls.name);
-            updateSummary(studentsInClass, subject.name);
+            const payload = {
+                class_id: currentClassId,
+                subject_id: currentSubjectId,
+                grades: grades
+            };
 
-            // Feedback
-            const btn = document.getElementById('btn-save-all');
-            const oldHtml = btn.innerHTML;
-            btn.innerHTML = `<ion-icon name="checkmark-done"></ion-icon> Saved ${updatedCount} Students`;
-            btn.classList.replace('bg-primary', 'bg-green-600');
-            setTimeout(() => {
-                btn.innerHTML = oldHtml;
-                btn.classList.replace('bg-green-600', 'bg-primary');
-            }, 2000);
+            const result = await fetchTeacherData('save_grades', payload, 'POST');
+            
+            if(result && result.success) {
+                const btn = document.getElementById('btn-save-all');
+                const oldHtml = btn.innerHTML;
+                btn.innerHTML = `<ion-icon name="checkmark-done"></ion-icon> Saved ${grades.length} Students`;
+                btn.classList.replace('bg-primary', 'bg-green-600');
+                
+                setTimeout(() => {
+                    btn.innerHTML = oldHtml;
+                    btn.classList.replace('bg-green-600', 'bg-primary');
+                }, 2000);
+            } else {
+                alert('Error asking server: ' + (result?.message || 'Unknown error'));
+            }
         }
 
         function switchView(view) {

@@ -16,6 +16,19 @@
             }
         }
     </script>
+    <style>
+        @page { size: A4; margin: 0; }
+        body { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+        @media print {
+            body { background: white; padding: 0; }
+            #report-card { box-shadow: none; border-radius: 0; max-width: none; width: 100%; border: none; margin: 0; }
+            .print\:hidden { display: none !important; }
+            .print\:block { display: block !important; }
+            .print\:flex { display: flex !important; }
+            footer { position: fixed; bottom: 0; width: 100%; border-top: 1px solid #eee; padding-top: 10px; }
+            /* Hide URL headers/footers in generic browsers if possible, though @page margin 0 helps */
+        }
+    </style>
 </head>
 <body class="bg-gray-100 min-h-screen p-4 print:p-0 print:bg-white">
 
@@ -39,17 +52,69 @@
         </button>
     </div>
 
-    <script src="js/data.js"></script>
+    <script src="js/storage.js"></script>
     <script src="js/app.js"></script>
-    <script src="js/demo.js"></script>
     <script>
         // Protect Page
-        const user = checkAuth(['student']);
-        const schoolData = getSchoolData();
-        
-        // Render Report
-        function renderReport() {
+        async function init() {
+            const auth = checkAuth(['student']);
+            if(!auth) return;
+
+            // Show loading state
             const container = document.getElementById('report-card');
+            container.innerHTML = `<div class="p-12 text-center text-gray-500">Loading Report Card...</div>`;
+
+            try {
+                const data = await fetchStudentReport(auth.id);
+                
+                if (data && data.student) {
+                    renderReport(data.student, data.settings);
+                } else {
+                    container.innerHTML = `<div class="p-12 text-center text-red-500">
+                        <h3 class="font-bold text-xl">Report Not Found</h3>
+                        <p class="mt-2 text-sm">No academic record found for this index number.</p>
+                        <button onclick="window.history.back()" class="mt-4 text-blue-600 hover:underline">Go Back</button>
+                    </div>`;
+                }
+            } catch (e) {
+                console.error(e);
+                container.innerHTML = `<div class="p-12 text-center text-red-500">Error loading report.</div>`;
+            }
+        }
+        function calculateGrade(score, gradingSystem) {
+             // Use custom grading system if available
+             if(gradingSystem && gradingSystem.length > 0) {
+                 for(let g of gradingSystem) {
+                     if(score >= g.min && score <= g.max) {
+                         return { 
+                             grade: g.grade, 
+                             remark: g.remark, 
+                             bg: 'bg-blue-50', 
+                             color: 'text-blue-700' 
+                         };
+                     }
+                 }
+             }
+
+            // Default
+            if (score >= 80) return { grade: 'A', remark: 'Excellent', bg: 'bg-green-100', color: 'text-green-700' };
+            if (score >= 70) return { grade: 'B', remark: 'Very Good', bg: 'bg-blue-100', color: 'text-blue-700' };
+            if (score >= 60) return { grade: 'C', remark: 'Good', bg: 'bg-yellow-100', color: 'text-yellow-700' };
+            if (score >= 50) return { grade: 'D', remark: 'Credit', bg: 'bg-orange-100', color: 'text-orange-700' };
+            if (score >= 45) return { grade: 'E', remark: 'Pass', bg: 'bg-gray-100', color: 'text-gray-700' };
+            return { grade: 'F', remark: 'Fail', bg: 'bg-red-100', color: 'text-red-700' };
+        }
+
+        function escapeHtml(text) {
+             if(!text) return '';
+             return text.toString().replace(/[&<>"']/g, function(m) { return {'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;'}[m]; });
+        }
+
+        // Render Report
+        function renderReport(user, settings) {
+            const container = document.getElementById('report-card');
+            const schoolData = { settings }; // Compatibility wrapper
+
             
             // Calculate Totals and Grades
             let totalScore = 0;
@@ -176,17 +241,33 @@
                         <tbody class="divide-y divide-gray-100">${rows}</tbody>
                     </table>
 
-                     <!-- Signatures -->
-                     <div class="grid grid-cols-2 gap-8 mt-12 bg-gray-50 p-6 rounded-xl border border-gray-100 print:bg-transparent print:border-none print:p-0">
-                        <div class="print:border-t print:border-gray-400 print:pt-2">
-                            <h4 class="text-sm font-bold text-gray-500 uppercase mb-2">Class Teacher's Remark</h4>
-                            <p class="italic text-gray-800 font-serif mb-4">"${user.teacher_remark}"</p>
-                            <div class="w-32 py-2 border-t border-gray-400 text-xs text-gray-500 print:hidden">Signature</div>
+                     <!-- Signatures Section -->
+                     <div class="grid grid-cols-2 gap-12 mt-12 pt-8 border-t border-gray-100 print:mt-12 print:pt-4 page-break-inside-avoid">
+                        <div>
+                            <h4 class="text-xs font-bold text-gray-400 uppercase mb-2">Class Teacher's Remark</h4>
+                            <p class="text-sm text-gray-800 font-serif italic mb-8 min-h-[40px]">"${user.teacher_remark || 'Good academic progress.'}"</p>
+                            <div class="border-t border-gray-800 pt-2 w-3/4">
+                                <p class="text-xs font-bold text-gray-500 uppercase">Signature & Date</p>
+                            </div>
                         </div>
-                        <div class="print:border-t print:border-gray-400 print:pt-2">
-                            <h4 class="text-sm font-bold text-gray-500 uppercase mb-2">Headteacher's Remark</h4>
-                            <p class="italic text-gray-800 font-serif mb-4">"${user.head_remark}"</p>
-                            <div class="w-32 py-2 border-t border-gray-400 text-xs text-gray-500 print:hidden">Signature & Stamp</div>
+                        <div>
+                            <h4 class="text-xs font-bold text-gray-400 uppercase mb-2">Headteacher's Remark</h4>
+                            <p class="text-sm text-gray-800 font-serif italic mb-8 min-h-[40px]">"${user.head_remark || 'Promoted to next class.'}"</p>
+                            <div class="border-t border-gray-800 pt-2 w-3/4">
+                                <p class="text-xs font-bold text-gray-500 uppercase">Signature & Stamp</p>
+                            </div>
+                        </div>
+                     </div>
+                     
+                     <!-- Grading Key -->
+                     <div class="mt-8 p-4 bg-gray-50 rounded-lg border border-gray-100 print:mt-6 print:border print:bg-transparent print:text-xs page-break-inside-avoid">
+                        <p class="text-[10px] font-bold text-gray-400 uppercase mb-2">Grading System</p>
+                        <div class="flex flex-wrap gap-4 text-xs text-gray-600">
+                            ${schoolData.settings.gradingSystem ? 
+                                schoolData.settings.gradingSystem.map(g => `<span><strong class="text-gray-900">${g.grade}</strong>: ${g.min}-${g.max}% (${g.remark})</span>`).join('<span class="text-gray-300">|</span>')
+                                : 
+                                '<span><strong>A</strong>: 80-100% (Excellent)</span> <span class="text-gray-300">|</span> <span><strong>B</strong>: 70-79% (Very Good)</span> <span class="text-gray-300">|</span> <span><strong>C</strong>: 60-69% (Good)</span> <span class="text-gray-300">|</span> <span><strong>D</strong>: 50-59% (Credit)</span> <span class="text-gray-300">|</span> <span><strong>E</strong>: 45-49% (Pass)</span> <span class="text-gray-300">|</span> <span><strong>F</strong>: 0-44% (Fail)</span>'
+                            }
                         </div>
                      </div>
                 </div>
@@ -197,7 +278,7 @@
             `;
         }
 
-        renderReport();
+        init();
     </script>
 </body>
 </html>

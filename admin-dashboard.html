@@ -108,7 +108,7 @@
                 </div>
 
                 <!-- Stats Grid -->
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
                     <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4 hover:shadow-md transition">
                         <div class="w-16 h-16 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-3xl">
                             <ion-icon name="people"></ion-icon>
@@ -134,6 +134,15 @@
                         <div>
                             <p class="text-gray-400 text-sm font-bold uppercase tracking-wider">Classes</p>
                             <h3 class="text-3xl font-bold text-gray-900" id="count-classes">0</h3>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4 hover:shadow-md transition">
+                        <div class="w-16 h-16 rounded-xl bg-orange-50 text-orange-600 flex items-center justify-center text-3xl">
+                            <ion-icon name="book"></ion-icon>
+                        </div>
+                        <div>
+                            <p class="text-gray-400 text-sm font-bold uppercase tracking-wider">Subjects</p>
+                            <h3 class="text-3xl font-bold text-gray-900" id="count-subjects">0</h3>
                         </div>
                     </div>
                 </div>
@@ -311,6 +320,7 @@
                     <button onclick="switchSettingsTab('attendance')" id="tab-attendance" class="px-4 py-2 rounded-lg font-bold text-sm text-gray-500 hover:bg-gray-100 transition whitespace-nowrap">Attendance</button>
                     <button onclick="switchSettingsTab('system')" id="tab-system" class="px-4 py-2 rounded-lg font-bold text-sm text-gray-500 hover:bg-gray-100 transition whitespace-nowrap">System</button>
                     <button onclick="switchSettingsTab('academic')" id="tab-academic" class="px-4 py-2 rounded-lg font-bold text-sm text-gray-500 hover:bg-gray-100 transition whitespace-nowrap">Academic Year</button>
+                    <button onclick="switchSettingsTab('data')" id="tab-data" class="px-4 py-2 rounded-lg font-bold text-sm text-gray-500 hover:bg-gray-100 transition whitespace-nowrap">Data Management</button>
                 </div>
 
                 <!-- TAB: GENERAL -->
@@ -470,17 +480,7 @@
                                 </label>
                              </div>
 
-                             <!-- Demo Mode -->
-                             <div class="flex items-center justify-between p-4 bg-orange-50 rounded-xl border border-orange-100 mt-6">
-                                 <div>
-                                     <h4 class="font-bold text-orange-800 flex items-center gap-2"><ion-icon name="flask"></ion-icon> Demo Data Mode</h4>
-                                     <p class="text-sm text-orange-600">Fill system with sample data for testing. <strong>This hides real data safely.</strong></p>
-                                 </div>
-                                 <div class="flex gap-2">
-                                     <button onclick="enableDemoMode()" id="btn-enable-demo" class="px-4 py-2 bg-orange-600 text-white rounded-lg font-bold text-xs shadow hover:bg-orange-700 transition">Enable Demo</button>
-                                     <button onclick="disableDemoMode()" id="btn-disable-demo" class="px-4 py-2 bg-white text-orange-600 border border-orange-200 rounded-lg font-bold text-xs shadow-sm hover:bg-orange-50 transition hidden">Reset / Disable</button>
-                                 </div>
-                             </div>
+
                         </div>
                          <div class="mt-8 pt-6 border-t border-gray-100 flex justify-end">
                             <button onclick="saveSystemSettings()" class="bg-accent text-white px-6 py-3 rounded-xl font-bold hover:bg-blue-600 transition shadow-lg">Update System</button>
@@ -544,6 +544,53 @@
                     </div>
                 </div>
 
+            <!-- TAB: DATA MANAGEMENT -->
+            <div id="set-data" class="settings-tab hidden">
+                 <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 max-w-2xl">
+                     <h3 class="font-bold text-xl text-gray-800 mb-6 flex items-center gap-2"><ion-icon name="server-outline"></ion-icon> Data Management</h3>
+                     
+                     <div class="space-y-6">
+                         <!-- Backup -->
+                         <div class="bg-blue-50 border border-blue-100 rounded-xl p-6">
+                             <div class="flex justify-between items-center mb-4">
+                                 <div>
+                                     <h4 class="font-bold text-blue-900">Backup System Data</h4>
+                                     <p class="text-sm text-blue-700">Download a full backup of your school database (Students, Teachers, Settings).</p>
+                                 </div>
+                                 <button onclick="exportData()" class="bg-blue-600 text-white px-4 py-2 rounded-lg font-bold hover:bg-blue-700 transition shadow">
+                                     <ion-icon name="cloud-download-outline" class="mr-2"></ion-icon> Download Backup
+                                 </button>
+                             </div>
+                         </div>
+                         
+                         <!-- Restore -->
+                         <div class="bg-green-50 border border-green-100 rounded-xl p-6">
+                             <div class="flex justify-between items-center mb-4">
+                                 <div>
+                                     <h4 class="font-bold text-green-900">Restore Data</h4>
+                                     <p class="text-sm text-green-700">Restore from a previously saved JSON backup file. <span class="font-bold text-red-600">Warning: Overwrites current data!</span></p>
+                                 </div>
+                                 <label class="bg-green-600 text-white px-4 py-2 rounded-lg font-bold hover:bg-green-700 transition shadow cursor-pointer">
+                                     <ion-icon name="cloud-upload-outline" class="mr-2"></ion-icon> Select File
+                                     <input type="file" onchange="handleRestore(this)" accept=".json" class="hidden">
+                                 </label>
+                             </div>
+                         </div>
+                         
+                          <!-- Reset -->
+                         <div class="bg-red-50 border border-red-100 rounded-xl p-6 opacity-75 hover:opacity-100 transition">
+                             <div class="flex justify-between items-center">
+                                 <div>
+                                     <h4 class="font-bold text-red-900">Factory Reset</h4>
+                                     <p class="text-xs text-red-700">Clear all local data and reset to fresh state.</p>
+                                 </div>
+                                 <button onclick="if(confirm('Are you sure? This will wipe ALL data.')) { localStorage.clear(); location.reload(); }" class="text-red-600 font-bold hover:underline text-xs">Reset System</button>
+                             </div>
+                         </div>
+                     </div>
+                 </div>
+            </div>
+            
             </div>
             
             <!-- VIEW: RESULTS REVIEW -->
@@ -717,12 +764,37 @@
         <div class="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md mx-4">
             <h2 class="text-2xl font-bold mb-6 text-gray-800">New Class</h2>
              <form onsubmit="handleAddClass(event)" class="space-y-4">
-                <input type="text" name="name" required placeholder="Class Name (e.g. JHS 1 A)" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-secondary outline-none">
-                <label class="block text-xs font-bold text-gray-400 uppercase">Assign Teachers (Hold Ctrl)</label>
-                <select name="teachers" multiple id="class-teacher-select" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl h-32 outline-none"></select>
+                <input type="hidden" name="id">
+                <div>
+                     <label class="text-xs font-bold text-gray-500 uppercase">Class Name</label>
+                     <input type="text" name="name" required placeholder="e.g. JHS 1 A" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-secondary outline-none">
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-gray-500 uppercase">Level</label>
+                    <select name="level" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none">
+                        <option value="KG">Kindergarten (KG)</option>
+                        <option value="Primary">Primary</option>
+                        <option value="JHS">Junior High (JHS)</option>
+                    </select>
+                </div>
+                </div>
+                <div>
+                     <label class="text-xs font-bold text-gray-500 uppercase">Class Teacher (Form Master)</label>
+                     <select name="class_teacher_id" id="class-teacher-select" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none mb-4">
+                         <option value="">-- No Class Teacher --</option>
+                     </select>
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-gray-500 uppercase">Status</label>
+                    <select name="active" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none">
+                        <option value="true">Active</option>
+                        <option value="false">Inactive</option>
+                    </select>
+                </div>
+
                 <div class="pt-4 flex gap-3">
                     <button type="button" onclick="closeModal('add-class-modal')" class="flex-1 py-3 border border-gray-200 rounded-xl font-bold hover:bg-gray-50">Cancel</button>
-                    <button type="submit" class="flex-1 py-3 bg-secondary text-white rounded-xl font-bold hover:bg-amber-600 shadow-lg shadow-amber-500/30">Create Class</button>
+                    <button type="submit" class="flex-1 py-3 bg-secondary text-white rounded-xl font-bold hover:bg-amber-600 shadow-lg shadow-amber-500/30">Save Class</button>
                 </div>
              </form>
         </div>
@@ -733,6 +805,7 @@
         <div class="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md mx-4">
             <h2 class="text-2xl font-bold mb-6 text-gray-800">New Teacher</h2>
              <form onsubmit="handleAddTeacher(event)" class="space-y-4">
+                <input type="hidden" name="id">
                 <input type="text" name="name" required placeholder="Full Name" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none">
                 <input type="email" name="email" required placeholder="Login Email" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none">
                 <input type="text" name="password" required value="password123" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none">
@@ -759,12 +832,21 @@
                     <input type="text" name="code" required placeholder="e.g. MATH" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none font-mono">
                 </div>
                 <div class="space-y-1">
+                    <label class="text-xs font-bold text-gray-500 uppercase">Education Level</label>
+                    <select name="level" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none">
+                        <option value="KG">Kindergarten (KG)</option>
+                        <option value="Primary">Primary School</option>
+                        <option value="JHS">Junior High (JHS)</option>
+                    </select>
+                </div>
+                <div class="space-y-1">
                     <label class="text-xs font-bold text-gray-500 uppercase">Status</label>
                     <select name="status" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none">
                         <option value="Active">Active</option>
                         <option value="Inactive">Inactive</option>
                     </select>
                 </div>
+
                 <div class="pt-4 flex gap-3">
                     <button type="button" onclick="closeModal('add-subject-modal')" class="flex-1 py-3 border border-gray-200 rounded-xl font-bold hover:bg-gray-50">Cancel</button>
                     <button type="submit" class="flex-1 py-3 bg-primary text-white rounded-xl font-bold hover:bg-gray-800 shadow-lg">Save Subject</button>
@@ -773,43 +855,149 @@
         </div>
     </div>
 
-    <script src="js/data.js"></script>
+    <!-- Manage Class Subjects Modal -->
+    <div id="manage-subjects-modal" class="fixed inset-0 bg-gray-900/50 backdrop-blur-sm hidden flex items-center justify-center z-50">
+        <div class="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-lg mx-4 flex flex-col max-h-[90vh]">
+            <h2 class="text-2xl font-bold mb-2 text-gray-800">Class Subjects</h2>
+            <p class="text-sm text-gray-500 mb-6" id="manage-subjects-subtitle">Select subjects offered by this class.</p>
+            
+            <form id="manage-subjects-form" onsubmit="handleSaveClassSubjects(event)" class="flex flex-col flex-1 overflow-hidden">
+                <input type="hidden" name="class_id">
+                
+                <div class="flex-1 overflow-y-auto pr-2 space-y-2" id="class-subjects-list">
+                    <!-- Checkboxes injected here -->
+                </div>
+
+                <div class="pt-6 flex gap-3 mt-auto">
+                    <button type="button" onclick="closeModal('manage-subjects-modal')" class="flex-1 py-3 border border-gray-200 rounded-xl font-bold hover:bg-gray-50">Cancel</button>
+                    <button type="submit" class="flex-1 py-3 bg-secondary text-white rounded-xl font-bold hover:bg-amber-600 shadow-lg shadow-amber-500/30">Save Assignments</button>
+                </div>
+             </form>
+        </div>
+    </div>
+
+    <script src="js/storage.js"></script>
     <script src="js/app.js"></script>
     <script src="js/settings.js"></script>
-    <script src="js/demo.js"></script>
+
     <script>
         checkAuth(['admin']);
-        const data = getSchoolData();
         
-        // Auto-initialize subjects for existing installations
-        if ((!data.subjects || data.subjects.length === 0) && typeof MOCK_DATA !== 'undefined' && MOCK_DATA.subjects) {
-            data.subjects = MOCK_DATA.subjects;
-            saveSchoolData(data);
-        } else if (!data.subjects) {
-            data.subjects = [];
+        let allStudents = []; 
+ 
+        let allClasses = [];
+        let allTeachers = [];
+
+        async function initDashboard() {
+            // Load Stats
+            const stats = await fetchAdminData('stats');
+            if (stats) {
+                document.getElementById('count-students').innerText = stats.students || 0;
+                document.getElementById('count-teachers').innerText = stats.teachers || 0;
+                document.getElementById('count-classes').innerText = stats.classes || 0;
+                document.getElementById('count-subjects').innerText = stats.subjects || 0;
+            }
+
+            // Load Classes for Filters
+            allClasses = await fetchAdminData('classes') || [];
+            const filter = document.getElementById('filter-class');
+            filter.innerHTML = '<option value="">All Classes</option>' + 
+                 allClasses.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
+
+            // Load Students
+            await renderStudents();
+            renderEnrollmentChart(stats);
         }
 
-        let studentToDelete = null;
+        // View Management
+        const viewList = ['dashboard', 'classes', 'teachers', 'subjects', 'settings', 'results'];
+        function switchView(viewName) {
+            viewList.forEach(v => document.getElementById(`view-${v}`).classList.add('hidden'));
+            document.getElementById(`view-${viewName}`).classList.remove('hidden');
+            
+            // Update Nav
+            viewList.forEach(v => {
+                 const btn = document.getElementById(`nav-${v}`);
+                 if(btn) {
+                     btn.classList.remove('bg-accent', 'text-white', 'shadow-lg');
+                     btn.classList.add('text-gray-400');
+                 }
+            });
+            const activeBtn = document.getElementById(`nav-${viewName}`);
+            if(activeBtn) {
+                 activeBtn.classList.remove('text-gray-400', 'hover:bg-gray-800');
+                 activeBtn.classList.add('bg-accent', 'text-white', 'shadow-lg');
+            }
 
-        // Populate Filter Dropdown
-        function initFilters() {
-            const filter = document.getElementById('filter-class');
-            const classes = data.classes || [];
-            // Keep "All Classes" option
-            filter.innerHTML = '<option value="">All Classes</option>' + 
-                classes.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
+            // Dynamic Load
+            if(viewName === 'classes') renderClasses();
+            if(viewName === 'teachers') renderTeachers();
+            if(viewName === 'subjects') initSubjectView();
+            if(viewName === 'results') renderResults();
+            if(viewName === 'settings') initSettingsView();
+        }
+
+        // Student Management
+        let deleteTargetId = null;
+        async function renderStudents() {
+            const search = document.getElementById('search-input').value.toLowerCase();
+            const filterClass = document.getElementById('filter-class').value;
+            
+            const students = await fetchAdminData('students');
+            allStudents = students || [];
+
+            // Filter in memory for local engine
+            let filtered = allStudents.filter(s => {
+                const matchName = !search || s.name.toLowerCase().includes(search) || s.id.toLowerCase().includes(search);
+                const matchClass = !filterClass || s.class === filterClass;
+                return matchName && matchClass;
+            });
+
+            const tbody = document.getElementById('student-table-body');
+            tbody.innerHTML = '';
+            
+            document.getElementById('showing-count').innerText = `Showing ${filtered.length} students`;
+            
+            if(filtered.length === 0) {
+                 tbody.innerHTML = `<tr><td colspan="5" class="py-10 text-center text-gray-400">No students found.</td></tr>`;
+                 return;
+            }
+
+            filtered.forEach(student => {
+                const tr = document.createElement('tr');
+                tr.className = "border-b border-gray-100 hover:bg-gray-50 transition";
+                tr.innerHTML = `
+                    <td class="px-4 py-3 font-mono text-gray-500">${student.id}</td>
+                    <td class="px-4 py-3 font-medium text-gray-900 flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center text-xs font-bold">
+                            ${student.name.charAt(0)}
+                        </div>
+                        ${student.name}
+                    </td>
+                    <td class="px-4 py-3"><span class="px-2 py-1 bg-blue-50 text-blue-600 rounded text-[10px] font-bold">${student.class || 'Unassigned'}</span></td>
+                    <td class="px-4 py-3"><span class="px-2 py-1 bg-green-50 text-green-600 rounded text-[10px] font-bold uppercase">Active</span></td>
+                    <td class="px-4 py-3 text-right">
+                         <div class="flex justify-end gap-2 group-hover:opacity-100 transition">
+                            <button onclick="openAddStudentModal('${student.id}')" class="p-1.5 hover:bg-white text-gray-400 hover:text-accent rounded shadow-sm" title="Edit"><ion-icon name="create"></ion-icon></button>
+                            <button onclick="openDeleteStudentModal('${student.id}')" class="p-1.5 hover:bg-white text-gray-400 hover:text-red-500 rounded shadow-sm" title="Delete"><ion-icon name="trash"></ion-icon></button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
         }
 
         // Chart
-        function initChart() {
+        function renderEnrollmentChart(stats) {
             const ctx = document.getElementById('enrollmentChart').getContext('2d');
             if(window.myChart) window.myChart.destroy();
+
             window.myChart = new Chart(ctx, {
                 type: 'doughnut',
                 data: {
                     labels: ['Students', 'Teachers', 'Classes'],
                     datasets: [{
-                        data: [data.students.length, data.teachers.length, data.classes ? data.classes.length : 0],
+                        data: [stats?.students || 0, stats?.teachers || 0, stats?.classes || 0],
                         backgroundColor: ['#3b82f6', '#10b981', '#f59e0b'],
                         borderWidth: 0
                     }]
@@ -818,611 +1006,738 @@
             });
         }
 
-        function updateStats() {
-            document.getElementById('count-students').innerText = data.students.length;
-            document.getElementById('count-teachers').innerText = data.teachers.length;
-            document.getElementById('count-classes').innerText = data.classes ? data.classes.length : 0;
-            initChart();
-        }
-
-        // Logic
-        function switchView(view) {
-            ['dashboard', 'classes', 'teachers', 'subjects', 'settings', 'results'].forEach(v => {
-                const el = document.getElementById(`view-${v}`);
-                if(el) el.classList.add('hidden');
-                
-                const nav = document.getElementById(`nav-${v}`);
-                if(nav) {
-                    nav.classList.remove('bg-accent', 'text-white', 'shadow-lg');
-                    nav.classList.add('text-gray-400');
-                }
-            });
-            const viewEl = document.getElementById(`view-${view}`);
-            if(viewEl) viewEl.classList.remove('hidden');
-
-            const active = document.getElementById(`nav-${view}`);
-            if(active) {
-                active.classList.add('bg-accent', 'text-white', 'shadow-lg');
-                active.classList.remove('text-gray-400');
-            }
-            
-            if(view === 'classes') renderClasses();
-            if(view === 'teachers') renderTeachers();
-            if(view === 'subjects') initSubjectView();
-            if(view === 'settings') initSettingsView();
-            if(view === 'results') initResultsView();
-        }
-
         // --- RESULTS REVIEW LOGIC ---
         
-        let currentResultsList = [];
+        let allResults = [];
 
-        function initResultsView() {
-            // Populate Dropdowns
-            const classSelect = document.getElementById('res-filter-class');
-            classSelect.innerHTML = '<option value="">All Classes</option>' + (data.classes || []).map(c => `<option value="${c.name}">${c.name}</option>`).join('');
+        async function renderResults() {
+             const filterClass = document.getElementById('res-filter-class').value;
+             const filterSubject = document.getElementById('res-filter-subject').value;
+             const filterStatus = document.getElementById('res-filter-status').value;
+             const search = document.getElementById('res-search').value.toLowerCase();
+             
+             // Fetch all results flattened
+             allResults = await fetchAdminData('results_queue') || [];
 
-            const subjectSelect = document.getElementById('res-filter-subject');
-            subjectSelect.innerHTML = '<option value="">All Subjects</option>' + (data.subjects || []).map(s => `<option value="${s.name}">${s.name}</option>`).join('');
+             // Update Stats
+             document.getElementById('res-total').innerText = allResults.length;
+             document.getElementById('res-pending').innerText = allResults.filter(r => r.status === 'Pending').length;
+             document.getElementById('res-approved').innerText = allResults.filter(r => r.status === 'Approved').length;
+             document.getElementById('res-rejected').innerText = allResults.filter(r => r.status === 'Rejected').length;
 
-            renderResults();
+             // Populate Filters if empty (First Load)
+             const classSelect = document.getElementById('res-filter-class');
+             if(classSelect.children.length === 0) {
+                 if(!allClasses || allClasses.length === 0) allClasses = await fetchAdminData('classes') || [];
+                 classSelect.innerHTML = '<option value="">All Classes</option>' + 
+                     allClasses.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
+             }
+
+             const subjectSelect = document.getElementById('res-filter-subject');
+             if(subjectSelect.children.length === 0) {
+                 const subjects = [...new Set(allResults.map(r => r.subject))].sort();
+                 subjectSelect.innerHTML = '<option value="">All Subjects</option>' + subjects.map(s => `<option value="${s}">${s}</option>`).join('');
+             }
+
+             // Filter
+             const filtered = allResults.filter(r => {
+                 const matchClass = !filterClass || r.class === filterClass;
+                 const matchSubject = !filterSubject || r.subject === filterSubject;
+                 const matchStatus = !filterStatus || r.status === filterStatus;
+                 const matchSearch = !search || r.student_name.toLowerCase().includes(search) || r.student_id.toLowerCase().includes(search);
+                 return matchClass && matchSubject && matchStatus && matchSearch;
+             });
+
+             // Render
+             const tbody = document.getElementById('results-table-body');
+             tbody.innerHTML = '';
+             document.getElementById('res-count-display').innerText = `Showing ${filtered.length} entries`;
+
+             if(filtered.length === 0) {
+                 tbody.innerHTML = `<tr><td colspan="7" class="text-center py-8 text-gray-400">No results found matching filters.</td></tr>`;
+                 return;
+             }
+
+             filtered.forEach(r => {
+                 let statusColor = 'bg-yellow-50 text-yellow-600';
+                 if(r.status === 'Approved') statusColor = 'bg-green-50 text-green-600';
+                 if(r.status === 'Rejected') statusColor = 'bg-red-50 text-red-600';
+
+                 const tr = document.createElement('tr');
+                 tr.className = "border-b border-gray-100 hover:bg-gray-50 transition";
+                 tr.innerHTML = `
+                     <td class="px-4 py-3">
+                         <div class="font-bold text-gray-800">${r.student_name}</div>
+                         <div class="text-xs text-gray-400 font-mono">${r.student_id}</div>
+                     </td>
+                     <td class="px-4 py-3">
+                         <div class="text-sm text-gray-600">${r.subject}</div>
+                         <div class="text-xs text-blue-500 font-bold">${r.class}</div>
+                     </td>
+                     <td class="px-4 py-3 text-center font-mono">${r.class_score || '-'}</td>
+                     <td class="px-4 py-3 text-center font-mono">${r.exam_score || '-'}</td>
+                     <td class="px-4 py-3 text-center font-bold">${r.total}</td>
+                     <td class="px-4 py-3 text-center">
+                         <span class="px-2 py-1 rounded text-[10px] font-bold uppercase ${statusColor}">${r.status}</span>
+                     </td>
+                     <td class="px-4 py-3 text-right">
+                         <div class="flex justify-end gap-2">
+                             ${r.status !== 'Approved' ? `
+                             <button onclick="updateResultStatus('${r.student_id}', '${r.subject_id}', 'Approved')" class="p-1 px-2 bg-green-100 text-green-700 hover:bg-green-200 rounded text-xs font-bold transition" title="Approve">
+                                 <ion-icon name="checkmark"></ion-icon> Approve
+                             </button>` : ''}
+                             ${r.status !== 'Rejected' ? `
+                             <button onclick="updateResultStatus('${r.student_id}', '${r.subject_id}', 'Rejected')" class="p-1 px-2 bg-red-100 text-red-700 hover:bg-red-200 rounded text-xs font-bold transition" title="Reject">
+                                 <ion-icon name="close"></ion-icon> Reject
+                             </button>` : ''}
+                         </div>
+                     </td>
+                 `;
+                 tbody.appendChild(tr);
+             });
         }
 
-        function renderResults() {
-            const classFilter = document.getElementById('res-filter-class').value;
-            const subjectFilter = document.getElementById('res-filter-subject').value;
-            const statusFilter = document.getElementById('res-filter-status').value;
-            const search = document.getElementById('res-search').value.toLowerCase();
-
-            // Flatten all scores into a single iterable list
-            let flatScores = [];
-            let counts = { total: 0, Pending: 0, Approved: 0, Rejected: 0 };
-
-            data.students.forEach(student => {
-                const scores = student.scores || [];
-                scores.forEach((score, index) => {
-                    const status = score.status || 'Pending'; // Default
-                    counts.total++;
-                    counts[status] = (counts[status] || 0) + 1;
-
-                    // Filtering
-                    if (classFilter && student.class !== classFilter) return;
-                    if (subjectFilter && score.subject !== subjectFilter) return;
-                    if (statusFilter && status !== statusFilter) return;
-                    if (search && !(student.name.toLowerCase().includes(search) || student.id.toLowerCase().includes(search))) return;
-
-                    flatScores.push({
-                        studentId: student.id,
-                        studentName: student.name,
-                        class: student.class,
-                        subject: score.subject,
-                        scoreMatches: score, 
-                        scoreIndex: index,
-                        total: (parseInt(score.class)||0) + (parseInt(score.exam)||0)
-                    });
-                });
-            });
-
-            // Update Counts
-            document.getElementById('res-total').innerText = counts.total;
-            document.getElementById('res-pending').innerText = counts.Pending;
-            document.getElementById('res-approved').innerText = counts.Approved;
-            document.getElementById('res-rejected').innerText = counts.Rejected;
-
-            currentResultsList = flatScores; // Store for bulk actions
-
-            // Render Table
-            const tbody = document.getElementById('results-table-body');
-            if(flatScores.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" class="text-center py-10 text-gray-400 italic">No results found matching your filters.</td></tr>`;
-                document.getElementById('res-count-display').innerText = `Showing 0 entries`;
-                return;
+        async function updateResultStatus(studentId, subjectId, newStatus) {
+            const btn = event.target.closest('button');
+            if(btn) {
+                btn.innerHTML = '<ion-icon name="sync" class="animate-spin"></ion-icon>';
+                btn.disabled = true;
             }
 
-            tbody.innerHTML = flatScores.map(item => {
-                const s = item.scoreMatches;
-                const status = s.status || 'Pending';
-                let statusBadge = '';
-                if(status === 'Pending') statusBadge = '<span class="px-2 py-1 bg-yellow-100 text-yellow-700 text-xs font-bold rounded">Pending</span>';
-                if(status === 'Approved') statusBadge = '<span class="px-2 py-1 bg-green-100 text-green-700 text-xs font-bold rounded">Approved</span>';
-                if(status === 'Rejected') statusBadge = '<span class="px-2 py-1 bg-red-100 text-red-700 text-xs font-bold rounded">Rejected</span>';
-
-                return `
-                    <tr class="hover:bg-gray-50 border-b border-gray-50">
-                        <td class="px-4 py-3">
-                            <div class="font-bold text-gray-800">${escapeHtml(item.studentName)}</div>
-                            <div class="text-[10px] text-gray-400 font-mono">${item.studentId}</div>
-                        </td>
-                        <td class="px-4 py-3 text-xs">
-                            <div class="font-bold text-gray-600">${escapeHtml(item.subject)}</div>
-                            <div class="text-gray-400">${item.class}</div>
-                        </td>
-                        <td class="px-4 py-3 text-center font-mono text-gray-600">${s.class}</td>
-                        <td class="px-4 py-3 text-center font-mono text-gray-600">${s.exam}</td>
-                        <td class="px-4 py-3 text-center font-bold text-gray-800">${item.total}</td>
-                        <td class="px-4 py-3 text-center">${statusBadge}</td>
-                        <td class="px-4 py-3 text-right space-x-1">
-                            ${status !== 'Approved' ? `
-                                <button onclick="updateResultStatus('${item.studentId}', '${escapeHtml(item.subject)}', 'Approved')" class="p-1 text-green-600 hover:bg-green-50 rounded" title="Approve">
-                                    <ion-icon name="checkmark-circle-outline" class="text-xl"></ion-icon>
-                                </button>
-                            ` : ''}
-                            ${status !== 'Rejected' ? `
-                                <button onclick="updateResultStatus('${item.studentId}', '${escapeHtml(item.subject)}', 'Rejected')" class="p-1 text-red-600 hover:bg-red-50 rounded" title="Reject">
-                                    <ion-icon name="close-circle-outline" class="text-xl"></ion-icon>
-                                </button>
-                            ` : ''}
-                        </td>
-                    </tr>
-                `;
-            }).join('');
-
-            document.getElementById('res-count-display').innerText = `Showing ${flatScores.length} entries`;
-        }
-
-        function updateResultStatus(studentId, subjectName, newStatus) {
-            const student = data.students.find(s => s.id === studentId);
-            if(!student) return;
-
-            const score = student.scores.find(s => s.subject === subjectName);
-            if(score) {
-                score.status = newStatus;
-                saveSchoolData(data);
-                
-                // Optimistic UI update or re-render
-                renderResults();
-            }
-        }
-
-        function approveAllVisible() {
-            if(!confirm('Are you sure you want to Approve ALL currently listed results?')) return;
-            
-            let count = 0;
-            currentResultsList.forEach(item => {
-                const student = data.students.find(s => s.id === item.studentId);
-                if(student) {
-                    const score = student.scores.find(s => s.subject === item.subject);
-                    if(score && score.status !== 'Approved') {
-                        score.status = 'Approved';
-                        count++;
-                    }
-                }
-            });
-
-            if(count > 0) {
-                saveSchoolData(data);
-                renderResults();
-                alert(`Successfully approved ${count} results.`);
+            const result = await fetchAdminData('update_result_status', { student_id: studentId, subject_id: subjectId, status: newStatus }, 'POST');
+            if(result && result.success) {
+                // Optimistic UI update or re-fetch
+                await renderResults();
             } else {
-                alert('No pending results to approve in current view.');
+                alert('Action failed');
+                if(btn) btn.disabled = false;
             }
         }
 
-        // --- STUDENT MANAGEMENT LOGIC ---
+        async function approveAllVisible() {
+             const btn = document.querySelector('button[onclick="approveAllVisible()"]');
+             const originalContent = btn.innerHTML;
+             btn.innerHTML = '<ion-icon name="sync" class="animate-spin"></ion-icon> Processing...';
+             btn.disabled = true;
 
-        function renderStudents() {
-            const searchQuery = document.getElementById('search-input').value.toLowerCase();
-            const classFilter = document.getElementById('filter-class').value;
+             // Logic: get currently filtered items that are NOT approved
+             const filterClass = document.getElementById('res-filter-class').value;
+             // ... re-apply filter logic or look at filtered var if accessible.
+             // Simpler: Just rely on allResults filtered again
+             // For strictness, let's pass a bulk list of IDs
+             
+             // Re-filter here to be safe
+             const search = document.getElementById('res-search').value.toLowerCase();
+             const filterSubject = document.getElementById('res-filter-subject').value;
+             const filterStatus = document.getElementById('res-filter-status').value;
 
-            const filteredStudents = data.students.filter(s => {
-                const matchesSearch = (s.name.toLowerCase().includes(searchQuery) || s.id.toLowerCase().includes(searchQuery));
-                const matchesClass = classFilter === "" || s.class === classFilter;
-                return matchesSearch && matchesClass;
-            });
+             const toApprove = allResults.filter(r => {
+                 const matchClass = !filterClass || r.class === filterClass;
+                 const matchSubject = !filterSubject || r.subject === filterSubject;
+                 const matchStatus = !filterStatus || r.status === filterStatus; // Usually we approve 'Pending', but button says 'Approve All Listed'
+                 const matchSearch = !search || r.student_name.toLowerCase().includes(search);
+                 return matchClass && matchSubject && matchStatus && matchSearch && r.status !== 'Approved';
+             }).map(r => ({ student_id: r.student_id, subject_id: r.subject_id }));
 
-            document.getElementById('student-table-body').innerHTML = filteredStudents.slice(0, 50).map(s => `
-                <tr class="hover:bg-gray-50 group transition align-middle">
-                    <td class="px-4 py-3 font-mono text-gray-500 text-xs">${escapeHtml(s.id)}</td>
-                    <td class="px-4 py-3 font-bold text-gray-800">${escapeHtml(s.name)}</td>
-                    <td class="px-4 py-3"><span class="px-2 py-1 bg-blue-50 text-blue-600 rounded text-xs font-bold">${escapeHtml(s.class)}</span></td>
-                    <td class="px-4 py-3">
-                        <span class="px-2 py-1 rounded-full text-xs font-bold ${s.status === 'Inactive' ? 'bg-red-100 text-red-600' : 'bg-green-100 text-green-600'}">
-                            ${s.status || 'Active'}
-                        </span>
-                    </td>
-                    <td class="px-4 py-3 text-right space-x-2">
-                        <button onclick="viewAsStudent('${s.id}')" title="View Report" class="text-gray-400 hover:text-accent"><ion-icon name="eye-outline"></ion-icon></button>
-                        <button onclick="openEditStudentModal('${s.id}')" title="Edit" class="text-gray-400 hover:text-secondary"><ion-icon name="create-outline"></ion-icon></button>
-                        <button onclick="promptDeleteStudent('${s.id}')" title="Delete" class="text-gray-400 hover:text-red-500"><ion-icon name="trash-outline"></ion-icon></button>
-                    </td>
-                </tr>
-            `).join('');
-            
-            document.getElementById('showing-count').innerText = `Showing ${filteredStudents.length} students`;
+             if(toApprove.length === 0) {
+                 alert('No pending items to approve in current view.');
+                 btn.innerHTML = originalContent;
+                 btn.disabled = false;
+                 return;
+             }
+
+             if(!confirm(`Approve ${toApprove.length} results?`)) {
+                 btn.innerHTML = originalContent;
+                 btn.disabled = false;
+                 return;
+             }
+
+             const result = await fetchAdminData('bulk_approve', { items: toApprove }, 'POST');
+             
+             if(result && result.success) {
+                 await renderResults();
+                 alert('Bulk approval complete!');
+             } else {
+                 alert('Bulk action failed');
+             }
+             btn.innerHTML = originalContent;
+             btn.disabled = false;
         }
 
         // --- MODAL & FORM HANDLERS ---
+        // --- MODAL & FORM HANDLERS ---
+        async function openAddStudentModal(studentId = null) {
+             const modal = document.getElementById('add-student-modal');
+             const form = document.getElementById('add-student-form');
+             const title = document.getElementById('modal-title');
+             
+             // Populate Classes
+             const classes = await fetchAdminData('classes');
+             const classSelect = document.getElementById('student-class-select');
+             classSelect.innerHTML = (classes || []).map(c => `<option value="${c.name}">${c.name}</option>`).join('');
 
-        function openAddStudentModal() {
-             resetStudentForm();
-             document.getElementById('modal-title').innerText = "Register New Student";
-             document.getElementById('input-id').readOnly = false; // Allow ID editing for new
+             if(studentId) {
+                 title.innerText = "Edit Student";
+                 const student = allStudents.find(s => s.id == studentId);
+                 if(student) {
+                      document.getElementById('edit-mode-id').value = student.id;
+                      document.getElementById('input-name').value = student.name;
+                      const idInput = document.getElementById('input-id');
+                      idInput.value = student.id;
+                      idInput.readOnly = true; 
+                      idInput.classList.add('bg-gray-100', 'cursor-not-allowed');
+                      
+                      document.getElementById('student-class-select').value = student.class;
+                      document.getElementById('input-gender').value = student.gender || 'Male';
+                      document.getElementById('input-status').value = student.status || 'Active';
+                 }
+             } else {
+                 title.innerText = "Register New Student";
+                 form.reset();
+                 document.getElementById('edit-mode-id').value = "";
+                 const idInput = document.getElementById('input-id');
+                 idInput.readOnly = false;
+                 idInput.classList.remove('bg-gray-100', 'cursor-not-allowed');
+                 idInput.value = "";
+                 document.getElementById('input-status').value = "Active";
+             }
              
-             // Populate classes
-             const select = document.getElementById('student-class-select');
-             select.innerHTML = (data.classes || []).map(c => `<option value="${c.name}">${c.name}</option>`).join('');
-             
-             document.getElementById('add-student-modal').classList.remove('hidden');
+             modal.classList.remove('hidden');
         }
 
-        function openEditStudentModal(id) {
-            const student = data.students.find(s => s.id === id);
-            if (!student) return;
-
-            resetStudentForm();
-            document.getElementById('modal-title').innerText = "Edit Student Details";
-            
-            // Fill Data
-            document.getElementById('edit-mode-id').value = student.id;
-            document.getElementById('input-name').value = student.name;
-            document.getElementById('input-id').value = student.id;
-            document.getElementById('input-id').readOnly = true; // Prevent ID change to avoid chaos
-            document.getElementById('input-gender').value = student.gender || 'Male';
-            document.getElementById('input-status').value = student.status || 'Active';
-
-            // Populate classes and select current
-            const select = document.getElementById('student-class-select');
-            select.innerHTML = (data.classes || []).map(c => `<option value="${c.name}" ${c.name === student.class ? 'selected' : ''}>${c.name}</option>`).join('');
-
-            document.getElementById('add-student-modal').classList.remove('hidden');
-        }
-
-        function handleSaveStudent(e) {
+        async function handleSaveStudent(e) {
             e.preventDefault();
-            const formData = new FormData(e.target);
-            const editId = formData.get('editModeId');
+            const form = e.target;
+            const editId = document.getElementById('edit-mode-id').value;
             
-            // Prepare Student Object
-            const studentData = {
-                id: formData.get('id'),
-                name: formData.get('name'),
-                class: formData.get('class'),
-                gender: formData.get('gender'),
-                status: formData.get('status'),
-                term: formData.get('term') // Preserved for new users, but arguably should be global setting
+            const data = {
+                id: editId || document.getElementById('input-id').value, 
+                name: document.getElementById('input-name').value,
+                class: document.getElementById('student-class-select').value,
+                gender: document.getElementById('input-gender').value,
+                status: document.getElementById('input-status').value
             };
+            
+            if(!data.id) { alert("ID is required"); return; }
 
-            if (editId) {
-                // EDIT MODE
-                const index = data.students.findIndex(s => s.id === editId);
-                if (index !== -1) {
-                    // Update only specific fields, preserve scores/attendance
-                    const existing = data.students[index];
-                    data.students[index] = { ...existing, ...studentData };
-                }
+            const result = await fetchAdminData('add_student', data, 'POST');
+            if (result && result.success) {
+                alert('Student saved successfully');
+                closeModal('add-student-modal');
+                initDashboard();
+                if(!editId) form.reset(); 
             } else {
-                // ADD MODE
-                if(data.students.find(s => s.id === studentData.id)) { 
-                    alert('Index Number already exists!'); 
-                    return; 
-                }
-                // Determine new student default structure
-                const newStudent = {
-                    ...studentData,
-                    year: "2024/2025",
-                    attendance: { present: 0, total: 60 },
-                    conduct: "Good",
-                    image: "",
-                    scores: [
-                         { subject: "English Language", class: 0, exam: 0 }, { subject: "Mathematics", class: 0, exam: 0 }, { subject: "Integrated Science", class: 0, exam: 0 }, 
-                         { subject: "Social Studies", class: 0, exam: 0 }, { subject: "I.C.T.", class: 0, exam: 0 }, { subject: "R.M.E.", class: 0, exam: 0 }, 
-                         { subject: "B.D.T.", class: 0, exam: 0 }, { subject: "French", class: 0, exam: 0 }, { subject: "Ghanaian Language", class: 0, exam: 0 }
-                    ]
-                };
-                data.students.unshift(newStudent);
+                alert('Error: ' + (result?.message || 'Failed to save student'));
             }
-
-            saveSchoolData(data);
-            renderStudents();
-            updateStats();
-            closeModal('add-student-modal');
         }
-
-        function promptDeleteStudent(id) {
-            studentToDelete = id;
+        
+        function openDeleteStudentModal(id) {
+            deleteTargetId = id;
             document.getElementById('delete-modal').classList.remove('hidden');
         }
-
-        function confirmDeleteStudent() {
-            if (studentToDelete) {
-                data.students = data.students.filter(s => s.id !== studentToDelete);
-                saveSchoolData(data);
-                renderStudents();
-                updateStats();
-                studentToDelete = null;
+        
+        async function confirmDeleteStudent() {
+            if(!deleteTargetId) return;
+            const result = await fetchAdminData('delete_student', { id: deleteTargetId }, 'POST');
+            if(result && result.success) {
+                alert('Student deleted');
                 closeModal('delete-modal');
+                initDashboard();
+            } else {
+                alert('Failed to delete');
             }
         }
-
-        function resetStudentForm() {
-            document.getElementById('add-student-form').reset();
-            document.getElementById('edit-mode-id').value = "";
+        
+        // --- MODAL UTILS (Ensure Defined) ---
+        function closeModal(id) {
+            document.getElementById(id).classList.add('hidden');
         }
 
-        // --- OTHER LOGIC SAME AS BEFORE ---
+        // --- CLASS HANDLERS ---
 
-        // --- CLASS MANAGEMENT ---
 
-         // --- CLASS MANAGEMENT ---
+        async function handleAddClass(e) {
+            e.preventDefault();
+            const form = e.target;
+            const data = {
+                id: form.id.value,
+                name: form.name.value,
+                level: form.level.value,
+                class_teacher_id: form.class_teacher_id.value,
+                active: form.active.value
+            };
+            
+            const result = await fetchAdminData('add_class', data, 'POST');
+            if(result && result.success) {
+                alert('Class saved successfully');
+                closeModal('add-class-modal');
+                initDashboard(); 
+                form.reset();
+            } else {
+                alert('Failed to save class');
+            }
+        }
+        
+        function openDeleteClassModal(id) {
+            deleteTargetId = id;
+            const modal = document.getElementById('delete-modal');
+            modal.querySelector('h3').innerText = "Delete Class?";
+            modal.querySelector('p').innerText = "Delete this class? This will NOT delete detailed student/teacher links yet."; 
+            const btn = modal.querySelector('button.bg-red-500');
+            btn.setAttribute('onclick', 'confirmDeleteClass()');
+            modal.classList.remove('hidden');
+        }
+        
+        async function confirmDeleteClass() {
+             if(!deleteTargetId) return;
+             const result = await fetchAdminData('delete_class', { id: deleteTargetId }, 'POST');
+             if(result && result.success) { alert("Class deleted"); closeModal('delete-modal'); initDashboard(); }
+        }
 
-         // --- CLASS MANAGEMENT ---
+        // --- TEACHER HANDLERS ---
+         async function openAddTeacherModal(id = null) {
+            const modal = document.getElementById('add-teacher-modal');
+            const form = modal.querySelector('form');
+            const title = modal.querySelector('h2');
+            
+            form.reset();
+            if(id) {
+                const t = allTeachers.find(u => u.id == id);
+                if(t) {
+                    form.dataset.editId = t.id;
+                    form.name.value = t.name;
+                    form.email.value = t.email;
+                    form.password.value = ""; 
+                    form.password.placeholder = "Leave blank to keep same";
+                    if(title) title.innerText = "Edit Teacher";
+                }
+            } else {
+                 delete form.dataset.editId;
+                 form.password.placeholder = "Password";
+                 if(title) title.innerText = "Add New Teacher";
+            }
+            modal.classList.remove('hidden');
+        }
 
-         function renderClasses() {
-             const levels = {
-                 'Kindergarten': (data.classes || []).filter(c => c.name.startsWith('KG')),
-                 'Primary School': (data.classes || []).filter(c => c.name.startsWith('Basic')),
-                 'Junior High': (data.classes || []).filter(c => c.name.startsWith('JHS')),
-                 'Other Classes': (data.classes || []).filter(c => !c.name.startsWith('KG') && !c.name.startsWith('Basic') && !c.name.startsWith('JHS'))
-             };
+        async function handleAddTeacher(e) {
+            e.preventDefault();
+            const form = e.target;
+            const editId = form.dataset.editId;
+            const data = {
+                name: form.name.value,
+                email: form.email.value,
+                password: form.password.value
+            };
+            if(editId) data.id = editId;
+            
+            const result = await fetchAdminData('add_teacher', data, 'POST');
+            if (result && result.success) {
+                alert('Teacher saved successfully!');
+                closeModal('add-teacher-modal');
+                renderTeachers();
+                initDashboard(); 
+                form.reset();
+            } else {
+                 alert('Error: ' + (result?.message || 'Could not save teacher'));
+            }
+        }
+        
+        function openDeleteTeacherModal(id) {
+            deleteTargetId = id;
+            const modal = document.getElementById('delete-modal');
+            modal.querySelector('h3').innerText = "Delete Teacher?";
+            modal.querySelector('p').innerText = "Delete this teacher account?";
+            const btn = modal.querySelector('button.bg-red-500');
+            btn.setAttribute('onclick', 'confirmDeleteTeacher()');
+            modal.classList.remove('hidden');
+        }
+        
+         async function confirmDeleteTeacher() {
+             if(!deleteTargetId) return;
+             const result = await fetchAdminData('delete_teacher', { id: deleteTargetId }, 'POST');
+             if(result && result.success) { 
+                 alert("Teacher deleted"); 
+                 closeModal('delete-modal'); 
+                 renderTeachers(); // Refresh list
+                 initDashboard();  // Refresh stats
+             } else {
+                 alert("Failed to delete");
+             }
+        }
+        
+        // --- STUDENT DELETE OVERRIDE ---
+        function openDeleteStudentModal(id) {
+            deleteTargetId = id;
+            const modal = document.getElementById('delete-modal');
+            modal.querySelector('h3').innerText = "Delete Student?";
+            modal.querySelector('p').innerText = "Are you sure you want to delete this student?";
+            const btn = modal.querySelector('button.bg-red-500');
+            btn.setAttribute('onclick', 'confirmDeleteStudent()');
+            modal.classList.remove('hidden');
+        }
 
-             const styles = { 
-                 'Kindergarten': { iconBg: 'bg-rose-100', iconText: 'text-rose-600', border: 'border-l-4 border-l-rose-500', title: 'text-rose-900', bg: 'bg-rose-50/50' },
-                 'Primary School': { iconBg: 'bg-sky-100', iconText: 'text-sky-600', border: 'border-l-4 border-l-sky-500', title: 'text-sky-900', bg: 'bg-sky-50/50' },
-                 'Junior High': { iconBg: 'bg-violet-100', iconText: 'text-violet-600', border: 'border-l-4 border-l-violet-500', title: 'text-violet-900', bg: 'bg-violet-50/50' },
-                 'Other Classes': { iconBg: 'bg-gray-100', iconText: 'text-gray-600', border: 'border-l-4 border-gray-500', title: 'text-gray-900', bg: 'bg-gray-50' }
-             };
+        async function handleSaveSubject(e) {
+            e.preventDefault();
+            const form = e.target;
+            const data = {
+                id: form.id.value,
+                name: form.name.value,
+                code: form.code.value,
+                level: form.level.value,
+                status: form.status.value
+            };
+            const result = await fetchAdminData('add_subject', data, 'POST');
+            if (result && result.success) {
+                alert('Subject saved!');
+                closeModal('add-subject-modal');
+                initSubjectView();
+                initDashboard(); // Refresh stats
+                form.reset();
+            } else {
+                 alert('Error: ' + (result?.message || 'Could not save subject'));
+            }
+        }
+        
+        async function openManageSubjectsModal(classId) {
+             const classes = await fetchAdminData('classes');
+             const cls = classes.find(c => c.id === classId);
+             if(!cls) return;
 
-             let html = '';
+             const subjects = await fetchAdminData('subjects') || [];
+             // Filter subjects by class level (e.g. only show Primary subjects for Primary class)
+             const levelSubjects = subjects.filter(s => s.level === cls.level);
+             
+             const assigned = cls.subjects || [];
 
-             for (const [level, classes] of Object.entries(levels)) {
-                 if(classes.length === 0) continue;
+             const container = document.getElementById('class-subjects-list');
+             document.querySelector('#manage-subjects-form input[name="class_id"]').value = classId;
+             document.getElementById('manage-subjects-subtitle').innerText = `Configure subjects for ${cls.name} (${cls.level})`;
 
-                 const style = styles[level] || styles['Other Classes'];
-
-                 html += `
-                    <div class="col-span-full mt-6 mb-3 flex items-center gap-3">
-                        <div class="h-px bg-gray-200 flex-1"></div>
-                        <h4 class="text-sm font-bold uppercase tracking-wider ${style.iconText} px-4 py-1 rounded-full ${style.iconBg}">${level}</h4>
-                        <div class="h-px bg-gray-200 flex-1"></div>
-                    </div>
-                 `;
-
-                 html += classes.map(c => {
-                     const teachers = data.teachers.filter(t => t.assigned_classes && t.assigned_classes.includes(c.id));
+             if(levelSubjects.length === 0) {
+                 container.innerHTML = '<div class="text-center py-10 text-gray-400 italic">No subjects defined for this level yet.</div>';
+             } else {
+                 container.innerHTML = levelSubjects.map(s => {
+                     const isChecked = assigned.includes(s.id);
                      return `
-                        <div class="bg-white p-5 rounded-xl border border-gray-100 shadow-sm hover:shadow-lg hover:-translate-y-1 transition relative group flex flex-col justify-between ${style.border} overflow-hidden">
-                            <div class="absolute inset-0 ${style.bg} opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                            <div class="relative z-10">
-                                <div class="flex justify-between items-start mb-3">
-                                    <div class="w-10 h-10 rounded-lg ${style.iconBg} ${style.iconText} flex items-center justify-center text-lg font-bold shadow-sm">
-                                        ${c.name.split(' ').pop().charAt(0)}
-                                    </div>
-                                    <div class="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                        <button onclick="openEditClassModal('${c.id}')" class="w-8 h-8 flex items-center justify-center bg-white rounded-lg shadow-sm text-gray-400 hover:text-secondary hover:shadow-md transition"><ion-icon name="create-outline"></ion-icon></button>
-                                        <button onclick="deleteClass('${c.id}')" class="w-8 h-8 flex items-center justify-center bg-white rounded-lg shadow-sm text-gray-400 hover:text-red-500 hover:shadow-md transition"><ion-icon name="trash-outline"></ion-icon></button>
-                                    </div>
-                                </div>
-                                <h4 class="font-bold text-lg mb-0.5 ${style.title}">${escapeHtml(c.name)}</h4>
-                                <p class="text-[10px] text-gray-400 font-mono mb-4 uppercase tracking-wide">ID: ${escapeHtml(c.id)}</p>
+                        <label class="flex items-center gap-3 p-3 rounded-xl border border-gray-100 hover:border-gray-300 hover:bg-gray-50 cursor-pointer transition">
+                            <input type="checkbox" name="subject_ids" value="${s.id}" ${isChecked ? 'checked' : ''} class="w-5 h-5 rounded border-gray-300 text-secondary focus:ring-secondary">
+                            <div>
+                                <span class="block text-gray-800 font-bold text-sm">${s.name}</span>
+                                <span class="block text-xs text-gray-400 font-mono">${s.code}</span>
                             </div>
-                            
-                            <div class="relative z-10 flex items-center gap-2 pt-3 border-t border-gray-100/50">
-                                 <div class="flex -space-x-2">
-                                    ${teachers.length ? teachers.map((t, i) => i < 3 ? `<div class="w-7 h-7 rounded-full bg-white border-2 border-white shadow-sm flex items-center justify-center text-[9px] font-bold text-gray-600 ring-1 ring-gray-100" title="${t.name}">${t.name.charAt(0)}</div>` : '').join('') : '<span class="text-xs text-gray-300 italic pl-1">No Teacher Assigned</span>'}
-                                    ${teachers.length > 3 ? `<div class="w-7 h-7 rounded-full bg-gray-50 border-2 border-white shadow-sm flex items-center justify-center text-[9px] font-bold text-gray-500 ring-1 ring-gray-100">+${teachers.length-3}</div>` : ''}
-                                 </div>
-                            </div>
-                        </div>
+                            <span class="ml-auto text-xs font-bold px-2 py-1 rounded bg-${s.active ? 'green' : 'red'}-100 text-${s.active ? 'green' : 'red'}-600">${s.active ? 'Active' : 'Inactive'}</span>
+                        </label>
                      `;
                  }).join('');
              }
-             
-             document.getElementById('class-grid').innerHTML = html;
+
+             document.getElementById('manage-subjects-modal').classList.remove('hidden');
         }
 
-        function openEditClassModal(id) {
-            const cls = data.classes.find(c => c.id === id);
-            if(!cls) return;
-            // Reuse Add Class Modal but populate it
-            document.getElementById('add-class-modal').classList.remove('hidden');
-            const form = document.querySelector('#add-class-modal form');
-            form.name.value = cls.name;
-            form.dataset.editId = cls.id; // Store editing ID
-            document.querySelector('#add-class-modal h2').innerText = "Edit Class";
+        async function handleSaveClassSubjects(e) {
+            e.preventDefault();
+            const form = e.target;
+            const classId = form.class_id.value;
             
-            // Set assigned teachers
-            const tIds = data.teachers.filter(t => t.assigned_classes && t.assigned_classes.includes(id)).map(t => t.id);
-            const options = document.getElementById('class-teacher-select').options;
-            for(let i=0; i<options.length; i++) {
-                options[i].selected = tIds.includes(options[i].value);
-            }
-        }
+            // Get checked IDs
+            const checkedBoxes = form.querySelectorAll('input[name="subject_ids"]:checked');
+            const subjectIds = Array.from(checkedBoxes).map(cb => cb.value);
 
-        function handleAddClass(e){
-            e.preventDefault(); 
-            const fd = new FormData(e.target);
-            const editId = e.target.dataset.editId;
+            const result = await fetchAdminData('assign_class_subjects', { class_id: classId, subjects: subjectIds }, 'POST');
             
-            if (editId) {
-                // Edit Existing
-                const cls = data.classes.find(c => c.id === editId);
-                if(cls) cls.name = fd.get('name');
-                // Update teachers: First clear this class from all teachers, then re-assign
-                data.teachers.forEach(t => {
-                   if(t.assigned_classes) t.assigned_classes = t.assigned_classes.filter(cid => cid !== editId);
-                });
+            if(result && result.success) {
+                alert('Subjects updated successfully');
+                closeModal('manage-subjects-modal');
+                renderClasses(); // Refresh counts
             } else {
-                // Create New
-                const cid = "C" + Date.now().toString().slice(-4);
-                if(!data.classes) data.classes=[];
-                data.classes.push({id: cid, name: fd.get('name')});
-                e.target.dataset.tempId = cid; // Valid only for immediate teacher assignment below
+                alert('Failed to update subjects');
             }
+        }
 
-            const targetId = editId || e.target.dataset.tempId;
-            const tIds = Array.from(e.target.teachers.selectedOptions).map(o=>o.value);
+
+        // --- VIEW RENDERERS ---
+        async function renderClasses() {
+            const grid = document.getElementById('class-grid');
+            const classes = await fetchAdminData('classes');
+            // Fetch teachers if not loaded
+            if(allTeachers.length === 0) allTeachers = await fetchAdminData('teachers') || [];
+            // Fetch students if not loaded (for counts)
+            if(allStudents.length === 0) allStudents = await fetchAdminData('students') || [];
+            allClasses = classes || [];
             
-            tIds.forEach(tid => { 
-                const t = data.teachers.find(x => x.id === tid); 
-                if(t) { 
-                    if(!t.assigned_classes) t.assigned_classes = []; 
-                    if(!t.assigned_classes.includes(targetId)) t.assigned_classes.push(targetId); 
-                }
-            });
-
-            delete e.target.dataset.editId;
-            delete e.target.dataset.tempId;
-            document.querySelector('#add-class-modal h2').innerText = "New Class";
-            saveSchoolData(data); renderClasses(); updateStats(); closeModal('add-class-modal'); e.target.reset();
-        }
-
-        function backupData() {
-            const a = document.createElement('a');
-            a.href = URL.createObjectURL(new Blob([JSON.stringify(data,null,2)], {type:'application/json'}));
-            a.download = `backup_${new Date().toISOString().slice(0,10)}.json`;
-            a.click();
-        }
-        function restoreData(input) {
-            const r = new FileReader();
-            r.onload = e => { try { saveSchoolData(JSON.parse(e.target.result)); location.reload(); } catch(x){alert('Invalid File');} };
-            r.readAsText(input.files[0]);
-        }
-        function hardResetSystem() {
-            if(confirm('⚠️ FACTORY RESET WARNING ⚠️\n\nThis will Delete ALL data (Students, Teachers, Classes) and reset the system to the default GES structure.\n\nAre you sure completely?')) {
-                localStorage.removeItem('schoolData');
-                location.reload();
+            if(!classes || classes.length === 0) {
+                grid.innerHTML = '<div class="col-span-full text-center py-10 text-gray-400">No classes found. Add one to start.</div>';
+                return;
             }
+
+            // Group by Level
+            const levels = ['KG', 'Primary', 'JHS'];
+            let html = '';
+
+            levels.forEach(level => {
+                 const levelClasses = classes.filter(c => c.level === level);
+                 if(levelClasses.length > 0) {
+                     html += `
+                        <div class="col-span-full mt-4 mb-2">
+                            <h3 class="font-bold text-gray-500 uppercase text-xs tracking-wider border-b border-gray-100 pb-2">${level} Classes</h3>
+                        </div>
+                     ` + levelClasses.map(c => `
+                        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition group relative">
+                            <div class="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition flex gap-2">
+                                <button onclick="openManageSubjectsModal('${c.id}')" title="Manage Subjects" class="p-1 hover:bg-gray-100 rounded text-gray-400 hover:text-blue-500"><ion-icon name="book-outline"></ion-icon></button>
+                                <button onclick="openAddClassModal('${c.id}')" class="p-1 hover:bg-gray-100 rounded text-gray-400 hover:text-accent"><ion-icon name="create-outline"></ion-icon></button>
+                                <button onclick="confirmDeleteClass('${c.id}')" class="p-1 hover:bg-red-50 rounded text-gray-400 hover:text-red-500"><ion-icon name="trash-outline"></ion-icon></button>
+                            </div>
+                            <div class="w-12 h-12 rounded-xl bg-${getLevelColor(c.level)}-50 text-${getLevelColor(c.level)}-600 flex items-center justify-center text-2xl mb-4 relative">
+                                <ion-icon name="people"></ion-icon>
+                                ${c.active === false ? '<div class="absolute -top-1 -right-1 w-3 h-3 bg-gray-400 rounded-full border-2 border-white"></div>' : '<div class="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></div>'}
+                            </div>
+                            <h3 class="font-bold text-gray-800 text-lg ${c.active === false ? 'opacity-50' : ''}">${c.name}</h3>
+                            <p class="text-xs text-gray-400 font-bold uppercase mt-1 mb-2 text-${getLevelColor(c.level)}-500">${c.level || 'General'} <span class="ml-2 px-1.5 py-0.5 rounded text-[10px] ${c.active === false ? 'bg-gray-100 text-gray-500' : 'bg-green-50 text-green-600'}">${c.active === false ? 'INACTIVE' : 'ACTIVE'}</span></p>
+                            
+                            <p class="text-sm text-gray-600 mb-4 flex items-center gap-2">
+                                <ion-icon name="person-outline"></ion-icon> 
+                                ${c.class_teacher_id ? (allTeachers.find(t => t.id === c.class_teacher_id)?.name || 'Unknown Teacher') : '<span class="text-gray-400 italic">No Class Teacher</span>'}
+                            </p>
+                            
+                            <div class="flex items-center justify-between text-sm text-gray-500 border-t border-gray-50 pt-3">
+                                <div class="flex items-center gap-1" title="Assigned Subjects">
+                                    <ion-icon name="book-outline"></ion-icon>
+                                    <span>${c.subjects ? c.subjects.length : 0} Subjects</span>
+                                </div>
+                                <div class="flex items-center gap-1" title="Enrolled Students">
+                                    <ion-icon name="people-circle-outline"></ion-icon>
+                                    <span class="font-bold text-gray-700">${(allStudents || []).filter(s => s.class === c.name || s.class_id === c.id).length} Students</span>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('');
+                 }
+            });
+            
+            // Catch-all
+            const others = classes.filter(c => !levels.includes(c.level));
+            if(others.length > 0) {
+                 html += `
+                    <div class="col-span-full mt-4 mb-2">
+                            <h3 class="font-bold text-gray-500 uppercase text-xs tracking-wider border-b border-gray-100 pb-2">Other Classes</h3>
+                        </div>
+                 ` + others.map(c => `
+                        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition group relative">
+                             <div class="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition flex gap-2">
+                                <button onclick="openAddClassModal('${c.id}')" class="p-1 hover:bg-gray-100 rounded text-gray-400 hover:text-accent"><ion-icon name="create-outline"></ion-icon></button>
+                                <button onclick="confirmDeleteClass('${c.id}')" class="p-1 hover:bg-red-50 rounded text-gray-400 hover:text-red-500"><ion-icon name="trash-outline"></ion-icon></button>
+                            </div>
+                            <div class="w-12 h-12 rounded-xl bg-gray-50 text-gray-600 flex items-center justify-center text-2xl mb-4">
+                                <ion-icon name="people"></ion-icon>
+                            </div>
+                            <h3 class="font-bold text-gray-800 text-lg">${c.name}</h3>
+                            <div class="flex items-center gap-4 text-sm text-gray-500 mt-4">
+                                <div class="flex items-center gap-1">
+                                    <ion-icon name="book-outline"></ion-icon>
+                                    <span>${c.subjects ? c.subjects.length : 0} Subjects</span>
+                                </div>
+                            </div>
+                        </div>
+                 `).join('');
+            }
+
+            grid.innerHTML = html;
         }
 
-        // Init
-        initFilters();
-        updateStats();
-        renderStudents();
-        setTimeout(initChart, 500);
-        // --- SUBJECT MANAGEMENT LOGIC ---
-        
-        // --- SETTINGS MANAGEMENT LOGIC ---
-        // Logic moved to js/settings.js
-
-
-        function initSubjectView() {
-            renderSubjects();
-            populateSubjectAssignmentDropdown();
+        function getLevelColor(level) {
+            if(level === 'KG') return 'pink'; 
+            if(level === 'Primary') return 'blue';
+            if(level === 'JHS') return 'purple';
+            return 'gray';
         }
 
-        function renderSubjects() {
-            const tbody = document.getElementById('subject-table-body');
-            tbody.innerHTML = (data.subjects || []).map(s => `
-                <tr class="hover:bg-gray-50 transition border-b border-gray-50">
-                    <td class="px-4 py-3 font-mono text-xs text-gray-400">${escapeHtml(s.code)}</td>
-                    <td class="px-4 py-3 font-bold text-gray-800">${escapeHtml(s.name)}</td>
-                    <td class="px-4 py-3">
-                         <span class="px-2 py-1 rounded text-[10px] font-bold uppercase ${s.status === 'Inactive' ? 'bg-gray-100 text-gray-400' : 'bg-green-100 text-green-600'}">${s.status}</span>
+        async function renderTeachers() {
+            const tbody = document.getElementById('teacher-table-body');
+            const teachers = await fetchAdminData('teachers');
+            allTeachers = teachers || [];
+            
+            tbody.innerHTML = (teachers||[]).map(t => `
+                <tr class="hover:bg-gray-50/50 transition group">
+                    <td class="px-6 py-4 font-mono text-xs text-gray-500">${t.id}</td>
+                    <td class="px-6 py-4">
+                        <div class="font-bold text-gray-800">${t.name}</div>
+                        <div class="text-xs text-gray-400">${t.email}</div>
                     </td>
-                    <td class="px-4 py-3 text-right">
-                        <button onclick="openEditSubjectModal('${s.id}')" class="text-gray-300 hover:text-secondary p-1"><ion-icon name="create-outline"></ion-icon></button>
-                         <button onclick="deleteSubject('${s.id}')" class="text-gray-300 hover:text-red-500 p-1"><ion-icon name="trash-outline"></ion-icon></button>
+                    <td class="px-6 py-4">
+                        <div class="flex flex-wrap gap-1">
+                             ${t.assigned_classes && t.assigned_classes.length > 0 ? t.assigned_classes.map(c => `<span class="px-2 py-1 bg-blue-50 text-blue-600 text-[10px] rounded font-mono font-bold">${c}</span>`).join('') : '<span class="text-xs text-gray-300 italic">No classes</span>'}
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 text-right">
+                        <div class="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition">
+                             <button onclick="openAddTeacherModal('${t.id}')" class="text-gray-400 hover:text-accent transition p-1"><ion-icon name="create-outline"></ion-icon></button>
+                             <button onclick="openDeleteTeacherModal('${t.id}')" class="text-gray-400 hover:text-red-500 transition p-1"><ion-icon name="trash-outline"></ion-icon></button>
+                        </div>
                     </td>
                 </tr>
             `).join('');
         }
 
-        function openAddSubjectModal() {
-            document.querySelector('#add-subject-modal form').reset();
-            document.querySelector('#add-subject-modal form').id.value = "";
-            document.getElementById('subject-modal-title').innerText = "New Subject";
-            document.getElementById('add-subject-modal').classList.remove('hidden');
+        async function initSubjectView() {
+            const tbody = document.getElementById('subject-table-body');
+            const subjects = await fetchAdminData('subjects');
+            
+            allSubjects = subjects || [];
+            
+            // Group by Level
+            const levels = ['KG', 'Primary', 'JHS'];
+            let html = '';
+
+            levels.forEach(level => {
+                 const levelSubjects = allSubjects.filter(s => s.level === level);
+                 if(levelSubjects.length > 0) {
+                     html += `
+                        <tr class="bg-gray-50/50"><td colspan="4" class="px-4 py-2 font-bold text-xs uppercase text-gray-400 tracking-wider sticky top-0 bg-gray-50">${level} Subjects</td></tr>
+                     ` + levelSubjects.map(s => `
+                        <tr class="hover:bg-gray-50/50 transition group border-b border-gray-50">
+                            <td class="px-4 py-3 font-mono font-bold text-gray-600">${s.code}</td>
+                            <td class="px-4 py-3 font-medium text-gray-800">${s.name}</td>
+                            <td class="px-4 py-3"><span class="px-2 py-1 ${s.status === 'Active' ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'} text-[10px] rounded font-bold uppercase">${s.status}</span></td>
+                            <td class="px-4 py-3 text-right">
+                                <div class="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition">
+                                    <button onclick="openEditSubjectModal('${s.id}')" class="text-gray-400 hover:text-accent transition"><ion-icon name="create-outline"></ion-icon></button>
+                                    <button onclick="deleteSubject('${s.id}')" class="text-gray-400 hover:text-red-500 transition"><ion-icon name="trash-outline"></ion-icon></button>
+                                </div>
+                            </td>
+                        </tr>
+                     `).join('');
+                 }
+            });
+
+            // Catch-all for undefined levels
+            const otherSubjects = allSubjects.filter(s => !levels.includes(s.level));
+            if(otherSubjects.length > 0) {
+                 html += `
+                    <tr class="bg-gray-50/50"><td colspan="4" class="px-4 py-2 font-bold text-xs uppercase text-gray-400 tracking-wider">Other / Uncategorized</td></tr>
+                 ` + otherSubjects.map(s => `
+                    <tr class="hover:bg-gray-50/50 transition group border-b border-gray-50">
+                        <td class="px-4 py-3 font-mono font-bold text-gray-600">${s.code}</td>
+                        <td class="px-4 py-3 font-medium text-gray-800">${s.name}</td>
+                        <td class="px-4 py-3"><span class="px-2 py-1 ${s.status === 'Active' ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'} text-[10px] rounded font-bold uppercase">${s.status}</span></td>
+                        <td class="px-4 py-3 text-right">
+                            <div class="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition">
+                                <button onclick="openEditSubjectModal('${s.id}')" class="text-gray-400 hover:text-accent transition"><ion-icon name="create-outline"></ion-icon></button>
+                                <button onclick="deleteSubject('${s.id}')" class="text-gray-400 hover:text-red-500 transition"><ion-icon name="trash-outline"></ion-icon></button>
+                            </div>
+                        </td>
+                    </tr>
+                 `).join('');
+            }
+            
+            tbody.innerHTML = html;
+            
+            // Populate Class Assigmnent Select
+            const clsSelect = document.getElementById('assign-class-select');
+            // Assuming allClasses is populated
+            if(allClasses.length === 0) allClasses = await fetchAdminData('classes');
+            clsSelect.innerHTML = '<option value="">-- Select Class to Assign --</option>' + 
+                 allClasses.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
         }
 
-        function openEditSubjectModal(id) {
-            const sub = data.subjects.find(s => s.id === id);
-            if(!sub) return;
+        async function saveClassSubjects() {
+             const classId = document.getElementById('assign-class-select').value;
+             if(!classId) return alert('Select a class first');
+             
+             // Get Checked checkboxes
+             const checkboxes = document.querySelectorAll('input[name="subject_assign"]:checked');
+             const subjectIds = Array.from(checkboxes).map(cb => cb.value);
+
+             const result = await fetchAdminData('assign_class_subjects', { class_id: classId, subjects: subjectIds }, 'POST');
+             if(result && result.success) alert('Assignments Saved');
+        }
+
+        function openEditStudentModal(id) {
+             openAddStudentModal(id);
+        }
+
+        async function populateClassTeacherSelect(selectedId = null) {
+            const select = document.getElementById('class-teacher-select');
+            if(!select) return;
+            
+            if(allTeachers.length === 0) allTeachers = await fetchAdminData('teachers') || [];
+            
+            select.innerHTML = '<option value="">-- No Class Teacher --</option>' + 
+                allTeachers.map(t => `<option value="${t.id}" ${t.id === selectedId ? 'selected' : ''}>${t.name}</option>`).join('');
+        }
+
+        async function openAddClassModal() {
+            const form = document.querySelector('#add-class-modal form');
+            form.reset();
+            form.id.value = "";
+            await populateClassTeacherSelect();
+            document.querySelector('#add-class-modal h2').innerText = "New Class";
+            document.getElementById('add-class-modal').classList.remove('hidden');
+        }
+
+        async function openEditClassModal(id) {
+             const classes = await fetchAdminData('classes');
+             const cls = classes.find(c => c.id === id);
+             if(!cls) return;
+
+             const form = document.querySelector('#add-class-modal form');
+             form.id.value = cls.id;
+             form.name.value = cls.name;
+             if(form.level) form.level.value = cls.level;
+             // handle active/inactive
+             if(form.active) form.active.value = cls.active === false ? "false" : "true";
+             
+             await populateClassTeacherSelect(cls.class_teacher_id);
+             
+             document.querySelector('#add-class-modal h2').innerText = "Edit Class";
+             document.getElementById('add-class-modal').classList.remove('hidden');
+        }
+
+
+
+        let allSubjects = [];
+
+        function openAddSubjectModal() {
+             const form = document.querySelector('#add-subject-modal form');
+             form.reset();
+             form.id.value = ""; // clear hidden id
+             document.getElementById('subject-modal-title').innerText = "New Subject";
+             document.getElementById('add-subject-modal').classList.remove('hidden');
+        }
+
+        async function openEditSubjectModal(id) {
+            const subject = allSubjects.find(s => s.id === id);
+            if(!subject) return;
+            
             const form = document.querySelector('#add-subject-modal form');
-            form.id.value = sub.id;
-            form.name.value = sub.name;
-            form.code.value = sub.code;
-            form.status.value = sub.status || 'Active';
+            form.id.value = subject.id;
+            form.name.value = subject.name;
+            form.code.value = subject.code;
+            form.status.value = subject.status;
+            if(form.level) form.level.value = subject.level;
+
             document.getElementById('subject-modal-title').innerText = "Edit Subject";
             document.getElementById('add-subject-modal').classList.remove('hidden');
         }
 
-        function handleSaveSubject(e) {
-            e.preventDefault();
-            const fd = new FormData(e.target);
-            const id = fd.get('id');
-            const sub = {
-                id: id || "SUB_" + Date.now(),
-                name: fd.get('name'),
-                code: fd.get('code'),
-                status: fd.get('status')
-            };
-
-            if(id) {
-                const idx = data.subjects.findIndex(s => s.id === id);
-                if(idx !== -1) data.subjects[idx] = sub;
-            } else {
-                if(!data.subjects) data.subjects = [];
-                data.subjects.push(sub);
-            }
-            
-            saveSchoolData(data);
-            renderSubjects();
-            closeModal('add-subject-modal');
-        }
-
-        function deleteSubject(id) {
-            if(confirm('Delete this subject? This will not remove existing grades, but will stop it appearing in new entries.')) {
-                data.subjects = data.subjects.filter(s => s.id !== id);
-                saveSchoolData(data);
-                renderSubjects();
+        async function deleteSubject(id) {
+            if(confirm('Delete this subject?')) {
+                const result = await fetchAdminData('delete_subject', { id }, 'POST');
+                if(result && result.success) {
+                    initSubjectView();
+                    initDashboard();
+                }
             }
         }
 
-        // --- CLASS SUBJECT ASSIGNMENT ---
-
-        function populateSubjectAssignmentDropdown() {
-             const select = document.getElementById('assign-class-select');
-             select.innerHTML = '<option value="">-- Select Class to Configure --</option>' + 
-                (data.classes || []).map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.add('hidden');
         }
 
-        function loadClassSubjects() {
-            const classId = document.getElementById('assign-class-select').value;
-            const container = document.getElementById('assignment-checkboxes');
-            
-            if(!classId) {
-                container.innerHTML = '<p class="text-gray-400 text-sm italic text-center py-10">Select a class to configure subjects.</p>';
-                return;
-            }
-
-            const cls = data.classes.find(c => c.id === classId);
-            const assigned = cls && cls.subjects ? cls.subjects : [];
-
-            container.innerHTML = (data.subjects || []).map(s => `
-                <label class="flex items-center gap-3 p-3 hover:bg-white rounded-lg cursor-pointer transition border border-transparent hover:border-gray-100">
-                    <input type="checkbox" name="class_subject" value="${s.id}" ${assigned.includes(s.id) ? 'checked' : ''} class="w-5 h-5 text-accent rounded focus:ring-accent border-gray-300">
-                    <div>
-                        <div class="font-bold text-gray-700 text-sm">${escapeHtml(s.name)}</div>
-                        <div class="text-[10px] text-gray-400 font-mono">${escapeHtml(s.code)}</div>
-                    </div>
-                     ${s.status === 'Inactive' ? '<span class="ml-auto text-[10px] bg-gray-100 text-gray-400 px-1 rounded">Inactive</span>' : ''}
-                </label>
-            `).join('');
+        function openAddYearModal() {
+            alert('Feature coming soon');
         }
 
-        function toggleAllSubjects(check) {
-            document.querySelectorAll('#assignment-checkboxes input[type="checkbox"]').forEach(cb => cb.checked = check);
-        }
-
-        function saveClassSubjects() {
-            const classId = document.getElementById('assign-class-select').value;
-            if(!classId) return;
-
-            const selected = Array.from(document.querySelectorAll('#assignment-checkboxes input[type="checkbox"]:checked')).map(cb => cb.value);
-            
-            const idx = data.classes.findIndex(c => c.id === classId);
-            if(idx !== -1) {
-                data.classes[idx].subjects = selected;
-                saveSchoolData(data);
-                
-                // Visual Feedback
-                const btn = document.querySelector('button[onclick="saveClassSubjects()"]');
-                const prev = btn.innerHTML;
-                btn.innerHTML = '<ion-icon name="checkmark-circle"></ion-icon> Saved!';
-                btn.classList.add('bg-green-600');
-                setTimeout(() => { btn.innerHTML = prev; btn.classList.remove('bg-green-600'); }, 1500);
-            }
-        }
     </script>
 </body>
 </html>

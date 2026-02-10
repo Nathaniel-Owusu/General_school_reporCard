@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register School | General School</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: { primary: '#0f172a', accent: '#3b82f6', secondary: '#f59e0b' },
+                    fontFamily: { sans: ['Outfit', 'sans-serif'] }
+                }
+            }
+        }
+    </script>
+    <style>
+        .hero-bg {
+            background-color: #0f172a;
+            background-image: 
+                radial-gradient(at 0% 0%, hsla(253,16%,7%,1) 0, transparent 50%), 
+                radial-gradient(at 50% 0%, hsla(225,39%,30%,1) 0, transparent 50%), 
+                radial-gradient(at 100% 0%, hsla(339,49%,30%,1) 0, transparent 50%);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans min-h-screen flex flex-col">
+
+    <nav class="absolute w-full z-50 p-6">
+        <div class="container mx-auto flex justify-between items-center">
+            <a href="index.html" class="flex items-center gap-3 text-white">
+                <div class="w-10 h-10 bg-accent rounded-xl flex items-center justify-center font-bold text-xl">G</div>
+                <span class="font-bold text-lg">General School</span>
+            </a>
+            <a href="login.html" class="text-white/80 hover:text-white font-medium transition">Login</a>
+        </div>
+    </nav>
+
+    <div class="hero-bg flex-grow flex items-center justify-center p-6 relative">
+        <div class="absolute inset-0 overflow-hidden">
+             <div class="absolute top-10 left-10 w-72 h-72 bg-purple-500/20 rounded-full blur-3xl"></div>
+             <div class="absolute bottom-10 right-10 w-72 h-72 bg-accent/20 rounded-full blur-3xl"></div>
+        </div>
+
+        <div class="w-full max-w-md bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl p-8 relative z-10 transition-all duration-300" id="register-card">
+            
+            <div class="text-center mb-8">
+                <div class="w-16 h-16 bg-accent/10 text-accent rounded-2xl flex items-center justify-center text-3xl mx-auto mb-4">
+                    <ion-icon name="business-outline"></ion-icon>
+                </div>
+                <h2 class="text-2xl font-bold text-gray-900">Register Your School</h2>
+                <p class="text-gray-500 text-sm mt-2">Create a new school account to manage your data.</p>
+            </div>
+
+            <form id="register-form" onsubmit="handleRegister(event)" class="space-y-5">
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">School Name</label>
+                    <div class="relative">
+                        <span class="absolute left-3 top-3 text-gray-400"><ion-icon name="school-outline"></ion-icon></span>
+                        <input type="text" id="school-name" required class="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-accent/50 focus:border-accent outline-none transition bg-gray-50/50" placeholder="e.g. Accra High School">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Administrator Name</label>
+                    <div class="relative">
+                        <span class="absolute left-3 top-3 text-gray-400"><ion-icon name="person-outline"></ion-icon></span>
+                        <input type="text" id="admin-name" required class="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-accent/50 focus:border-accent outline-none transition bg-gray-50/50" placeholder="Your Full Name">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Admin Email</label>
+                    <div class="relative">
+                        <span class="absolute left-3 top-3 text-gray-400"><ion-icon name="mail-outline"></ion-icon></span>
+                        <input type="email" id="admin-email" required class="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-accent/50 focus:border-accent outline-none transition bg-gray-50/50" placeholder="admin@yourschool.com">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                    <div class="relative">
+                        <span class="absolute left-3 top-3 text-gray-400"><ion-icon name="lock-closed-outline"></ion-icon></span>
+                        <input type="password" id="admin-password" required class="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-accent/50 focus:border-accent outline-none transition bg-gray-50/50" placeholder="••••••••">
+                    </div>
+                </div>
+
+                <div class="pt-2">
+                    <button type="submit" id="submit-btn" class="w-full bg-accent hover:bg-blue-600 text-white font-bold py-3 rounded-xl shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2">
+                        <span>Get Started</span>
+                        <ion-icon name="arrow-forward"></ion-icon>
+                    </button>
+                </div>
+
+                <p class="text-xs text-center text-gray-400 mt-4 leading-relaxed">
+                    By registering, you agree to handle your school's data responsibly.
+                </p>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">School Levels</label>
+                    <div class="grid grid-cols-3 gap-2">
+                         <label class="flex items-center gap-2 border p-3 rounded-xl cursor-pointer hover:bg-gray-50 bg-white">
+                             <input type="checkbox" name="levels" value="KG" class="w-4 h-4 text-accent rounded focus:ring-accent">
+                             <span class="text-sm font-bold">KG</span>
+                         </label>
+                         <label class="flex items-center gap-2 border p-3 rounded-xl cursor-pointer hover:bg-gray-50 bg-white">
+                             <input type="checkbox" name="levels" value="Primary" checked class="w-4 h-4 text-accent rounded focus:ring-accent">
+                             <span class="text-sm font-bold">Primary</span>
+                         </label>
+                         <label class="flex items-center gap-2 border p-3 rounded-xl cursor-pointer hover:bg-gray-50 bg-white">
+                             <input type="checkbox" name="levels" value="JHS" checked class="w-4 h-4 text-accent rounded focus:ring-accent">
+                             <span class="text-sm font-bold">JHS</span>
+                         </label>
+                    </div>
+                </div>
+
+            </form>
+
+            <div id="success-msg" class="hidden text-center py-10">
+                <div class="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center text-3xl mx-auto mb-4 animate-bounce">
+                    <ion-icon name="checkmark"></ion-icon>
+                </div>
+                <h3 class="text-xl font-bold text-gray-900">Registration Successful!</h3>
+                <p class="text-gray-500 mt-2 mb-6">Your school has been set up.</p>
+                <a href="login.html?role=staff" class="bg-gray-900 text-white px-6 py-2 rounded-lg font-medium hover:bg-black transition">Login Now</a>
+            </div>
+
+        </div>
+    </div>
+
+    <script src="js/storage.js"></script>
+    <script src="js/app.js"></script>
+    <script>
+        // Check for Live Server usage
+
+
+        async function handleRegister(e) {
+            e.preventDefault();
+            const btn = document.getElementById('submit-btn');
+            const originalText = btn.innerHTML;
+            
+            btn.innerHTML = '<ion-icon name="sync" class="animate-spin text-xl"></ion-icon>';
+            btn.disabled = true;
+
+            try {
+                // Get selected levels
+                const levelCheckboxes = document.querySelectorAll('input[name="levels"]:checked');
+                const selectedLevels = Array.from(levelCheckboxes).map(cb => cb.value);
+
+                // Call local engine
+                const result = await registerSchool({
+                    school_name: document.getElementById('school-name').value,
+                    admin_name: document.getElementById('admin-name').value,
+                    email: document.getElementById('admin-email').value,
+                    password: document.getElementById('admin-password').value,
+                    levels: selectedLevels
+                });
+
+                if(result.success) {
+                    document.getElementById('register-form').classList.add('hidden');
+                    document.getElementById('success-msg').classList.remove('hidden');
+                    
+                    // Auto-login after delay? Or just let them click login.
+                    // Let's add the school ID to the message for clarity
+                    // (though in this design they login with email)
+                } else {
+                    alert(result.message || 'Registration failed');
+                }
+            } catch (err) {
+                console.error(err);
+                alert('Error: ' + err.message);
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        }
+    </script>
+</body>
+</html>
