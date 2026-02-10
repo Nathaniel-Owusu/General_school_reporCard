@@ -5,33 +5,34 @@
 // Do NOT include db_connect.php to avoid CLI issues with $_SERVER
 // require_once 'config/db_connect.php'; 
 
+// Hostinger Database Credentials
 $host = 'localhost';
-$user = 'root';
-$pass = '';
-$dbname = 'school_report_db';
+$user = 'owusuansahnath.';
+$pass = 'reportCard@1234';
+$dbname = 'school_report';
 
 echo "Starting installation...\n";
 
 try {
-    // 1. Create DB if not exists
-    $pdo = new PDO("mysql:host=$host", $user, $pass);
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    $pdo->exec("CREATE DATABASE IF NOT EXISTS `$dbname`");
-    $pdo->exec("USE `$dbname`");
+  // 1. Create DB if not exists
+  $pdo = new PDO("mysql:host=$host", $user, $pass);
+  $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+  $pdo->exec("CREATE DATABASE IF NOT EXISTS `$dbname`");
+  $pdo->exec("USE `$dbname`");
 
-    echo "Database `$dbname` selected.\n";
+  echo "Database `$dbname` selected.\n";
 
-    // 2. Drop mismatching tables if they exist (Clean Slate)
-    $tables = ['schools', 'users', 'classes', 'subjects', 'students', 'grades', 'student_term_data', 'teacher_classes', 'academic_years', 'settings'];
-    foreach ($tables as $t) {
-        $pdo->exec("DROP TABLE IF EXISTS `$t`");
-    }
-    echo "Old tables cleared.\n";
+  // 2. Drop mismatching tables if they exist (Clean Slate)
+  $tables = ['schools', 'users', 'classes', 'subjects', 'students', 'grades', 'student_term_data', 'teacher_classes', 'academic_years', 'settings'];
+  foreach ($tables as $t) {
+    $pdo->exec("DROP TABLE IF EXISTS `$t`");
+  }
+  echo "Old tables cleared.\n";
 
-    // 3. Create Correct Tables (Matching database_schema.sql and db_handler.php)
+  // 3. Create Correct Tables (Matching database_schema.sql and db_handler.php)
 
-    // Schools
-    $pdo->exec("CREATE TABLE `schools` (
+  // Schools
+  $pdo->exec("CREATE TABLE `schools` (
       `id` varchar(50) NOT NULL,
       `name` varchar(255) DEFAULT NULL,
       `address` text DEFAULT NULL,
@@ -43,8 +44,8 @@ try {
       PRIMARY KEY (`id`)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
 
-    // Users
-    $pdo->exec("CREATE TABLE `users` (
+  // Users
+  $pdo->exec("CREATE TABLE `users` (
       `id` varchar(50) NOT NULL,
       `school_id` varchar(50) DEFAULT NULL,
       `name` varchar(100) DEFAULT NULL,
@@ -56,8 +57,8 @@ try {
       PRIMARY KEY (`id`)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
 
-    // Classes
-    $pdo->exec("CREATE TABLE `classes` (
+  // Classes
+  $pdo->exec("CREATE TABLE `classes` (
       `id` varchar(50) NOT NULL,
       `school_id` varchar(50) DEFAULT NULL,
       `name` varchar(50) DEFAULT NULL,
@@ -66,8 +67,8 @@ try {
       PRIMARY KEY (`id`)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
 
-    // Subjects
-    $pdo->exec("CREATE TABLE `subjects` (
+  // Subjects
+  $pdo->exec("CREATE TABLE `subjects` (
       `id` varchar(50) NOT NULL,
       `school_id` varchar(50) DEFAULT NULL,
       `name` varchar(100) DEFAULT NULL,
@@ -77,8 +78,8 @@ try {
       PRIMARY KEY (`id`)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
 
-    // Students
-    $pdo->exec("CREATE TABLE `students` (
+  // Students
+  $pdo->exec("CREATE TABLE `students` (
       `id` varchar(50) NOT NULL,
       `school_id` varchar(50) DEFAULT NULL,
       `name` varchar(100) DEFAULT NULL,
@@ -96,7 +97,7 @@ try {
       PRIMARY KEY (`id`)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
 
-    echo "Correct tables created successfully.\n";
+  echo "Correct tables created successfully.\n";
 } catch (PDOException $e) {
-    die("DB Error: " . $e->getMessage());
+  die("DB Error: " . $e->getMessage());
 }
