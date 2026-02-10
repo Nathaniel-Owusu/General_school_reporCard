@@ -456,8 +456,13 @@
             const grades = [];
             rows.forEach(row => {
                 const studentId = row.dataset.studentId;
-                const classScore = parseInt(row.querySelector('input[data-type="class"]').value) || 0;
-                const examScore = parseInt(row.querySelector('input[data-type="exam"]').value) || 0;
+                if (!studentId) return; // Skip headers or placeholders
+
+                const classInput = row.querySelector('input[data-type="class"]');
+                const examInput = row.querySelector('input[data-type="exam"]');
+                
+                const classScore = classInput ? (parseInt(classInput.value) || 0) : 0;
+                const examScore = examInput ? (parseInt(examInput.value) || 0) : 0;
                 
                 grades.push({
                     student_id: studentId,

@@ -1,193 +1,102 @@
 <?php
 // install.php
-// Run this file to setup the database and populate it with sample data
+// Setup the database with the schema required by api/db_handler.php
+
+// Do NOT include db_connect.php to avoid CLI issues with $_SERVER
+// require_once 'config/db_connect.php'; 
 
 $host = 'localhost';
+$user = 'root';
+$pass = '';
 $dbname = 'school_report_db';
-$username = 'root';
-$password = '';
+
+echo "Starting installation...\n";
 
 try {
-    // 1. Connect and Create Database
-    $pdo = new PDO("mysql:host=$host", $username, $password);
+    // 1. Create DB if not exists
+    $pdo = new PDO("mysql:host=$host", $user, $pass);
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    
     $pdo->exec("CREATE DATABASE IF NOT EXISTS `$dbname`");
     $pdo->exec("USE `$dbname`");
-    
-    echo "Database created/selected successfully.<br>";
-    
-    // 2. Run Schema (Tables)
-    // We read the structure from database.sql, but we'll manually execute the critical parts here to ensure order
-    
-    $queries = [
-        "DROP TABLE IF EXISTS grades, student_term_data, teacher_classes, students, subjects, classes, academic_years, settings, users",
-        
-        "CREATE TABLE users (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            email VARCHAR(100) UNIQUE NOT NULL,
-            password_hash VARCHAR(255) NOT NULL,
-            full_name VARCHAR(100) NOT NULL,
-            role ENUM('admin', 'teacher') NOT NULL DEFAULT 'teacher',
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        )",
-        
-        "CREATE TABLE academic_years (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            name VARCHAR(20) NOT NULL,
-            is_active TINYINT(1) DEFAULT 0
-        )",
-        
-        "CREATE TABLE classes (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            name VARCHAR(50) NOT NULL UNIQUE
-        )",
-        
-        "CREATE TABLE subjects (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            name VARCHAR(50) NOT NULL,
-            code VARCHAR(10) UNIQUE,
-            sort_order INT DEFAULT 0
-        )",
-        
-        "CREATE TABLE settings (
-            setting_key VARCHAR(50) PRIMARY KEY,
-            setting_value TEXT
-        )",
-        
-        "CREATE TABLE students (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            index_number VARCHAR(20) NOT NULL UNIQUE,
-            full_name VARCHAR(100) NOT NULL,
-            current_class_id INT,
-            FOREIGN KEY (current_class_id) REFERENCES classes(id)
-        )",
-        
-        "CREATE TABLE student_term_data (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            student_id INT NOT NULL,
-            academic_year_id INT NOT NULL,
-            term VARCHAR(20) NOT NULL,
-            class_id INT NOT NULL,
-            attendance_present INT DEFAULT 0,
-            attendance_total INT DEFAULT 60,
-            conduct VARCHAR(50),
-            teacher_remark TEXT,
-            head_remark TEXT,
-            position_in_class VARCHAR(10),
-            total_students INT,
-            FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE,
-            FOREIGN KEY (academic_year_id) REFERENCES academic_years(id),
-            FOREIGN KEY (class_id) REFERENCES classes(id)
-        )",
-        
-        "CREATE TABLE grades (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            student_term_data_id INT NOT NULL,
-            subject_id INT NOT NULL,
-            class_score DECIMAL(5,2) DEFAULT 0,
-            exam_score DECIMAL(5,2) DEFAULT 0,
-            total_score DECIMAL(5,2) GENERATED ALWAYS AS (class_score + exam_score) STORED,
-            status ENUM('Pending', 'Approved', 'Rejected') DEFAULT 'Pending',
-            FOREIGN KEY (student_term_data_id) REFERENCES student_term_data(id) ON DELETE CASCADE,
-            FOREIGN KEY (subject_id) REFERENCES subjects(id)
-        )"
-    ];
-    
-    foreach ($queries as $q) {
-        $pdo->exec($q);
-    }
-    echo "Tables created successfully.<br>";
-    
-    // 3. Seed Data
-    
-    // Users
-    $password = password_hash('password', PASSWORD_DEFAULT);
-    $adminPass = password_hash('admin', PASSWORD_DEFAULT);
-    
-    $pdo->exec("INSERT INTO users (email, password_hash, full_name, role) VALUES 
-        ('admin@school.com', '$adminPass', 'System Administrator', 'admin'),
-        ('teacher@school.com', '$password', 'Mr. John Doe', 'teacher')
-    ");
-    
-    // Settings
-    $pdo->exec("INSERT INTO settings (setting_key, setting_value) VALUES 
-        ('school_name', 'General School'),
-        ('school_motto', 'Knowledge is Power'),
-        ('school_address', '123 School Lane, Accra, Ghana'),
-        ('contact_phone', '+233 55 123 4567'),
-        ('contact_email', 'info@generalschool.edu.gh'),
-        ('current_term', '1st Term'),
-        ('grading_system', '[{\"min\":80,\"max\":100,\"grade\":\"1\",\"remark\":\"HIGHEST\"},{\"min\":70,\"max\":79,\"grade\":\"2\",\"remark\":\"HIGHER\"}]')
-    ");
-    
-    // Academic Year
-    $pdo->exec("INSERT INTO academic_years (name, is_active) VALUES ('2024/2025', 1)");
-    $ayId = $pdo->lastInsertId();
-    
-    // Classes
-    $classes = ['JHS 1 A', 'JHS 2 A', 'JHS 3 A'];
-    foreach ($classes as $c) {
-        $stmt = $pdo->prepare("INSERT INTO classes (name) VALUES (?)");
-        $stmt->execute([$c]);
-    }
-    // Get ID of JHS 2 A
-    $stmt = $pdo->query("SELECT id FROM classes WHERE name='JHS 2 A'");
-    $classId = $stmt->fetchColumn();
-    
-    // Subjects
-    $subjects = [
-        'English Language' => 'ENG', 
-        'Mathematics' => 'MATH', 
-        'Integrated Science' => 'SCI', 
-        'Social Studies' => 'SOC', 
-        'I.C.T.' => 'ICT'
-    ];
-    
-    $subIds = [];
-    foreach ($subjects as $name => $code) {
-        $stmt = $pdo->prepare("INSERT INTO subjects (name, code) VALUES (?, ?)");
-        $stmt->execute([$name, $code]);
-        $subIds[] = $pdo->lastInsertId();
-    }
-    
-    // Student: Emmanuel Mensah (ST001)
-    $stmt = $pdo->prepare("INSERT INTO students (index_number, full_name, current_class_id) VALUES (?, ?, ?)");
-    $stmt->execute(['ST001', 'Emmanuel Mensah', $classId]);
-    $st1 = $pdo->lastInsertId();
-    
-    // Term Data
-    $stmt = $pdo->prepare("INSERT INTO student_term_data 
-        (student_id, academic_year_id, term, class_id, attendance_present, conduct, teacher_remark, head_remark, position_in_class, total_students)
-        VALUES (?, ?, '1st Term', ?, 58, 'Exemplary', 'Emmanuel is a disciplined hard worker.', 'Promoted to next class.', '4th', 45)
-    ");
-    $stmt->execute([$st1, $ayId, $classId]);
-    $reportId = $pdo->lastInsertId();
-    
-    // Grades
-    $scores = [
-        ['English Language', 24, 58, 'Pending'],
-        ['Mathematics', 26, 62, 'Approved'],
-        ['Integrated Science', 22, 53, 'Rejected'],
-        ['Social Studies', 25, 60, 'Pending'],
-        ['I.C.T.', 28, 65, 'Pending']
-    ];
-    
-    foreach ($scores as $s) {
-        $subName = $s[0];
-        // Get Sub ID
-        $subIdStmt = $pdo->prepare("SELECT id FROM subjects WHERE name = ?");
-        $subIdStmt->execute([$subName]);
-        $sId = $subIdStmt->fetchColumn();
-        
-        $gStmt = $pdo->prepare("INSERT INTO grades (student_term_data_id, subject_id, class_score, exam_score, status) VALUES (?, ?, ?, ?, ?)");
-        $gStmt->execute([$reportId, $sId, $s[1], $s[2], $s[3]]);
-    }
-    
-    echo "Seed data inserted successfully. User: admin@school.com / admin, Student: ST001.<br>";
-    echo "<a href='index.html'>Go to App</a>";
 
+    echo "Database `$dbname` selected.\n";
+
+    // 2. Drop mismatching tables if they exist (Clean Slate)
+    $tables = ['schools', 'users', 'classes', 'subjects', 'students', 'grades', 'student_term_data', 'teacher_classes', 'academic_years', 'settings'];
+    foreach ($tables as $t) {
+        $pdo->exec("DROP TABLE IF EXISTS `$t`");
+    }
+    echo "Old tables cleared.\n";
+
+    // 3. Create Correct Tables (Matching database_schema.sql and db_handler.php)
+
+    // Schools
+    $pdo->exec("CREATE TABLE `schools` (
+      `id` varchar(50) NOT NULL,
+      `name` varchar(255) DEFAULT NULL,
+      `address` text DEFAULT NULL,
+      `logo` longtext DEFAULT NULL,
+      `contact_email` varchar(100) DEFAULT NULL,
+      `contact_phone` varchar(50) DEFAULT NULL,
+      `settings` json DEFAULT NULL,
+      `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+      PRIMARY KEY (`id`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+
+    // Users
+    $pdo->exec("CREATE TABLE `users` (
+      `id` varchar(50) NOT NULL,
+      `school_id` varchar(50) DEFAULT NULL,
+      `name` varchar(100) DEFAULT NULL,
+      `email` varchar(100) DEFAULT NULL,
+      `password` varchar(255) DEFAULT NULL,
+      `role` varchar(20) DEFAULT NULL,
+      `assigned_classes` json DEFAULT NULL,
+      `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+      PRIMARY KEY (`id`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+
+    // Classes
+    $pdo->exec("CREATE TABLE `classes` (
+      `id` varchar(50) NOT NULL,
+      `school_id` varchar(50) DEFAULT NULL,
+      `name` varchar(50) DEFAULT NULL,
+      `subjects` json DEFAULT NULL,
+      `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+      PRIMARY KEY (`id`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+
+    // Subjects
+    $pdo->exec("CREATE TABLE `subjects` (
+      `id` varchar(50) NOT NULL,
+      `school_id` varchar(50) DEFAULT NULL,
+      `name` varchar(100) DEFAULT NULL,
+      `code` varchar(20) DEFAULT NULL,
+      `status` varchar(20) DEFAULT NULL,
+      `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+      PRIMARY KEY (`id`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+
+    // Students
+    $pdo->exec("CREATE TABLE `students` (
+      `id` varchar(50) NOT NULL,
+      `school_id` varchar(50) DEFAULT NULL,
+      `name` varchar(100) DEFAULT NULL,
+      `class` varchar(50) DEFAULT NULL,
+      `gender` varchar(10) DEFAULT NULL,
+      `status` varchar(20) DEFAULT 'Active',
+      `scores` json DEFAULT NULL,
+      `attendance` json DEFAULT NULL,
+      `teacher_remark` text DEFAULT NULL,
+      `head_remark` text DEFAULT NULL,
+      `conduct` varchar(50) DEFAULT NULL,
+      `position` int(11) DEFAULT NULL,
+      `total_students` int(11) DEFAULT NULL,
+      `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+      PRIMARY KEY (`id`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+
+    echo "Correct tables created successfully.\n";
 } catch (PDOException $e) {
-    echo "Error: " . $e->getMessage();
+    die("DB Error: " . $e->getMessage());
 }
-?>

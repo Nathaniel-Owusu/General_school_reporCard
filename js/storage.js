@@ -1,20 +1,39 @@
 /**
  * Centralized Data Storage Module
- * Handles all interactions with localStorage and ensures data consistency.
+ * Bridges localStorage (offline first) with Remote MySQL Database
  */
 
 const DB_KEY = 'school_report_card_db';
+const API_URL = 'api/db_handler.php';
 
 const Storage = {
     // --- Core Operations ---
 
     /**
-     * Initialize the database if it doesn't exist.
+     * Initialize the database.
+     * Tries to fetch latest from server first, falls back to local.
      */
-    init: () => {
-        if (!localStorage.getItem(DB_KEY)) {
-            console.log("Initializing new database...");
-            Storage.seed();
+    init: async () => {
+        // Try to load from Server first (Source of Truth)
+        try {
+            console.log("Storage: Attempting to fetch from server...");
+            const response = await fetch(API_URL);
+            if (response.ok) {
+                const serverData = await response.json();
+                if (serverData && serverData.schools && serverData.schools.length > 0) {
+                    console.log("Storage: Server data found. Syncing to local.");
+                    // Check timestamps to see if we should overwrite? 
+                    // For now, Server is master on load.
+                    localStorage.setItem(DB_KEY, JSON.stringify(serverData));
+                } else {
+                     console.log("Storage: Server empty. Using local/seed.");
+                     if (!localStorage.getItem(DB_KEY)) Storage.seed();
+                     else Storage.sync(); // Push local to server if server is empty
+                }
+            }
+        } catch (e) {
+            console.warn("Storage: Offline or Server Unreachable. Using Local Data.", e);
+            if (!localStorage.getItem(DB_KEY)) Storage.seed();
         }
     },
 
@@ -33,23 +52,56 @@ const Storage = {
     },
 
     /**
-     * Save the entire database object.
+     * Save the entire database object to LocalStorage and Sync to Server.
      * @param {Object} data 
      */
     save: (data) => {
         data.last_updated = Date.now();
         localStorage.setItem(DB_KEY, JSON.stringify(data));
+        
         // Notify other tabs/components
         window.dispatchEvent(new Event('db-updated'));
+        
+        // Trigger Background Sync
+        Storage.sync(data);
+    },
+
+    /**
+     * Sync data to the server.
+     * @param {Object} data (Optional)
+     */
+    sync: async (data = null) => {
+        if (!data) data = Storage.get();
+        if (!data) return;
+
+        try {
+            // console.log("Storage: Syncing to server...");
+            const response = await fetch(API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            const result = await response.json();
+            if(!result.success) {
+                console.error("Storage: Sync Failed", result.message);
+            } else {
+                // console.log("Storage: Sync Complete");
+            }
+        } catch (e) {
+            console.error("Storage: Sync Network Error", e);
+        }
     },
 
     /**
      * Reset the database to factory settings (Seeded data).
      */
     reset: () => {
-        localStorage.removeItem(DB_KEY);
-        Storage.seed();
-        location.reload();
+        if(confirm("Factory Reset? This clears EVERYTHING.")) {
+            localStorage.removeItem(DB_KEY);
+            Storage.seed(); // Generate fresh seed
+            Storage.sync(); // Force push fresh seed to wipe server
+            location.reload();
+        }
     },
 
     // --- Seeding ---
