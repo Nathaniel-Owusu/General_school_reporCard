@@ -7,9 +7,9 @@
 
 // Hostinger Database Credentials
 $host = 'localhost';
-$user = 'owusuansahnath.';
+$user = 'u957056558_owusuansahnath';
 $pass = 'reportCard@1234';
-$dbname = 'school_report';
+$dbname = 'u957056558_school_report';
 
 echo "Starting installation...\n";
 
