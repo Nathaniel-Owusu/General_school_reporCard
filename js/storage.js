@@ -11,30 +11,54 @@ const Storage = {
 
     /**
      * Initialize the database.
+     * MODIFIED: Server sync disabled on load to preserve local changes
      * Tries to fetch latest from server first, falls back to local.
      */
     init: async () => {
-        // Try to load from Server first (Source of Truth)
+        // TEMPORARY FIX: Disable server fetch to prevent localStorage overwrite
+        // This ensures your local changes persist across refreshes
+        // Server sync still happens when you SAVE (one-way push)
+        
+        console.log("📦 Storage: Using localStorage (server fetch disabled)");
+        
+        // Just use localStorage - don't fetch from server
+        if (!localStorage.getItem(DB_KEY)) {
+            console.log("🌱 Storage: No local data. Seeding database...");
+            Storage.seed();
+        } else {
+            console.log("✅ Storage: Local data found. Using existing data.");
+        }
+        
+        /* COMMENTED OUT - Server fetch was overwriting local changes
         try {
-            console.log("Storage: Attempting to fetch from server...");
+            console.log("📡 Storage: Attempting to fetch from server...");
             const response = await fetch(API_URL);
             if (response.ok) {
                 const serverData = await response.json();
+                console.log("📊 Server data received:", serverData);
+                
                 if (serverData && serverData.schools && serverData.schools.length > 0) {
-                    console.log("Storage: Server data found. Syncing to local.");
+                    console.log("✅ Storage: Server data found. Syncing to local.");
+                    console.log("📝 Number of schools:", serverData.schools.length);
+                    console.log("📝 Number of classes:", (serverData.classes || []).length);
+                    
                     // Check timestamps to see if we should overwrite? 
                     // For now, Server is master on load.
                     localStorage.setItem(DB_KEY, JSON.stringify(serverData));
                 } else {
-                     console.log("Storage: Server empty. Using local/seed.");
+                     console.log("⚠️ Storage: Server empty or invalid. Using local/seed.");
                      if (!localStorage.getItem(DB_KEY)) Storage.seed();
                      else Storage.sync(); // Push local to server if server is empty
                 }
+            } else {
+                console.warn("❌ Storage: Server response not OK:", response.status);
+                if (!localStorage.getItem(DB_KEY)) Storage.seed();
             }
         } catch (e) {
-            console.warn("Storage: Offline or Server Unreachable. Using Local Data.", e);
+            console.warn("⚠️ Storage: Offline or Server Unreachable. Using Local Data.", e);
             if (!localStorage.getItem(DB_KEY)) Storage.seed();
         }
+        */
     },
 
     /**
@@ -75,7 +99,12 @@ const Storage = {
         if (!data) return;
 
         try {
-            // console.log("Storage: Syncing to server...");
+            console.log("🔄 Storage: Syncing to server...", {
+                schools: (data.schools || []).length,
+                classes: (data.classes || []).length,
+                subjects: (data.subjects || []).length
+            });
+            
             const response = await fetch(API_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -83,12 +112,12 @@ const Storage = {
             });
             const result = await response.json();
             if(!result.success) {
-                console.error("Storage: Sync Failed", result.message);
+                console.error("❌ Storage: Sync Failed", result.message);
             } else {
-                // console.log("Storage: Sync Complete");
+                console.log("✅ Storage: Sync Complete");
             }
         } catch (e) {
-            console.error("Storage: Sync Network Error", e);
+            console.error("⚠️ Storage: Sync Network Error", e);
         }
     },
 
@@ -115,6 +144,7 @@ const Storage = {
                 logo: '', 
                 contact_email: 'admin@generalschool.com',
                 contact_phone: '+1 234 567 890',
+                active: true,
                 settings: {
                     currentTerm: '1st Term',
                     academicYear: '2024/2025',
@@ -134,6 +164,14 @@ const Storage = {
                 }
             }],
             users: [
+                { 
+                    id: 'SUPERADM_001', 
+                    school_id: null,
+                    name: 'Super Administrator', 
+                    email: 'superadmin@system.com', 
+                    password: 'superadmin123', 
+                    role: 'super_admin' 
+                },
                 { 
                     id: 'ADM_001', 
                     school_id: 'SCH_DEFAULT', 
@@ -198,8 +236,9 @@ const Storage = {
                     gender: 'Male', 
                     active: true,
                     scores: [
-                        { subject_id: 'SUB_MATH', subject: 'Mathematics', class_score: 25, exam_score: 60, status: 'Approved' },
-                        { subject_id: 'SUB_ENG', subject: 'English Language', class_score: 20, exam_score: 55, status: 'Pending' }
+                        { subject_id: 'SUB_JHS_MATH', subject: 'Mathematics', class_score: 25, exam_score: 60, status: 'Pending' },
+                        { subject_id: 'SUB_JHS_ENG', subject: 'English Language', class_score: 20, exam_score: 55, status: 'Pending' },
+                        { subject_id: 'SUB_JHS_SCI', subject: 'Integrated Science', class_score: 22, exam_score: 58, status: 'Pending' }
                     ],
                     attendance: { present: 45, total: 60 },
                     conduct: 'Good'
@@ -211,7 +250,10 @@ const Storage = {
                     class: 'JHS 1 A', 
                     gender: 'Female', 
                     active: true,
-                    scores: [],
+                    scores: [
+                        { subject_id: 'SUB_JHS_MATH', subject: 'Mathematics', class_score: 28, exam_score: 65, status: 'Pending' },
+                        { subject_id: 'SUB_JHS_ENG', subject: 'English Language', class_score: 26, exam_score: 62, status: 'Pending' }
+                    ],
                     attendance: { present: 58, total: 60 },
                     conduct: 'Excellent'
                 }

@@ -9,6 +9,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
     <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+    <link rel="stylesheet" href="css/modern-ui.css">
     <script>
         tailwind.config = {
             theme: {
@@ -830,8 +831,39 @@
              </form>
         </div>
     </div>
+    <!-- Assign Teacher Classes Modal -->
+    <div id="assign-teacher-classes-modal" class="fixed inset-0 bg-gray-900/50 backdrop-blur-sm hidden flex items-center justify-center z-50">
+        <div class="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
+            <h2 class="text-2xl font-bold mb-2 text-gray-800">Assign Classes to Teacher</h2>
+            <p class="text-gray-500 text-sm mb-6" id="assign-teacher-name">Select which classes this teacher can access</p>
+            
+            <form onsubmit="handleAssignTeacherClasses(event)" class="space-y-6">
+                <input type="hidden" name="teacher_id" id="assign-teacher-id">
+                
+                <div class="bg-gray-50 rounded-xl p-5 border border-gray-200">
+                    <h3 class="font-bold text-gray-700 mb-4 flex items-center gap-2">
+                        <ion-icon name="school" class="text-lg"></ion-icon>
+                        Available Classes
+                    </h3>
+                    
+                    <div id="assign-teacher-classes-list" class="space-y-2 max-h-96 overflow-y-auto">
+                        <!-- Classes will be populated here -->
+                    </div>
+                </div>
+                
+                <div class="pt-2 flex gap-3">
+                    <button type="button" onclick="closeModal('assign-teacher-classes-modal')" class="flex-1 py-3 border border-gray-200 rounded-xl font-bold hover:bg-gray-50 transition">Cancel</button>
+                    <button type="submit" class="flex-1 py-3 bg-green-600 text-white rounded-xl font-bold hover:bg-green-700 shadow-lg shadow-green-500/30 transition flex items-center justify-center gap-2">
+                        <ion-icon name="checkmark-circle"></ion-icon>
+                        Save Assignments
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 
     <!-- Add/Edit Subject Modal -->
+
     <div id="add-subject-modal" class="fixed inset-0 bg-gray-900/50 backdrop-blur-sm hidden flex items-center justify-center z-50">
         <div class="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md mx-4">
             <h2 class="text-2xl font-bold mb-6 text-gray-800" id="subject-modal-title">New Subject</h2>
@@ -1063,11 +1095,50 @@
                      allClasses.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
              }
 
+             // Populate subject filter based on selected class or all subjects
              const subjectSelect = document.getElementById('res-filter-subject');
-             if(subjectSelect.children.length === 0) {
-                 const subjects = [...new Set(allResults.map(r => r.subject))].sort();
-                 subjectSelect.innerHTML = '<option value="">All Subjects</option>' + subjects.map(s => `<option value="${s}">${s}</option>`).join('');
+             
+             // Capture current selection to restore it (prevent reset on rebuild)
+             const currentSubject = subjectSelect.value;
+
+             if(typeof allSubjects === 'undefined' || !allSubjects || allSubjects.length === 0) {
+                 allSubjects = await fetchAdminData('subjects') || [];
              }
+             
+             let availableSubjects = allSubjects;
+             
+             // If a class is selected, filter subjects by that class
+             if(filterClass) {
+                 const selectedClass = allClasses.find(c => c.name === filterClass);
+                 if(selectedClass && selectedClass.subjects) {
+                     // Filter to subjects assigned to this class
+                     availableSubjects = allSubjects.filter(s => selectedClass.subjects.includes(s.id));
+                 }
+             }
+             
+             // Update subject dropdown
+             const subjectNames = [...new Set(availableSubjects.map(s => s.name))].sort();
+             const newOptions = '<option value="">All Subjects</option>' + 
+                 subjectNames.map(name => `<option value="${name}">${name}</option>`).join('');
+            
+             // Only update DOM if options changed to avoid flicker/reset
+             if(subjectSelect.innerHTML !== newOptions) {
+                 subjectSelect.innerHTML = newOptions;
+                 // Restore selection if it's still valid for this filtered list
+                 if(currentSubject && subjectNames.includes(currentSubject)) {
+                     subjectSelect.value = currentSubject;
+                 }
+             } else {
+                 // Ensure value is set correctly (e.g. if logic elsewhere set it but DOM didn't update)
+                 if(currentSubject) subjectSelect.value = currentSubject;
+             }
+
+             console.log("🔍 Results Debug:", { 
+                 resultsCount: allResults.length, 
+                 filters: { class: filterClass || 'All', subject: filterSubject || 'All', status: filterStatus || 'All' },
+                 firstResult: allResults[0] || 'None'
+             });
+
 
              // Filter
              const filtered = allResults.filter(r => {
@@ -1425,8 +1496,90 @@
              } else {
                  alert("Failed to delete");
              }
-        }
-        
+         }
+         
+         // --- ASSIGN TEACHER TO CLASSES ---
+         async function openAssignTeacherClassesModal(teacherId) {
+             const teacher = allTeachers.find(t => t.id === teacherId);
+             if (!teacher) return;
+             
+             const classes = await fetchAdminData('classes') || [];
+             const assignedClasses = teacher.assigned_classes || [];
+             
+             // Update modal title
+             document.getElementById('assign-teacher-name').innerText = `Assign classes for: ${teacher.name}`;
+             document.getElementById('assign-teacher-id').value = teacherId;
+             
+             // Populate classes list
+             const container = document.getElementById('assign-teacher-classes-list');
+             
+             if (classes.length === 0) {
+                 container.innerHTML = '<p class="text-gray-400 text-sm italic text-center py-8">No classes available. Please add classes first.</p>';
+             } else {
+                 // Group by level
+                 const levels = ['KG', 'Primary', 'JHS'];
+                 let html = '';
+                 
+                 levels.forEach(level => {
+                     const levelClasses = classes.filter(c => c.level === level && c.active !== false);
+                     if (levelClasses.length > 0) {
+                         html += `
+                             <div class="mb-4">
+                                 <div class="text-xs font-bold text-gray-400 uppercase mb-2 px-1">${level} Classes</div>
+                                 ${levelClasses.map(c => {
+                                     const isAssigned = assignedClasses.includes(c.name);
+                                     return `
+                                         <label class="flex items-center gap-3 p-3 rounded-lg border border-gray-200 hover:border-green-400 hover:bg-green-50/30 cursor-pointer transition mb-2">
+                                             <input type="checkbox" name="class_names" value="${c.name}" ${isAssigned ? 'checked' : ''} class="w-5 h-5 rounded border-gray-300 text-green-600 focus:ring-green-500">
+                                             <div class="flex-1">
+                                                 <span class="block text-gray-800 font-bold text-sm">${c.name}</span>
+                                                 <span class="block text-xs text-gray-400">${c.level} • ${(c.subjects || []).length} subjects</span>
+                                             </div>
+                                             ${isAssigned ? '<ion-icon name="checkmark-circle" class="text-green-600 text-xl"></ion-icon>' : ''}
+                                         </label>
+                                     `;
+                                 }).join('')}
+                             </div>
+                         `;
+                     }
+                 });
+                 
+                 container.innerHTML = html || '<p class="text-gray-400 text-sm italic text-center py-8">No active classes found.</p>';
+             }
+             
+             // Show modal
+             document.getElementById('assign-teacher-classes-modal').classList.remove('hidden');
+         }
+         
+         async function handleAssignTeacherClasses(e) {
+             e.preventDefault();
+             const form = e.target;
+             const teacherId = form.teacher_id.value;
+             
+             // Get checked class names
+             const checkedBoxes = form.querySelectorAll('input[name="class_names"]:checked');
+             const classNames = Array.from(checkedBoxes).map(cb => cb.value);
+             
+             console.log('Assigning classes:', {
+                 teacher_id: teacherId,
+                 class_names: classNames
+             });
+             
+             const result = await fetchAdminData('assign_teacher_classes', {
+                 teacher_id: teacherId,
+                 class_names: classNames
+             }, 'POST');
+             
+             console.log('Assignment result:', result);
+             
+             if (result && result.success) {
+                 alert('Class assignments updated successfully!');
+                 closeModal('assign-teacher-classes-modal');
+                 renderTeachers(); // Refresh teacher list
+             } else {
+                 alert('Failed to update assignments: ' + (result?.message || 'Unknown error'));
+             }
+         }
 
         // --- SUBJECT ASSIGNMENT PANEL HANDLERS ---
         async function loadClassSubjects() {
@@ -1590,7 +1743,23 @@
                             
                             <p class="text-sm text-gray-600 mb-4 flex items-center gap-2">
                                 <ion-icon name="person-outline"></ion-icon> 
-                                ${c.class_teacher_id ? (allTeachers.find(t => t.id === c.class_teacher_id)?.name || 'Unknown Teacher') : '<span class="text-gray-400 italic">No Class Teacher</span>'}
+                                ${(() => {
+                                    // Find teachers who have this class assigned
+                                    const assignedTeachers = allTeachers.filter(t => 
+                                        t.assigned_classes && t.assigned_classes.includes(c.name)
+                                    );
+                                    
+                                    if (assignedTeachers.length > 0) {
+                                        // Show all assigned teachers
+                                        return assignedTeachers.map(t => `<span class="font-medium">${t.name}</span>`).join(', ');
+                                    } else if (c.class_teacher_id) {
+                                        // Fallback to old method
+                                        const teacher = allTeachers.find(t => t.id === c.class_teacher_id);
+                                        return teacher ? teacher.name : '<span class="text-gray-400 italic">Unknown Teacher</span>';
+                                    } else {
+                                        return '<span class="text-gray-400 italic">No Teacher Assigned</span>';
+                                    }
+                                })()}
                             </p>
                             
                             <div class="flex items-center justify-between text-sm text-gray-500 border-t border-gray-50 pt-3">
@@ -1664,6 +1833,7 @@
                     </td>
                     <td class="px-6 py-4 text-right">
                         <div class="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition">
+                             <button onclick="openAssignTeacherClassesModal('${t.id}')" title="Assign Classes" class="text-gray-400 hover:text-green-600 transition p-1"><ion-icon name="school-outline"></ion-icon></button>
                              <button onclick="openAddTeacherModal('${t.id}')" class="text-gray-400 hover:text-accent transition p-1"><ion-icon name="create-outline"></ion-icon></button>
                              <button onclick="openDeleteTeacherModal('${t.id}')" class="text-gray-400 hover:text-red-500 transition p-1"><ion-icon name="trash-outline"></ion-icon></button>
                         </div>

@@ -47,18 +47,37 @@ const GES_CLASSES = [
 
 function checkAuth(allowedRoles) {
     const user = JSON.parse(sessionStorage.getItem('currentUser'));
+    
+    // Not logged in
     if (!user) {
+        console.warn('⚠️ No user session found. Redirecting to login.');
         window.location.href = 'login.html';
         return null;
     }
-    if (allowedRoles && !allowedRoles.includes(user.role || 'student')) {
-        // 'student' role logic check
-        if(user.index_number && allowedRoles.includes('student')) return user;
+    
+    // Check role permissions
+    if (allowedRoles && allowedRoles.length > 0) {
+        const userRole = user.role || (user.index_number ? 'student' : 'unknown');
         
-        alert('Unauthorized Access');
-        window.location.href = 'login.html';
-        return null;
+        // Log authentication attempt
+        console.log(`🔐 Auth Check: User role="${userRole}", Allowed roles=[${allowedRoles.join(', ')}]`);
+        
+        if (!allowedRoles.includes(userRole)) {
+            // Special case for students (they have index_number instead of role)
+            if(user.index_number && allowedRoles.includes('student')) {
+                console.log('✅ Student authenticated');
+                return user;
+            }
+            
+            console.error(`❌ Unauthorized: "${userRole}" tried to access page requiring [${allowedRoles.join(', ')}]`);
+            alert(`Unauthorized Access\n\nYou do not have permission to view this page.\nRequired role: ${allowedRoles.join(' or ')}\nYour role: ${userRole}`);
+            window.location.href = 'login.html';
+            return null;
+        }
+        
+        console.log(`✅ Authorized: "${userRole}" has access`);
     }
+    
     return user;
 }
 
@@ -71,16 +90,37 @@ async function login(type, credentials) {
         if (student) {
              // Find school for context
              const school = db.schools.find(s => s.id === student.school_id);
+             
+             // Check if school is active
+             if (!school || school.deleted || school.active === false) {
+                 return { success: false, message: 'Your school is currently inactive. Contact administration.' };
+             }
+             
              const sessionUser = { ...student, type: 'student', school_name: school ? school.name : 'Unknown' };
              sessionStorage.setItem('currentUser', JSON.stringify(sessionUser));
              return { success: true, redirect: 'student-report.html', user: sessionUser };
         }
     } else {
-        // Admin or Teacher
+        // Super Admin, Admin or Teacher
         const user = db.users.find(u => u.email === credentials.email && u.password === credentials.password);
         if (user) {
+            // Check if user is active (for admins and teachers)
+            if (user.role !== 'super_admin' && user.active === false) {
+                return { success: false, message: 'Your account has been deactivated. Contact your administrator.' };
+            }
+            
+            // For non-super admins, check if their school is active
+            if (user.role !== 'super_admin' && user.school_id) {
+                const school = db.schools.find(s => s.id === user.school_id);
+                if (!school || school.deleted || school.active === false) {
+                    return { success: false, message: 'Your school is currently inactive. Contact super admin.' };
+                }
+            }
+            
             sessionStorage.setItem('currentUser', JSON.stringify(user));
-            const redirect = user.role === 'admin' ? 'admin-dashboard.html' : 'teacher-portal.html';
+            let redirect = 'teacher-portal.html';
+            if (user.role === 'super_admin') redirect = 'super-admin.html';
+            else if (user.role === 'admin') redirect = 'admin-dashboard.html';
             return { success: true, redirect: redirect, user: user };
         }
     }
@@ -201,10 +241,14 @@ async function fetchAdminData(action, params = {}) {
     else if (action === 'add_class') {
          const index = db.classes.findIndex(c => c.id === params.id);
          if (index >= 0) {
-             db.classes[index].name = params.name;
-             db.classes[index].level = params.level;
-             db.classes[index].class_teacher_id = params.class_teacher_id;
-             db.classes[index].active = params.active !== 'false' && params.active !== false; // handle string/bool
+             // Preserve existing properties (especially subjects array) when updating
+             db.classes[index] = {
+                 ...db.classes[index],
+                 name: params.name,
+                 level: params.level,
+                 class_teacher_id: params.class_teacher_id,
+                 active: params.active !== 'false' && params.active !== false
+             };
          } else {
              db.classes.push({
                  id: params.id || Storage.generateId('CLS'),
@@ -265,6 +309,22 @@ async function fetchAdminData(action, params = {}) {
         db.users = db.users.filter(u => u.id !== params.id);
         didUpdate = true;
         result = { success: true };
+    }
+
+    else if (action === 'assign_teacher_classes') {
+        // Find user by ID (could be teacher or admin)
+        const user = db.users.find(u => u.id === params.teacher_id);
+        
+        if (!user) {
+            result = { success: false, message: 'User not found with ID: ' + params.teacher_id };
+        } else if (user.role !== 'teacher' && user.role !== 'admin') {
+            result = { success: false, message: 'User is not a teacher or admin. Role: ' + user.role };
+        } else {
+            // Assign classes to the user (works for both teachers and admins)
+            user.assigned_classes = params.class_names || [];
+            didUpdate = true;
+            result = { success: true, message: 'Assigned ' + (params.class_names || []).length + ' classes' };
+        }
     }
 
     else if (action === 'add_subject') {
@@ -487,6 +547,175 @@ async function fetchStudentReport(studentId) {
     return null;
 }
 
+// --- Super Admin Controller ---
+
+async function fetchSuperAdminData(action, params = {}) {
+    const user = JSON.parse(sessionStorage.getItem('currentUser'));
+    if (!user || user.role !== 'super_admin') return null;
+    
+    const db = Storage.get();
+    let result = null;
+    let didUpdate = false;
+
+    if (action === 'stats') {
+        const activeSchools = db.schools.filter(s => s.active !== false && !s.deleted);
+        const totalSchools = db.schools.filter(s => !s.deleted).length;
+        const totalStudents = db.students.length;
+        const totalTeachers = db.users.filter(u => u.role === 'teacher').length;
+        
+        result = {
+            schools: totalSchools,
+            active_schools: activeSchools.length,
+            students: totalStudents,
+            teachers: totalTeachers
+        };
+    }
+    
+    else if (action === 'schools') {
+        result = db.schools.map(school => ({
+            ...school,
+            student_count: db.students.filter(s => s.school_id === school.id).length,
+            teacher_count: db.users.filter(u => u.school_id === school.id && u.role === 'teacher').length,
+            admin_count: db.users.filter(u => u.school_id === school.id && u.role === 'admin').length
+        }));
+    }
+    
+    else if (action === 'toggle_school') {
+        const school = db.schools.find(s => s.id === params.school_id);
+        if (school) {
+            school.active = params.active;
+            didUpdate = true;
+            result = { success: true };
+        } else {
+            result = { success: false, message: 'School not found' };
+        }
+    }
+    
+    else if (action === 'edit_school') {
+        const school = db.schools.find(s => s.id === params.school_id);
+        if (school) {
+            // Update school details
+            if (params.school_name) school.name = params.school_name;
+            if (params.school_address !== undefined) school.address = params.school_address;
+            if (params.contact_email) school.contact_email = params.contact_email;
+            if (params.contact_phone !== undefined) school.contact_phone = params.contact_phone;
+            if (params.active !== undefined) school.active = params.active;
+            
+            didUpdate = true;
+            result = { success: true };
+        } else {
+            result = { success: false, message: 'School not found' };
+        }
+    }
+    
+    else if (action === 'delete_school') {
+        const school = db.schools.find(s => s.id === params.school_id);
+        if (school) {
+            // Soft delete: Mark as deleted instead of removing from database
+            school.deleted = true;
+            school.active = false;
+            school.deleted_at = Date.now();
+            
+            didUpdate = true;
+            result = { success: true };
+        } else {
+            result = { success: false, message: 'School not found' };
+        }
+    }
+    
+    else if (action === 'create_admin') {
+        // Check if admin email already exists
+        const existingUser = db.users.find(u => u.email === params.email);
+        if (existingUser) {
+            return { success: false, message: 'Email already exists' };
+        }
+        
+        // Check if school exists and is active
+        const school = db.schools.find(s => s.id === params.school_id);
+        if (!school) {
+            return { success: false, message: 'School not found' };
+        }
+        if (school.deleted || school.active === false) {
+            return { success: false, message: 'Cannot assign admin to inactive or deleted school' };
+        }
+        
+        // Create new admin
+        const newAdmin = {
+            id: Storage.generateId('ADM'),
+            school_id: params.school_id,
+            name: params.name,
+            email: params.email,
+            password: params.password,
+            role: 'admin',
+            active: true,
+            created_at: Date.now()
+        };
+        
+        db.users.push(newAdmin);
+        didUpdate = true;
+        result = { success: true, admin_id: newAdmin.id };
+    }
+    
+    else if (action === 'edit_admin') {
+        const admin = db.users.find(u => u.id === params.admin_id && u.role === 'admin');
+        if (admin) {
+            // Check if email is being changed and if new email already exists
+            if (params.email && params.email !== admin.email) {
+                const emailExists = db.users.find(u => u.email === params.email && u.id !== admin.id);
+                if (emailExists) {
+                    return { success: false, message: 'Email already exists' };
+                }
+                admin.email = params.email;
+            }
+            
+            // Update other fields
+            if (params.name) admin.name = params.name;
+            if (params.school_id) {
+                const school = db.schools.find(s => s.id === params.school_id);
+                if (!school || school.deleted || school.active === false) {
+                    return { success: false, message: 'Cannot assign to this school' };
+                }
+                admin.school_id = params.school_id;
+            }
+            if (params.active !== undefined) admin.active = params.active;
+            
+            admin.updated_at = Date.now();
+            didUpdate = true;
+            result = { success: true };
+        } else {
+            result = { success: false, message: 'Admin not found' };
+        }
+    }
+    
+    else if (action === 'toggle_admin') {
+        const admin = db.users.find(u => u.id === params.admin_id && u.role === 'admin');
+        if (admin) {
+            admin.active = params.active;
+            admin.updated_at = Date.now();
+            didUpdate = true;
+            result = { success: true };
+        } else {
+            result = { success: false, message: 'Admin not found' };
+        }
+    }
+    
+    else if (action === 'reset_admin_password') {
+        const admin = db.users.find(u => u.id === params.admin_id && u.role === 'admin');
+        if (admin) {
+            admin.password = params.new_password;
+            admin.password_reset_at = Date.now();
+            didUpdate = true;
+            result = { success: true };
+        } else {
+            result = { success: false, message: 'Admin not found' };
+        }
+    }
+
+    if (didUpdate) Storage.save(db);
+    return result;
+}
+
+
 // --- Initialization ---
 
 // Register School (Public)
@@ -500,7 +729,8 @@ async function registerSchool(data) {
         address: data.school_address,
         contact_email: data.contact_email,
         contact_phone: data.contact_phone,
-        logo: data.school_logo, 
+        logo: data.school_logo,
+        active: true,
         settings: { currentTerm: '1st Term', academicYear: '2025/2026' }
     });
 

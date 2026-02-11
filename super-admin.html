@@ -1,0 +1,931 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Super Admin Dashboard | School Management System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: { 
+                    colors: { primary: '#6366f1', accent: '#8b5cf6', danger: '#ef4444', success: '#10b981' }, 
+                    fontFamily: { sans: ['Outfit', 'sans-serif'] } 
+                }
+            }
+        }
+    </script>
+    <style>
+        .fade-in { animation: fadeIn 0.5s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 min-h-screen font-sans">
+    
+    <!-- Header -->
+    <header class="bg-white border-b border-gray-200 shadow-sm sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center text-white text-2xl shadow-lg">
+                    <ion-icon name="shield-checkmark"></ion-icon>
+                </div>
+                <div>
+                    <h1 class="text-2xl font-bold text-gray-900">Super Admin Panel</h1>
+                    <p class="text-sm text-gray-500">Multi-School Management System</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-4">
+                <div class="hidden md:flex items-center gap-3 bg-gray-50 px-4 py-2 rounded-xl">
+                    <div class="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center text-white font-bold shadow">
+                        SA
+                    </div>
+                    <div>
+                        <p class="text-sm font-bold text-gray-800" id="super-admin-name">Super Admin</p>
+                        <p class="text-xs text-gray-400">System Administrator</p>
+                    </div>
+                </div>
+                <button onclick="logout()" class="p-3 hover:bg-red-50 rounded-xl text-red-500 transition">
+                    <ion-icon name="log-out-outline" class="text-2xl"></ion-icon>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        
+        <!-- Stats Overview -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8 fade-in">
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition">
+                <div class="flex items-center gap-4">
+                    <div class="w-14 h-14 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-2xl">
+                        <ion-icon name="business"></ion-icon>
+                    </div>
+                    <div>
+                        <p class="text-sm font-bold text-gray-400 uppercase tracking-wide">Total Schools</p>
+                        <h3 class="text-3xl font-bold text-gray-900" id="total-schools">0</h3>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition">
+                <div class="flex items-center gap-4">
+                    <div class="w-14 h-14 rounded-xl bg-green-50 text-green-600 flex items-center justify-center text-2xl">
+                        <ion-icon name="people"></ion-icon>
+                    </div>
+                    <div>
+                        <p class="text-sm font-bold text-gray-400 uppercase tracking-wide">Total Students</p>
+                        <h3 class="text-3xl font-bold text-gray-900" id="total-students">0</h3>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition">
+                <div class="flex items-center gap-4">
+                    <div class="w-14 h-14 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center text-2xl">
+                        <ion-icon name="briefcase"></ion-icon>
+                    </div>
+                    <div>
+                        <p class="text-sm font-bold text-gray-400 uppercase tracking-wide">Total Teachers</p>
+                        <h3 class="text-3xl font-bold text-gray-900" id="total-teachers">0</h3>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition">
+                <div class="flex items-center gap-4">
+                    <div class="w-14 h-14 rounded-xl bg-orange-50 text-orange-600 flex items-center justify-center text-2xl">
+                        <ion-icon name="checkmark-circle"></ion-icon>
+                    </div>
+                    <div>
+                        <p class="text-sm font-bold text-gray-400 uppercase tracking-wide">Active Schools</p>
+                        <h3 class="text-3xl font-bold text-gray-900" id="active-schools">0</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Schools Management -->
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 fade-in">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+                <div>
+                    <h2 class="text-xl font-bold text-gray-900">School Management</h2>
+                    <p class="text-sm text-gray-500">Manage all schools in the system</p>
+                </div>
+                <button onclick="openAddSchoolModal()" class="bg-gradient-to-r from-primary to-accent text-white px-6 py-3 rounded-xl font-bold shadow-lg hover:shadow-xl transition-all flex items-center gap-2">
+                    <ion-icon name="add-circle"></ion-icon>
+                    Add New School
+                </button>
+            </div>
+
+            <!-- Search and Filter -->
+            <div class="flex gap-4 mb-6">
+                <div class="relative flex-1">
+                    <ion-icon name="search-outline" class="absolute left-3 top-3 text-gray-400"></ion-icon>
+                    <input type="text" id="search-school" onkeyup="renderSchools()" placeholder="Search by school name..." class="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-primary">
+                </div>
+                <select id="filter-status" onchange="renderSchools()" class="px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-primary">
+                    <option value="">All Schools</option>
+                    <option value="active">Active Only</option>
+                    <option value="blocked">Blocked Only</option>
+                </select>
+            </div>
+
+            <!-- Schools Grid -->
+            <div id="schools-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Populated by JS -->
+            </div>
+        </div>
+
+        <!-- Admin Management -->
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 fade-in mt-8">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+                <div>
+                    <h2 class="text-xl font-bold text-gray-900">School Admin Management</h2>
+                    <p class="text-sm text-gray-500">Manage all school administrator accounts</p>
+                </div>
+                <button onclick="openAddAdminModal()" class="bg-gradient-to-r from-green-500 to-emerald-600 text-white px-6 py-3 rounded-xl font-bold shadow-lg hover:shadow-xl transition-all flex items-center gap-2">
+                    <ion-icon name="person-add"></ion-icon>
+                    Add New Admin
+                </button>
+            </div>
+
+            <!-- Search and Filter -->
+            <div class="flex gap-4 mb-6">
+                <div class="relative flex-1">
+                    <ion-icon name="search-outline" class="absolute left-3 top-3 text-gray-400"></ion-icon>
+                    <input type="text" id="search-admin" onkeyup="renderAdmins()" placeholder="Search by name or email..." class="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-primary">
+                </div>
+                <select id="filter-admin-school" onchange="renderAdmins()" class="px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-primary">
+                    <option value="">All Schools</option>
+                    <!-- Populated by JS -->
+                </select>
+                <select id="filter-admin-status" onchange="renderAdmins()" class="px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-primary">
+                    <option value="">All Status</option>
+                    <option value="active">Active</option>
+                    <option value="inactive">Inactive</option>
+                </select>
+            </div>
+
+            <!-- Admin Table -->
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead>
+                        <tr class="border-b border-gray-200">
+                            <th class="text-left py-3 px-4 text-xs font-bold text-gray-500 uppercase">Admin Name</th>
+                            <th class="text-left py-3 px-4 text-xs font-bold text-gray-500 uppercase">Email</th>
+                            <th class="text-left py-3 px-4 text-xs font-bold text-gray-500 uppercase">School</th>
+                            <th class="text-left py-3 px-4 text-xs font-bold text-gray-500 uppercase">Status</th>
+                            <th class="text-right py-3 px-4 text-xs font-bold text-gray-500 uppercase">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="admins-table">
+                        <!-- Populated by JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+
+    <!-- Add School Modal -->
+    <div id="add-school-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden flex items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-2xl animate-fade-in">
+            <h2 class="text-2xl font-bold mb-6 text-gray-900">Register New School</h2>
+            <form id="add-school-form" onsubmit="handleAddSchool(event)" class="space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="md:col-span-2">
+                        <label class="block text-xs font-bold text-gray-500 uppercase mb-2">School Name *</label>
+                        <input type="text" name="school_name" required placeholder="e.g. Springfield High School" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-primary">
+                    </div>
+                    
+                    <div class="md:col-span-2">
+                        <label class="block text-xs font-bold text-gray-500 uppercase mb-2">School Address</label>
+                        <textarea name="school_address" rows="2" placeholder="Full address" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-primary"></textarea>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Contact Email *</label>
+                        <input type="email" name="contact_email" required placeholder="admin@school.com" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-primary">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Contact Phone</label>
+                        <input type="tel" name="contact_phone" placeholder="+123 456 7890" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-primary">
+                    </div>
+                </div>
+
+                <div class="border-t border-gray-200 pt-6">
+                    <h3 class="font-bold text-gray-900 mb-4">School Admin Account</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Admin Name *</label>
+                            <input type="text" name="admin_name" required placeholder="John Doe" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-primary">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Admin Email *</label>
+                            <input type="email" name="admin_email" required placeholder="admin@school.com" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-primary">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Admin Password *</label>
+                            <input type="password" name="admin_password" required minlength="6" placeholder="Min 6 characters" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-primary">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="border-t border-gray-200 pt-6">
+                    <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Educational Levels</label>
+                    <div class="grid grid-cols-3 gap-4">
+                        <label class="flex items-center gap-2 cursor-pointer p-3 bg-gray-50 rounded-xl hover:bg-gray-100 transition">
+                            <input type="checkbox" name="levels" value="KG" class="w-5 h-5 rounded text-primary focus:ring-primary">
+                            <span class="font-medium text-gray-700">Kindergarten</span>
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer p-3 bg-gray-50 rounded-xl hover:bg-gray-100 transition">
+                            <input type="checkbox" name="levels" value="Primary" class="w-5 h-5 rounded text-primary focus:ring-primary">
+                            <span class="font-medium text-gray-700">Primary</span>
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer p-3 bg-gray-50 rounded-xl hover:bg-gray-100 transition">
+                            <input type="checkbox" name="levels" value="JHS" class="w-5 h-5 rounded text-primary focus:ring-primary">
+                            <span class="font-medium text-gray-700">JHS</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="flex gap-3 pt-4">
+                    <button type="button" onclick="closeModal('add-school-modal')" class="flex-1 py-3 border border-gray-300 rounded-xl font-bold hover:bg-gray-50 text-gray-700 transition">
+                        Cancel
+                    </button>
+                    <button type="submit" class="flex-1 py-3 bg-gradient-to-r from-primary to-accent text-white rounded-xl font-bold shadow-lg hover:shadow-xl transition-all">
+                        Create School
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Edit School Modal -->
+    <div id="edit-school-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden flex items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-2xl animate-fade-in max-h-[90vh] overflow-y-auto">
+            <h2 class="text-2xl font-bold mb-6 text-gray-900">Edit School Details</h2>
+            <form id="edit-school-form" onsubmit="handleEditSchool(event)" class="space-y-6">
+                <input type="hidden" name="school_id" id="edit-school-id">
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="md:col-span-2">
+                        <label class="block text-xs font-bold text-gray-500 uppercase mb-2">School Name *</label>
+                        <input type="text" id="edit-school-name" name="school_name" required placeholder="e.g. Springfield High School" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-primary">
+                    </div>
+                    
+                    <div class="md:col-span-2">
+                        <label class="block text-xs font-bold text-gray-500 uppercase mb-2">School Address</label>
+                        <textarea id="edit-school-address" name="school_address" rows="2" placeholder="Full address" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-primary"></textarea>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Contact Email *</label>
+                        <input type="email" id="edit-contact-email" name="contact_email" required placeholder="admin@school.com" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-primary">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Contact Phone</label>
+                        <input type="tel" id="edit-contact-phone" name="contact_phone" placeholder="+123 456 7890" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-primary">
+                    </div>
+                </div>
+
+                <div class="border-t border-gray-200 pt-6">
+                    <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
+                        <div>
+                            <h4 class="font-bold text-gray-800">School Status</h4>
+                            <p class="text-sm text-gray-500">Enable or disable school access</p>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="edit-school-active" name="active" class="sr-only peer">
+                            <div class="w-11 h-6 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-500"></div>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="flex gap-3 pt-4">
+                    <button type="button" onclick="closeModal('edit-school-modal')" class="flex-1 py-3 border border-gray-300 rounded-xl font-bold hover:bg-gray-50 text-gray-700 transition">
+                        Cancel
+                    </button>
+                    <button type="submit" class="flex-1 py-3 bg-gradient-to-r from-primary to-accent text-white rounded-xl font-bold shadow-lg hover:shadow-xl transition-all">
+                        Save Changes
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="delete-school-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden flex items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md animate-fade-in text-center">
+            <div class="w-16 h-16 bg-red-100 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl">
+                <ion-icon name="warning"></ion-icon>
+            </div>
+            <h3 class="text-2xl font-bold text-gray-900 mb-2">Delete This School?</h3>
+            <p class="text-gray-500 mb-2">This will mark the school as deleted (soft delete).</p>
+            <p class="text-sm text-gray-400 mb-6">School data will be preserved but inaccessible.</p>
+            
+            <div class="bg-yellow-50 border border-yellow-200 rounded-xl p-4 mb-6 text-left">
+                <div class="flex items-start gap-3">
+                    <ion-icon name="information-circle" class="text-yellow-600 text-2xl flex-shrink-0 mt-0.5"></ion-icon>
+                    <div>
+                        <p class="text-sm font-bold text-yellow-900 mb-1">What happens?</p>
+                        <ul class="text-xs text-yellow-800 space-y-1">
+                            <li>• School becomes inaccessible</li>
+                            <li>• All users (admins, teachers, students) cannot log in</li>
+                            <li>• Data is preserved and can be restored by super admin</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <input type="hidden" id="delete-school-id">
+            <div class="flex gap-3">
+                <button onclick="closeModal('delete-school-modal')" class="flex-1 py-3 border border-gray-300 rounded-xl font-bold hover:bg-gray-50 text-gray-700 transition">
+                    Cancel
+                </button>
+                <button onclick="confirmDeleteSchool()" class="flex-1 py-3 bg-red-600 text-white rounded-xl font-bold shadow-lg hover:bg-red-700 transition-all">
+                    Yes, Delete
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Admin Modal -->
+    <div id="add-admin-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden flex items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-2xl animate-fade-in">
+            <h2 class="text-2xl font-bold mb-6 text-gray-900">Create New School Admin</h2>
+            <form id="add-admin-form" onsubmit="handleAddAdmin(event)" class="space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Admin Name *</label>
+                        <input type="text" name="admin_name" required placeholder="John Doe" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-primary">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Email *</label>
+                        <input type="email" name="admin_email" required placeholder="admin@school.com" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-primary">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Password *</label>
+                        <input type="password" name="admin_password" required minlength="6" placeholder="Min 6 characters" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-primary">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Assign to School *</label>
+                        <select name="school_id" id="admin-add-school" required class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-primary">
+                            <option value="">Select School</option>
+                            <!-- Populated by JS -->
+                        </select>
+                    </div>
+                </div>
+
+                <div class="bg-blue-50 border border-blue-200 rounded-xl p-4">
+                    <div class="flex items-start gap-3">
+                        <ion-icon name="information-circle" class="text-blue-600 text-2xl flex-shrink-0 mt-0.5"></ion-icon>
+                        <div>
+                            <p class="text-sm font-bold text-blue-900 mb-1">Multi-School Policy</p>
+                            <p class="text-xs text-blue-800">By default, one admin can only manage one school. This system will check for existing assignments.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex gap-3 pt-4">
+                    <button type="button" onclick="closeModal('add-admin-modal')" class="flex-1 py-3 border border-gray-300 rounded-xl font-bold hover:bg-gray-50 text-gray-700 transition">
+                        Cancel
+                    </button>
+                    <button type="submit" class="flex-1 py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-xl font-bold shadow-lg hover:shadow-xl transition-all">
+                        Create Admin
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Edit Admin Modal -->
+    <div id="edit-admin-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden flex items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-2xl animate-fade-in">
+            <h2 class="text-2xl font-bold mb-6 text-gray-900">Edit Admin Account</h2>
+            <form id="edit-admin-form" onsubmit="handleEditAdmin(event)" class="space-y-6">
+                <input type="hidden" name="admin_id" id="edit-admin-id">
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Admin Name *</label>
+                        <input type="text" id="edit-admin-name" name="admin_name" required placeholder="John Doe" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-primary">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Email *</label>
+                        <input type="email" id="edit-admin-email" name="admin_email" required placeholder="admin@school.com" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-primary">
+                    </div>
+                    
+                    <div class="md:col-span-2">
+                        <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Assign to School *</label>
+                        <select id="edit-admin-school" name="school_id" required class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-primary">
+                            <!-- Populated by JS -->
+                        </select>
+                    </div>
+                </div>
+
+                <div class="border-t border-gray-200 pt-6">
+                    <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
+                        <div>
+                            <h4 class="font-bold text-gray-800">Admin Status</h4>
+                            <p class="text-sm text-gray-500">Enable or disable admin access</p>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="edit-admin-active" name="active" class="sr-only peer">
+                            <div class="w-11 h-6 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-500"></div>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="flex gap-3 pt-4">
+                    <button type="button" onclick="closeModal('edit-admin-modal')" class="flex-1 py-3 border border-gray-300 rounded-xl font-bold hover:bg-gray-50 text-gray-700 transition">
+                        Cancel
+                    </button>
+                    <button type="submit" class="flex-1 py-3 bg-gradient-to-r from-primary to-accent text-white rounded-xl font-bold shadow-lg hover:shadow-xl transition-all">
+                        Save Changes
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Reset Password Modal -->
+    <div id="reset-password-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden flex items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md animate-fade-in">
+            <div class="w-16 h-16 bg-blue-100 text-blue-500 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl">
+                <ion-icon name="key"></ion-icon>
+            </div>
+            <h3 class="text-2xl font-bold text-gray-900 mb-2 text-center">Reset Admin Password</h3>
+            <p class="text-gray-500 mb-6 text-center text-sm">Set a new password for this administrator</p>
+            
+            <form id="reset-password-form" onsubmit="handleResetPassword(event)" class="space-y-4">
+                <input type="hidden" id="reset-admin-id">
+                
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 uppercase mb-2">New Password *</label>
+                    <input type="password" name="new_password" required minlength="6" placeholder="Min 6 characters" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-primary">
+                </div>
+                
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Confirm Password *</label>
+                    <input type="password" name="confirm_password" required minlength="6" placeholder="Confirm password" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-primary">
+                </div>
+
+                <div class="bg-yellow-50 border border-yellow-200 rounded-xl p-3">
+                    <p class="text-xs text-yellow-800"><strong>Note:</strong> The admin will need to use this new password on their next login. Consider notifying them.</p>
+                </div>
+                
+                <div class="flex gap-3 pt-2">
+                    <button type="button" onclick="closeModal('reset-password-modal')" class="flex-1 py-3 border border-gray-300 rounded-xl font-bold hover:bg-gray-50 text-gray-700 transition">
+                        Cancel
+                    </button>
+                    <button type="submit" class="flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold shadow-lg hover:bg-blue-700 transition-all">
+                        Reset Password
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/storage.js"></script>
+    <script src="js/app.js"></script>
+    <script>
+        // Check Super Admin Auth
+        const user = checkAuth(['super_admin']);
+        if(user) {
+            document.getElementById('super-admin-name').textContent = user.name || 'Super Admin';
+        }
+
+        // Initialize Dashboard
+        async function initSuperAdmin() {
+            const stats = await fetchSuperAdminData('stats');
+            if(stats) {
+                document.getElementById('total-schools').textContent = stats.schools;
+                document.getElementById('total-students').textContent = stats.students;
+                document.getElementById('total-teachers').textContent = stats.teachers;
+                document.getElementById('active-schools').textContent = stats.active_schools;
+            }
+            renderSchools();
+        }
+
+        function renderSchools() {
+            const schools = Storage.get().schools.filter(s => !s.deleted) || [];
+            const searchTerm = document.getElementById('search-school').value.toLowerCase();
+            const statusFilter = document.getElementById('filter-status').value;
+
+            let filtered = schools.filter(school => {
+                const matchesSearch = school.name.toLowerCase().includes(searchTerm);
+                const matchesStatus = !statusFilter || 
+                    (statusFilter === 'active' && school.active !== false) ||
+                    (statusFilter === 'blocked' && school.active === false);
+                return matchesSearch && matchesStatus;
+            });
+
+            const grid = document.getElementById('schools-grid');
+            
+            if(filtered.length === 0) {
+                grid.innerHTML = `
+                    <div class="col-span-full text-center py-12 text-gray-400">
+                        <ion-icon name="school-outline" class="text-6xl mb-4"></ion-icon>
+                        <p class="text-lg font-medium">No schools found</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const db = Storage.get();
+            grid.innerHTML = filtered.map(school => {
+                const students = db.students.filter(s => s.school_id === school.id).length;
+                const teachers = db.users.filter(u => u.school_id === school.id && u.role === 'teacher').length;
+                const admins = db.users.filter(u => u.school_id === school.id && u.role === 'admin').length;
+                const isBlocked = school.active === false;
+
+                return `
+                    <div class="bg-gradient-to-br from-white to-gray-50 rounded-2xl p-6 border border-gray-200 hover:shadow-lg transition ${isBlocked ? 'opacity-60' : ''}">
+                        <div class="flex items-start justify-between mb-4">
+                            <div class="flex-1">
+                                <h3 class="font-bold text-lg text-gray-900 mb-1">${school.name}</h3>
+                                <p class="text-xs text-gray-500">${school.address || 'No address'}</p>
+                            </div>
+                            ${isBlocked ? 
+                                '<span class="px-3 py-1 bg-red-100 text-red-700 text-xs font-bold rounded-full">Blocked</span>' :
+                                '<span class="px-3 py-1 bg-green-100 text-green-700 text-xs font-bold rounded-full">Active</span>'
+                            }
+                        </div>
+                        
+                        <div class="grid grid-cols-3 gap-3 mb-4">
+                            <div class="bg-blue-50 rounded-xl p-3 text-center">
+                                <p class="text-2xl font-bold text-blue-600">${students}</p>
+                                <p class="text-xs text-blue-700 font-medium">Students</p>
+                            </div>
+                            <div class="bg-purple-50 rounded-xl p-3 text-center">
+                                <p class="text-2xl font-bold text-purple-600">${teachers}</p>
+                                <p class="text-xs text-purple-700 font-medium">Teachers</p>
+                            </div>
+                            <div class="bg-orange-50 rounded-xl p-3 text-center">
+                                <p class="text-2xl font-bold text-orange-600">${admins}</p>
+                                <p class="text-xs text-orange-700 font-medium">Admins</p>
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-2">
+                            <button onclick="editSchool('${school.id}')" class="py-2 bg-blue-500 text-white rounded-lg text-sm font-bold hover:bg-blue-600 transition flex items-center justify-center gap-1">
+                                <ion-icon name="pencil"></ion-icon> Edit
+                            </button>
+                            ${isBlocked ? 
+                                `<button onclick="toggleSchoolStatus('${school.id}', true)" class="py-2 bg-green-500 text-white rounded-lg text-sm font-bold hover:bg-green-600 transition flex items-center justify-center gap-1">
+                                    <ion-icon name="checkmark-circle"></ion-icon> Unblock
+                                </button>` :
+                                `<button onclick="toggleSchoolStatus('${school.id}', false)" class="py-2 bg-yellow-500 text-white rounded-lg text-sm font-bold hover:bg-yellow-600 transition flex items-center justify-center gap-1">
+                                    <ion-icon name="ban"></ion-icon> Block
+                                </button>`
+                            }
+                            <button onclick="viewSchoolDetails('${school.id}')" class="py-2 bg-gray-500 text-white rounded-lg text-sm font-bold hover:bg-gray-600 transition flex items-center justify-center gap-1">
+                                <ion-icon name="eye"></ion-icon> View
+                            </button>
+                            <button onclick="deleteSchool('${school.id}')" class="py-2 bg-red-600 text-white rounded-lg text-sm font-bold hover:bg-red-700 transition flex items-center justify-center gap-1">
+                                <ion-icon name="trash"></ion-icon> Delete
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        async function toggleSchoolStatus(schoolId, activate) {
+            const action = activate ? 'unblock' : 'block';
+            if(!confirm(`Are you sure you want to ${action} this school?`)) return;
+            
+            const result = await fetchSuperAdminData('toggle_school', { school_id: schoolId, active: activate });
+            if(result && result.success) {
+                alert(`School ${activate ? 'unblocked' : 'blocked'} successfully!`);
+                initSuperAdmin();
+            } else {
+                alert('Failed to update school status');
+            }
+        }
+
+        function viewSchoolDetails(schoolId) {
+            alert(`School details view coming soon for ID: ${schoolId}`);
+        }
+
+        function openAddSchoolModal() {
+            document.getElementById('add-school-modal').classList.remove('hidden');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.add('hidden');
+        }
+
+        async function handleAddSchool(e) {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            
+            const levels = [];
+            formData.getAll('levels').forEach(level => levels.push(level));
+            
+            const data = {
+                school_name: formData.get('school_name'),
+                school_address: formData.get('school_address'),
+                contact_email: formData.get('contact_email'),
+                contact_phone: formData.get('contact_phone'),
+                admin_name: formData.get('admin_name'),
+                email: formData.get('admin_email'),
+                password: formData.get('admin_password'),
+                levels: levels
+            };
+
+            const result = await registerSchool(data);
+            if(result && result.success) {
+                alert('School created successfully!');
+                closeModal('add-school-modal');
+                e.target.reset();
+                initSuperAdmin();
+            } else {
+                alert('Failed to create school');
+            }
+        }
+
+        function editSchool(schoolId) {
+            const db = Storage.get();
+            const school = db.schools.find(s => s.id === schoolId);
+            
+            if (!school) {
+                alert('School not found');
+                return;
+            }
+
+            // Populate the edit form
+            document.getElementById('edit-school-id').value = school.id;
+            document.getElementById('edit-school-name').value = school.name;
+            document.getElementById('edit-school-address').value = school.address || '';
+            document.getElementById('edit-contact-email').value = school.contact_email || '';
+            document.getElementById('edit-contact-phone').value = school.contact_phone || '';
+            document.getElementById('edit-school-active').checked = school.active !== false;
+
+            // Open modal
+            document.getElementById('edit-school-modal').classList.remove('hidden');
+        }
+
+        async function handleEditSchool(e) {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            
+            const data = {
+                school_id: formData.get('school_id'),
+                school_name: formData.get('school_name'),
+                school_address: formData.get('school_address'),
+                contact_email: formData.get('contact_email'),
+                contact_phone: formData.get('contact_phone'),
+                active: document.getElementById('edit-school-active').checked
+            };
+
+            const result = await fetchSuperAdminData('edit_school', data);
+            if(result && result.success) {
+                alert('School updated successfully!');
+                closeModal('edit-school-modal');
+                initSuperAdmin();
+            } else {
+                alert('Failed to update school');
+            }
+        }
+
+        function deleteSchool(schoolId) {
+            document.getElementById('delete-school-id').value = schoolId;
+            document.getElementById('delete-school-modal').classList.remove('hidden');
+        }
+
+        async function confirmDeleteSchool() {
+            const schoolId = document.getElementById('delete-school-id').value;
+            
+            const result = await fetchSuperAdminData('delete_school', { school_id: schoolId });
+            if(result && result.success) {
+                alert('School deleted successfully!');
+                closeModal('delete-school-modal');
+                initSuperAdmin();
+            } else {
+                alert(result.message || 'Failed to delete school');
+            }
+        }
+
+        // ==== ADMIN MANAGEMENT FUNCTIONS ====
+
+        function renderAdmins() {
+            const db = Storage.get();
+            const admins = db.users.filter(u => u.role === 'admin') || [];
+            const searchTerm = document.getElementById('search-admin').value.toLowerCase();
+            const schoolFilter = document.getElementById('filter-admin-school').value;
+            const statusFilter = document.getElementById('filter-admin-status').value;
+
+            let filtered = admins.filter(admin => {
+                const matchesSearch = admin.name.toLowerCase().includes(searchTerm) || 
+                                     admin.email.toLowerCase().includes(searchTerm);
+                const matchesSchool = !schoolFilter || admin.school_id === schoolFilter;
+                const matchesStatus = !statusFilter || 
+                    (statusFilter === 'active' && admin.active !== false) ||
+                    (statusFilter === 'inactive' && admin.active === false);
+                return matchesSearch && matchesSchool && matchesStatus;
+            });
+
+            const tbody = document.getElementById('admins-table');
+            
+            if (filtered.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="5" class="text-center py-12 text-gray-400">
+                            <ion-icon name="person-outline" class="text-6xl mb-4"></ion-icon>
+                            <p class="text-lg font-medium">No admins found</p>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = filtered.map(admin => {
+                const school = db.schools.find(s => s.id === admin.school_id);
+                const isActive = admin.active !== false;
+
+                return `
+                    <tr class="border-b border-gray-100 hover:bg-gray-50">
+                        <td class="py-4 px-4">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white font-bold">
+                                    ${admin.name.charAt(0).toUpperCase()}
+                                </div>
+                                <div>
+                                    <p class="font-bold text-gray-900">${admin.name}</p>
+                                    <p class="text-xs text-gray-500">ID: ${admin.id}</p>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="py-4 px-4 text-gray-700">${admin.email}</td>
+                        <td class="py-4 px-4">
+                            <span class="px-3 py-1 bg-blue-100 text-blue-700 text-xs font-bold rounded-full">
+                                ${school ? school.name : 'Unassigned'}
+                            </span>
+                        </td>
+                        <td class="py-4 px-4">
+                            ${isActive ?
+                                '<span class="px-3 py-1 bg-green-100 text-green-700 text-xs font-bold rounded-full">Active</span>' :
+                                '<span class="px-3 py-1 bg-red-100 text-red-700 text-xs font-bold rounded-full">Inactive</span>'
+                            }
+                        </td>
+                        <td class="py-4 px-4">
+                            <div class="flex justify-end gap-2">
+                                <button onclick="editAdmin('${admin.id}')" class="p-2 hover:bg-blue-50 rounded-lg text-blue-600 transition" title="Edit">
+                                    <ion-icon name="pencil"></ion-icon>
+                                </button>
+                                <button onclick="resetAdminPassword('${admin.id}')" class="p-2 hover:bg-purple-50 rounded-lg text-purple-600 transition" title="Reset Password">
+                                    <ion-icon name="key"></ion-icon>
+                                </button>
+                                <button onclick="toggleAdminStatus('${admin.id}', ${!isActive})" class="p-2 hover:bg-${isActive ? 'red' : 'green'}-50 rounded-lg text-${isActive ? 'red' : 'green'}-600 transition" title="${isActive ? 'Deactivate' : 'Activate'}">
+                                    <ion-icon name="${isActive ? 'close-circle' : 'checkmark-circle'}"></ion-icon>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function populateSchoolDropdowns() {
+            const db = Storage.get();
+            const schools = db.schools.filter(s => !s.deleted && s.active !== false);
+            
+            const options = schools.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
+            
+            document.getElementById('admin-add-school').innerHTML = '<option value="">Select School</option>' + options;
+            document.getElementById('edit-admin-school').innerHTML = options;
+            document.getElementById('filter-admin-school').innerHTML = '<option value="">All Schools</option>' + options;
+        }
+
+        function openAddAdminModal() {
+            populateSchoolDropdowns();
+            document.getElementById('add-admin-modal').classList.remove('hidden');
+        }
+
+        async function handleAddAdmin(e) {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            
+            const data = {
+                name: formData.get('admin_name'),
+                email: formData.get('admin_email'),
+                password: formData.get('admin_password'),
+                school_id: formData.get('school_id')
+            };
+
+            const result = await fetchSuperAdminData('create_admin', data);
+            if (result && result.success) {
+                alert('Admin created successfully!');
+                closeModal('add-admin-modal');
+                e.target.reset();
+                renderAdmins();
+            } else {
+             alert(result.message || 'Failed to create admin');
+            }
+        }
+
+        function editAdmin(adminId) {
+            const db = Storage.get();
+            const admin = db.users.find(u => u.id === adminId);
+            
+            if (!admin) {
+                alert('Admin not found');
+                return;
+            }
+
+            populateSchoolDropdowns();
+            
+            document.getElementById('edit-admin-id').value = admin.id;
+            document.getElementById('edit-admin-name').value = admin.name;
+            document.getElementById('edit-admin-email').value = admin.email;
+            document.getElementById('edit-admin-school').value = admin.school_id;
+            document.getElementById('edit-admin-active').checked = admin.active !== false;
+
+            document.getElementById('edit-admin-modal').classList.remove('hidden');
+        }
+
+        async function handleEditAdmin(e) {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            
+            const data = {
+                admin_id: formData.get('admin_id'),
+                name: formData.get('admin_name'),
+                email: formData.get('admin_email'),
+                school_id: formData.get('school_id'),
+                active: document.getElementById('edit-admin-active').checked
+            };
+
+            const result = await fetchSuperAdminData('edit_admin', data);
+            if (result && result.success) {
+                alert('Admin updated successfully!');
+                closeModal('edit-admin-modal');
+                renderAdmins();
+            } else {
+                alert(result.message || 'Failed to update admin');
+            }
+        }
+
+        async function toggleAdminStatus(adminId, activate) {
+            const action = activate ? 'activate' : 'deactivate';
+            if (!confirm(`Are you sure you want to ${action} this admin?`)) return;
+            
+            const result = await fetchSuperAdminData('toggle_admin', { admin_id: adminId, active: activate });
+            if (result && result.success) {
+                alert(`Admin ${activate ? 'activated' : 'deactivated'} successfully!`);
+                renderAdmins();
+            } else {
+                alert('Failed to update admin status');
+            }
+        }
+
+        function resetAdminPassword(adminId) {
+            document.getElementById('reset-admin-id').value = adminId;
+            document.getElementById('reset-password-modal').classList.remove('hidden');
+        }
+
+        async function handleResetPassword(e) {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            
+            const newPassword = formData.get('new_password');
+            const confirmPassword = formData.get('confirm_password');
+            
+            if (newPassword !== confirmPassword) {
+                alert('Passwords do not match!');
+                return;
+            }
+
+            const data = {
+                admin_id: document.getElementById('reset-admin-id').value,
+                new_password: newPassword
+            };
+
+            const result = await fetchSuperAdminData('reset_admin_password', data);
+            if (result && result.success) {
+                alert('Password reset successfully!');
+                closeModal('reset-password-modal');
+                e.target.reset();
+            } else {
+                alert('Failed to reset password');
+            }
+        }
+
+        // Initialize on load
+        initSuperAdmin();
+        renderAdmins();
+    </script>
+</body>
+</html>
