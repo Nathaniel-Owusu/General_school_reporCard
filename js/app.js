@@ -334,8 +334,10 @@ async function fetchAdminData(action, params = {}) {
         } else {
             // Assign classes to the user (works for both teachers and admins)
             user.assigned_classes = params.class_names || [];
+            user.assigned_subjects = params.assigned_subjects || []; // New: specific subject assignments
+            
             didUpdate = true;
-            result = { success: true, message: 'Assigned ' + (params.class_names || []).length + ' classes' };
+            result = { success: true, message: 'Assignments updated' };
         }
     }
 
@@ -450,16 +452,48 @@ async function fetchTeacherData(action, params = {}) {
         // Refresh teacher object to get latest assignments
         const me = db.users.find(u => u.id === user.id);
         const myClassNames = me ? (me.assigned_classes || []) : [];
-        // Match by Name (Legacy) or ID
-        return db.classes.filter(c => c.school_id === schoolId && (myClassNames.includes(c.name) || myClassNames.includes(c.id)));
+        const mySubjectAssignments = me ? (me.assigned_subjects || []) : [];
+        
+        // Match by Class Teacher ID, Name/ID assignment, OR Subject Assignment
+        return db.classes.filter(c => 
+            c.school_id === schoolId && (
+                c.class_teacher_id === user.id ||
+                myClassNames.includes(c.name) || 
+                myClassNames.includes(c.id) ||
+                mySubjectAssignments.some(as => as.class_id === c.id)
+            )
+        );
     };
 
     if (action === 'classes') {
         const classes = getMyClasses();
-        // Enrich with subject objects, filtering Active ones
+        const me = db.users.find(u => u.id === user.id);
+        
+        // Enrich with subject objects, filtering Active ones AND assigned ones
         result = classes.map(c => {
-             const subjectObjs = db.subjects.filter(s => c.subjects && c.subjects.includes(s.id) && s.active !== false); // Active only
-             return { ...c, subjects: subjectObjs };
+             let allowedSubjects;
+             
+             // If Class Teacher or Admin -> See ALL subjects
+             if(user.role === 'admin' || c.class_teacher_id === user.id) {
+                 allowedSubjects = db.subjects.filter(s => c.subjects && c.subjects.includes(s.id) && s.active !== false);
+             } else {
+                 // Check specific subject assignments
+                 const assignment = (me.assigned_subjects || []).find(as => as.class_id === c.id);
+                 if(assignment && assignment.subject_ids && assignment.subject_ids.length > 0) {
+                     // Strict mode: Only show assigned subjects
+                     allowedSubjects = db.subjects.filter(s => 
+                         c.subjects && c.subjects.includes(s.id) && 
+                         s.active !== false &&
+                         assignment.subject_ids.includes(s.id)
+                     );
+                 } else {
+                     // Fallback/Legacy: If assigned to class but no subjects specified, show ALL (assuming General Class Teacher)
+                     // OR should we show none? For backward compatibility, showing ALL is safer.
+                     allowedSubjects = db.subjects.filter(s => c.subjects && c.subjects.includes(s.id) && s.active !== false);
+                 }
+             }
+             
+             return { ...c, subjects: allowedSubjects };
         });
     }
 
