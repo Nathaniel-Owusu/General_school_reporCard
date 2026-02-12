@@ -127,14 +127,19 @@
             btn.disabled = true;
 
             let result;
+            console.log('Attempting login...', { type });
+            
             if(type === 'student') {
                 const id = document.getElementById('student-id').value;
+                console.log('Student ID:', id);
                 result = await login('student', { id });
             } else {
                 const email = document.getElementById('staff-email').value;
                 const password = document.getElementById('staff-pass').value;
+                console.log('Staff Credentials:', { email, password });
                 result = await login('staff', { email, password });
             }
+            console.log('Login Result:', result);
 
             if(result.success) {
                 btn.innerText = 'Redirecting...';

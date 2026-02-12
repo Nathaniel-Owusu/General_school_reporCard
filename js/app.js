@@ -82,49 +82,61 @@ function checkAuth(allowedRoles) {
 }
 
 async function login(type, credentials) {
+    // 1. Online Login (Secure)
+    try {
+        const response = await fetch('api/login.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({...credentials, type})
+        });
+        
+        if (response.ok) {
+            const data = await response.json();
+            if (data.success) {
+                const user = data.user;
+                if(!user.role && type === 'student') user.role = 'student';
+                
+                sessionStorage.setItem('currentUser', JSON.stringify(user));
+                
+                let redirect = 'index.html';
+                if (user.role === 'super_admin') redirect = 'super-admin.html';
+                else if (user.role === 'admin') redirect = 'admin-dashboard.html';
+                else if (user.role === 'teacher') redirect = 'teacher-portal.html';
+                else if (user.role === 'student') redirect = `student-report.html?student_id=${user.id}`;
+                
+                return { success: true, redirect };
+            }
+            return { success: false, message: data.message };
+        }
+    } catch (e) {
+        console.warn('⚠️ Server Unreachable. Using Offline Login.', e);
+    }
+
+    // 2. Offline Login (Insecure Fallback)
     const db = Storage.get();
-    if (!db) return { success: false, message: 'Database error' };
+    if (!db) return { success: false, message: 'Database error.' };
 
     if (type === 'student') {
         const student = db.students.find(s => s.id === credentials.id);
         if (student) {
-             // Find school for context
-             const school = db.schools.find(s => s.id === student.school_id);
-             
-             // Check if school is active
-             if (!school || school.deleted || school.active === false) {
-                 return { success: false, message: 'Your school is currently inactive. Contact administration.' };
-             }
-             
-             const sessionUser = { ...student, type: 'student', school_name: school ? school.name : 'Unknown' };
-             sessionStorage.setItem('currentUser', JSON.stringify(sessionUser));
-             return { success: true, redirect: 'student-report.html', user: sessionUser };
+             const user = { ...student, role: 'student' };
+             sessionStorage.setItem('currentUser', JSON.stringify(user));
+             return { success: true, redirect: `student-report.html?student_id=${user.id}` };
         }
     } else {
-        // Super Admin, Admin or Teacher
-        const user = db.users.find(u => u.email === credentials.email && u.password === credentials.password);
-        if (user) {
-            // Check if user is active (for admins and teachers)
-            if (user.role !== 'super_admin' && user.active === false) {
-                return { success: false, message: 'Your account has been deactivated. Contact your administrator.' };
-            }
-            
-            // For non-super admins, check if their school is active
-            if (user.role !== 'super_admin' && user.school_id) {
-                const school = db.schools.find(s => s.id === user.school_id);
-                if (!school || school.deleted || school.active === false) {
-                    return { success: false, message: 'Your school is currently inactive. Contact super admin.' };
-                }
-            }
+        const user = db.users.find(u => u.email === credentials.email);
+        if (user && user.password === credentials.password) {
+            if (user.active === false) return { success: false, message: 'Account Inactive' };
             
             sessionStorage.setItem('currentUser', JSON.stringify(user));
             let redirect = 'teacher-portal.html';
             if (user.role === 'super_admin') redirect = 'super-admin.html';
             else if (user.role === 'admin') redirect = 'admin-dashboard.html';
-            return { success: true, redirect: redirect, user: user };
+            
+            return { success: true, redirect };
         }
     }
-    return { success: false, message: 'Invalid credentials' };
+    return { success: false, message: 'Invalid Credentials (Offline)' };
 }
 
 function logout() {
@@ -484,11 +496,34 @@ async function fetchTeacherData(action, params = {}) {
                     name: s.name,
                     class_score: score.class_score || 0,
                     exam_score: score.exam_score || 0,
-                    status: score.status
+                    status: score.status,
+                    attendance: s.attendance || { present: 0, total: 0 },
+                    conduct: s.conduct || '',
+                    teacher_remark: s.teacher_remark || ''
                 };
             });
         } else {
             result = [];
+        }
+    }
+
+    else if (action === 'save_records') {
+        const { records } = params;
+        // records is array of { student_id, attendance, conduct, teacher_remark }
+        if(records && Array.isArray(records)) {
+             records.forEach(r => {
+                 const std = db.students.find(s => s.id === r.student_id);
+                 if(std) {
+                     // Check and update fields if provided
+                     if(r.attendance) std.attendance = r.attendance; 
+                     if(r.conduct) std.conduct = r.conduct;
+                     if(r.teacher_remark) std.teacher_remark = r.teacher_remark;
+                 }
+             });
+             didUpdate = true;
+             result = { success: true };
+        } else {
+             result = { success: false, message: 'Invalid records format' };
         }
     }
 

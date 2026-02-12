@@ -42,6 +42,10 @@
                     <ion-icon name="create-outline" class="text-xl"></ion-icon>
                     <span class="font-medium">Enter Results</span>
                 </button>
+                <button onclick="switchView('records')" id="nav-records" class="w-full flex items-center gap-3 px-6 py-3 text-gray-400 hover:text-white hover:bg-gray-800 transition-colors">
+                    <ion-icon name="list-outline" class="text-xl"></ion-icon>
+                    <span class="font-medium">Student Records</span>
+                </button>
                 <a href="../index.html" class="flex items-center gap-3 px-6 py-3 text-gray-400 hover:text-white hover:bg-gray-800 transition-colors">
                     <ion-icon name="home-outline" class="text-xl"></ion-icon>
                     <span class="font-medium">Visit Site</span>
@@ -200,6 +204,50 @@
                     </div>
                 </div>
 
+                <!-- VIEW: RECORDS (ATTENDANCE & REMARKS) -->
+                <div id="view-records" class="hidden max-w-full mx-auto h-full flex flex-col">
+                    
+                    <!-- Controls -->
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 mb-6 sticky top-0 z-20">
+                        <div class="flex flex-wrap gap-4 items-end">
+                            <div class="flex-1 min-w-[200px]">
+                                <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Select Class</label>
+                                <select id="records-class-select" onchange="loadRecords()" class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-primary"></select>
+                            </div>
+                            <div class="flex justify-end">
+                                <button onclick="saveRecords()" id="btn-save-records" disabled class="px-6 py-2 bg-primary text-white rounded-lg font-bold shadow-lg opacity-50 cursor-not-allowed flex items-center gap-2 transition hover:bg-blue-800">
+                                    <ion-icon name="save"></ion-icon> Save Records
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Records Table -->
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-100 flex-1 overflow-hidden flex flex-col table-container relative">
+                        <div class="overflow-auto flex-1">
+                            <table class="w-full text-left border-collapse min-w-[800px]">
+                                <thead class="bg-gray-50 text-gray-500 font-bold uppercase text-xs sticky top-0 z-10 shadow-sm">
+                                    <tr>
+                                        <th class="px-4 py-3 border-b border-gray-200 w-16">#</th>
+                                        <th class="px-4 py-3 border-b border-gray-200 w-32">Index ID</th>
+                                        <th class="px-4 py-3 border-b border-gray-200 w-48">Student Name</th>
+                                        <th class="px-4 py-3 border-b border-gray-200 w-40 text-center bg-blue-50/20">Attendance<br><span class="text-[10px] font-normal lowercase">(present / total)</span></th>
+                                        <th class="px-4 py-3 border-b border-gray-200 w-48 text-left bg-yellow-50/20">Conduct</th>
+                                        <th class="px-4 py-3 border-b border-gray-200 text-left">Class Teacher's Remark</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="records-body" class="divide-y divide-gray-100 text-sm">
+                                    <tr>
+                                        <td colspan="6" class="text-center py-20 text-gray-400 italic">
+                                            Select a Class to manage records.
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
             </main>
         </div>
     </div>
@@ -273,8 +321,13 @@
             
             // Populate Entry Dropdown
             const entrySelect = document.getElementById('entry-class-select');
-            entrySelect.innerHTML = '<option value="">-- Select Class --</option>' + 
+            const options = '<option value="">-- Select Class --</option>' + 
                 assignedClasses.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+            entrySelect.innerHTML = options;
+
+            // Populate Records Dropdown
+            const recordsSelect = document.getElementById('records-class-select');
+            if(recordsSelect) recordsSelect.innerHTML = options;
         }
 
         function goToEntry(className) {
@@ -495,7 +548,7 @@
         }
 
         function switchView(view) {
-            ['dashboard', 'entry'].forEach(v => {
+            ['dashboard', 'entry', 'records'].forEach(v => {
                 document.getElementById(`view-${v}`).classList.add('hidden');
                 
                 const nav = document.getElementById(`nav-${v}`);
@@ -507,6 +560,140 @@
             const active = document.getElementById(`nav-${view}`);
             active.classList.remove('text-gray-400', 'hover:text-white', 'hover:bg-gray-800');
             active.classList.add('bg-primary/20', 'text-blue-300', 'border-r-4', 'border-blue-400');
+        }
+
+        // --- RECORDS LOGIC (ATTENDANCE & REMARKS) ---
+        
+        async function loadRecords() {
+            const classId = document.getElementById('records-class-select').value;
+            const tbody = document.getElementById('records-body');
+            const saveBtn = document.getElementById('btn-save-records');
+
+            if(saveBtn) {
+                saveBtn.disabled = true;
+                saveBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            }
+
+            if(!classId) {
+                tbody.innerHTML = `<tr><td colspan="6" class="text-center py-20 text-gray-400 italic">Select a Class to manage records.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = `<tr><td colspan="6" class="text-center py-20 text-gray-400">Loading students...</td></tr>`;
+
+            // Reuse fetchTeacherData to get student list (ignoring subject-specific scores)
+            const students = await fetchTeacherData('students', { class_id: classId }) || [];
+
+            if(students.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="text-center py-20 text-gray-400">No students found.</td></tr>`;
+                return;
+            }
+
+            // Estimate default total attendance (e.g. 60 days) or use existing from first student
+            const defaultTotal = students[0]?.attendance?.total || 60;
+
+            tbody.innerHTML = students.map((s, i) => {
+                const att = s.attendance || { present: 0, total: defaultTotal };
+                
+                return `
+                    <tr class="hover:bg-blue-50/10 transition border-b border-gray-50" data-student-id="${s.id}">
+                        <td class="px-4 py-3 font-mono text-gray-400 text-xs">${i + 1}</td>
+                        <td class="px-4 py-3 font-mono font-bold text-gray-600 text-xs">${s.id}</td>
+                        <td class="px-4 py-3 font-bold text-gray-800">${s.name}</td>
+                        
+                        <!-- Attendance -->
+                        <td class="px-4 py-3 bg-blue-50/10 text-center">
+                            <div class="flex items-center justify-center gap-1">
+                                <input type="number" min="0" max="100" value="${att.present}" 
+                                    class="w-16 px-2 py-1 text-center font-mono font-bold bg-white border border-gray-200 rounded focus:ring-2 focus:ring-primary outline-none"
+                                    placeholder="0" data-type="present">
+                                <span class="text-gray-400">/</span>
+                                <input type="number" min="0" max="100" value="${att.total || defaultTotal}" 
+                                    class="w-16 px-2 py-1 text-center font-mono bg-gray-50 border border-gray-200 rounded focus:ring-2 focus:ring-primary outline-none text-gray-500"
+                                    placeholder="Total" data-type="total">
+                            </div>
+                        </td>
+
+                        <!-- Conduct -->
+                        <td class="px-4 py-3 bg-yellow-50/10">
+                            <input type="text" value="${s.conduct || ''}" 
+                                class="w-full px-2 py-1 text-sm bg-white border border-gray-200 rounded focus:ring-2 focus:ring-secondary outline-none"
+                                placeholder="e.g. Good" data-type="conduct">
+                        </td>
+
+                        <!-- Remark -->
+                        <td class="px-4 py-3">
+                            <input type="text" value="${s.teacher_remark || ''}" 
+                                class="w-full px-2 py-1 text-sm bg-white border border-gray-200 rounded focus:ring-2 focus:ring-primary outline-none"
+                                placeholder="Enter remark..." data-type="remark">
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+
+            if(saveBtn) {
+                saveBtn.disabled = false;
+                saveBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            }
+        }
+
+        async function saveRecords() {
+            const tbody = document.getElementById('records-body');
+            const rows = tbody.querySelectorAll('tr');
+            const records = [];
+
+            rows.forEach(row => {
+                const studentId = row.dataset.studentId;
+                if(!studentId) return;
+
+                const presentInput = row.querySelector('input[data-type="present"]');
+                const totalInput = row.querySelector('input[data-type="total"]');
+                const conductInput = row.querySelector('input[data-type="conduct"]');
+                const remarkInput = row.querySelector('input[data-type="remark"]');
+
+                if (presentInput && totalInput) {
+                    const present = parseInt(presentInput.value) || 0;
+                    const total = parseInt(totalInput.value) || 0;
+                    const conduct = conductInput ? conductInput.value.trim() : '';
+                    const remark = remarkInput ? remarkInput.value.trim() : '';
+
+                    records.push({
+                        student_id: studentId,
+                        attendance: { present, total },
+                        conduct: conduct,
+                        teacher_remark: remark
+                    });
+                }
+            });
+
+            const btn = document.getElementById('btn-save-records');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = 'Saving...';
+            btn.disabled = true;
+
+            try {
+                const result = await fetchTeacherData('save_records', { records });
+
+                if(result && result.success) {
+                    btn.innerHTML = '<ion-icon name="checkmark-done"></ion-icon> Saved Records!';
+                    btn.classList.replace('bg-primary', 'bg-green-600');
+                    
+                    setTimeout(() => {
+                        btn.innerHTML = originalText;
+                        btn.classList.replace('bg-green-600', 'bg-primary');
+                        btn.disabled = false;
+                    }, 2000);
+                } else {
+                    alert('Error: ' + (result?.message || 'Could not save records.'));
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                }
+            } catch (e) {
+                console.error(e);
+                alert('Error saving records.');
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
         }
 
         // Init

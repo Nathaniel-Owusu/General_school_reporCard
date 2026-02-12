@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Report Card | General School</title>
+    <title>Student Report Card | General School</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
     <script>
@@ -11,7 +11,7 @@
             theme: {
                 extend: {
                     colors: { primary: '#1e3a8a', secondary: '#d97706', paper: '#f8fafc' },
-                    fontFamily: { sans: ['Outfit', 'sans-serif'], serif: ['Playfair Display', 'serif'] }
+                    fontFamily: { sans: ['Outfit', 'sans-serif'], serif: ['Times New Roman', 'Playfair Display', 'serif'], mono: ['Courier New', 'monospace'] }
                 }
             }
         }
@@ -21,12 +21,21 @@
         body { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
         @media print {
             body { background: white; padding: 0; }
-            #report-card { box-shadow: none; border-radius: 0; max-width: none; width: 100%; border: none; margin: 0; }
+            #report-card { box-shadow: none; border: none; margin: 0; width: 100%; max-width: none; border-radius: 0; }
             .print\:hidden { display: none !important; }
             .print\:block { display: block !important; }
-            .print\:flex { display: flex !important; }
-            footer { position: fixed; bottom: 0; width: 100%; border-top: 1px solid #eee; padding-top: 10px; }
-            /* Hide URL headers/footers in generic browsers if possible, though @page margin 0 helps */
+            /* Force background colors */
+            * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+        }
+        .watermark {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 70%;
+            opacity: 0.08;
+            pointer-events: none;
+            z-index: 0;
         }
     </style>
 </head>
@@ -41,7 +50,7 @@
     </div>
 
     <!-- Report Card Container -->
-    <div id="report-card" class="w-full max-w-[210mm] mx-auto bg-white shadow-xl rounded-xl overflow-hidden print:shadow-none print:w-full print:max-w-none">
+    <div id="report-card" class="w-full max-w-[210mm] mx-auto bg-white shadow-xl rounded-xl overflow-hidden print:shadow-none print:w-full print:max-w-none print:rounded-none relative">
         <!-- Content will be injected via JS -->
     </div>
 
@@ -55,32 +64,51 @@
     <script src="js/storage.js"></script>
     <script src="js/app.js"></script>
     <script>
-        // Protect Page
+        // Protect Page / Init
         async function init() {
-            const auth = checkAuth(['student']);
-            if(!auth) return;
+            // PUBLIC ACCESS: No login required
+            const session = sessionStorage.getItem('currentUser');
+            const auth = session ? JSON.parse(session) : null;
 
+            // Determine which student to show
+            let targetStudentId = auth?.type === 'student' ? auth.id : null;
+            
+            const urlParams = new URLSearchParams(window.location.search);
+            const queryStudentId = urlParams.get('student_id');
+
+            // Query parameter overrides session
+            if (queryStudentId) {
+                targetStudentId = queryStudentId;
+            }
+
+            // If we don't have an ID yet, show the lookup form
+            if (!targetStudentId) {
+                renderAdminLookup(document.getElementById('report-card'));
+                return;
+            }
+            
             // Show loading state
             const container = document.getElementById('report-card');
-            container.innerHTML = `<div class="p-12 text-center text-gray-500">Loading Report Card...</div>`;
+            container.innerHTML = `<div class="p-12 text-center text-gray-500">Loading Report Card for ${targetStudentId}...</div>`;
 
             try {
-                const data = await fetchStudentReport(auth.id);
+                const data = await fetchStudentReport(targetStudentId);
                 
                 if (data && data.student) {
                     renderReport(data.student, data.settings);
                 } else {
                     container.innerHTML = `<div class="p-12 text-center text-red-500">
                         <h3 class="font-bold text-xl">Report Not Found</h3>
-                        <p class="mt-2 text-sm">No academic record found for this index number.</p>
-                        <button onclick="window.history.back()" class="mt-4 text-blue-600 hover:underline">Go Back</button>
+                        <p class="mt-2 text-sm">No academic record found for Student ID: ${targetStudentId}</p>
+                        <button onclick="renderAdminLookup(document.getElementById('report-card'))" class="mt-4 text-blue-600 hover:underline">Try Another Search</button>
                     </div>`;
                 }
             } catch (e) {
                 console.error(e);
-                container.innerHTML = `<div class="p-12 text-center text-red-500">Error loading report.</div>`;
+                container.innerHTML = `<div class="p-12 text-center text-red-500">Error loading report. Please try again.</div>`;
             }
         }
+
         function calculateGrade(score, gradingSystem) {
              // Use custom grading system if available
              if(gradingSystem && gradingSystem.length > 0) {
@@ -89,14 +117,14 @@
                          return { 
                              grade: g.grade, 
                              remark: g.remark, 
-                             bg: 'bg-blue-50', 
-                             color: 'text-blue-700' 
+                             bg: g.bg || 'bg-blue-50', 
+                             color: g.color || 'text-blue-700' 
                          };
                      }
                  }
              }
 
-            // Default
+            // Default Colors
             if (score >= 80) return { grade: 'A', remark: 'Excellent', bg: 'bg-green-100', color: 'text-green-700' };
             if (score >= 70) return { grade: 'B', remark: 'Very Good', bg: 'bg-blue-100', color: 'text-blue-700' };
             if (score >= 60) return { grade: 'C', remark: 'Good', bg: 'bg-yellow-100', color: 'text-yellow-700' };
@@ -110,172 +138,221 @@
              return text.toString().replace(/[&<>"']/g, function(m) { return {'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;'}[m]; });
         }
 
-        // Render Report
+        // Render Report (Colorful + Watermark)
         function renderReport(user, settings) {
             const container = document.getElementById('report-card');
-            const schoolData = { settings }; // Compatibility wrapper
-
+            const schoolData = { settings };
             
-            // Calculate Totals and Grades
+            // Calculate Totals and Rows
             let totalScore = 0;
             let approvedCount = 0;
-
             const rows = user.scores.map(s => {
-                const isApproved = s.status === 'Approved';
+                // Only show approved
+                if(s.status !== 'Approved') return '';
                 
-                if(isApproved) {
-                    const total = (s.class || 0) + (s.exam || 0);
-                    totalScore += total;
-                    approvedCount++;
-                    const gradeInfo = calculateGrade(total, schoolData.settings.gradingSystem);
-                    
-                    return `
-                        <tr class="border-b border-gray-100 group hover:bg-gray-50">
-                            <td class="px-6 py-4 font-medium text-gray-800">${s.subject}</td>
-                            <td class="px-6 py-4 text-center text-gray-500 font-mono">${s.class}</td>
-                            <td class="px-6 py-4 text-center text-gray-500 font-mono">${s.exam}</td>
-                            <td class="px-6 py-4 text-center font-bold text-gray-800 font-mono">${total}</td>
-                            <td class="px-6 py-4 text-center"><span class="${gradeInfo.bg} ${gradeInfo.color} px-2.5 py-1 rounded-lg text-xs font-bold shadow-sm">${gradeInfo.grade}</span></td>
-                            <td class="px-6 py-4 text-right text-sm text-gray-500 italic font-serif">${gradeInfo.remark}</td>
-                        </tr>
-                    `;
-                } else {
-                    return `
-                        <tr class="border-b border-gray-100 bg-gray-50/50">
-                            <td class="px-6 py-4 font-medium text-gray-400">${s.subject}</td>
-                            <td colspan="5" class="px-6 py-4 text-center text-xs font-bold text-orange-400 uppercase tracking-wider">
-                                <span class="flex items-center justify-center gap-2"><ion-icon name="time"></ion-icon> Results Pending Approval</span>
-                            </td>
-                        </tr>
-                    `;
-                }
+                const total = (s.class || 0) + (s.exam || 0);
+                totalScore += total;
+                approvedCount++;
+                const gradeInfo = calculateGrade(total, schoolData.settings.gradingSystem);
+                
+                return `
+                    <tr class="border-b border-gray-200">
+                        <td class="px-3 py-3 border-r border-gray-200 text-left font-sans font-medium text-gray-800 text-sm">${s.subject}</td>
+                        <td class="px-3 py-3 border-r border-gray-200 text-center font-mono text-sm text-gray-600">${s.class}</td>
+                        <td class="px-3 py-3 border-r border-gray-200 text-center font-mono text-sm text-gray-600">${s.exam}</td>
+                        <td class="px-3 py-3 border-r border-gray-200 text-center font-bold font-mono text-sm text-gray-900">${total}</td>
+                        <td class="px-3 py-3 border-r border-gray-200 text-center text-sm">
+                            <span class="${gradeInfo.bg} ${gradeInfo.color} px-2 py-1 rounded font-bold shadow-sm inline-block min-w-[30px]">${gradeInfo.grade}</span>
+                        </td>
+                        <td class="px-3 py-3 border-gray-200 text-left pl-3 text-sm italic text-gray-500">${gradeInfo.remark}</td>
+                    </tr>
+                `;
             }).join('');
 
-            const average = approvedCount > 0 ? (totalScore / approvedCount).toFixed(1) : "0.0";
+            const average = approvedCount > 0 ? (totalScore / approvedCount).toFixed(2) : "0.00";
 
             container.innerHTML = `
-                <!-- Decorative Header -->
-                <div class="h-2 bg-gradient-to-r from-primary via-blue-600 to-secondary print:block"></div>
-                
-                <header class="p-8 border-b border-gray-100 flex justify-between items-center relative overflow-hidden">
-                    <div class="flex items-center gap-4 relative z-10">
-                        ${schoolData.settings.schoolLogo ? 
-                            `<img src="${schoolData.settings.schoolLogo}" class="w-20 h-20 object-contain">` : 
-                            `<div class="w-20 h-20 bg-blue-50 rounded-full flex items-center justify-center border-2 border-primary/10">
-                                <span class="text-4xl">🎓</span>
-                            </div>`
-                        }
-                        <div>
-                            <h1 class="font-serif text-3xl font-bold text-gray-900">${escapeHtml(schoolData.settings.schoolName || 'General School')}</h1>
-                            <p class="text-xs uppercase tracking-widest text-gray-500 mt-1">${escapeHtml(schoolData.settings.schoolMotto || 'Excellence in Education')}</p>
-                            <p class="text-xs text-gray-400 mt-1">${escapeHtml(schoolData.settings.schoolAddress || '')}</p>
-                            <p class="text-xs text-gray-400">${escapeHtml(schoolData.settings.contactPhone || '')} | ${escapeHtml(schoolData.settings.contactEmail || '')}</p>
-                        </div>
-                    </div>
-                    <div class="text-right">
-                        <h2 class="text-2xl font-bold text-gray-800">${user.year}</h2>
-                        <p class="text-gray-500">${user.term} Report</p>
-                    </div>
-                </header>
-
-                <div class="bg-paper p-8 border-b border-gray-100 relative">
-                     ${schoolData.settings.toggles?.showWatermark && schoolData.settings.schoolLogo ? 
-                        `<div class="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.03]">
-                            <img src="${schoolData.settings.schoolLogo}" class="w-96 h-96 object-contain grayscale">
+                <div class="max-w-[210mm] mx-auto bg-white p-8 border border-gray-200 print:border-none print:p-0 min-h-[297mm] relative">
+                    
+                    <!-- WATERMARK -->
+                    ${schoolData.settings.schoolLogo ? 
+                        `<div class="watermark">
+                            <img src="${schoolData.settings.schoolLogo}" class="w-full h-full object-contain opacity-20 filter grayscale-0">
                         </div>` : ''
-                     }
+                    }
 
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-6 relative z-10">
-                        <div>
-                            <p class="text-xs font-bold text-gray-400 uppercase">Student Name</p>
-                            <p class="font-bold text-lg text-gray-800">${user.name}</p>
+                    <!-- HEADER -->
+                    <div class="text-center mb-6 pb-4 relative z-10 border-b-2 border-primary">
+                        <div class="flex justify-between items-center mb-4">
+                             <!-- Left Logo -->
+                             ${schoolData.settings.schoolLogo ? 
+                                `<img src="${schoolData.settings.schoolLogo}" class="h-24 w-24 object-contain">` : 
+                                `<div class="w-20 h-20 bg-blue-50 rounded-lg flex items-center justify-center font-bold text-primary text-xl shadow-sm">LOGO</div>`
+                             }
+                             
+                             <!-- Center Info -->
+                             <div class="flex-1 px-4">
+                                <h1 class="text-3xl font-black uppercase text-primary tracking-tight" style="font-family: 'Playfair Display', serif;">${escapeHtml(schoolData.settings.schoolName || 'General School')}</h1>
+                                <p class="text-xs font-bold text-gray-500 uppercase tracking-[0.2em] mb-1">${escapeHtml(schoolData.settings.schoolMotto || 'Excellence in Education')}</p>
+                                <p class="text-sm text-gray-600 font-medium">${escapeHtml(schoolData.settings.schoolAddress || '')}</p>
+                                <p class="text-sm text-gray-600">${escapeHtml(schoolData.settings.contactPhone || '')} • ${escapeHtml(schoolData.settings.contactEmail || '')}</p>
+                             </div>
+
+                             <!-- Right (Empty for balance or QR code) -->
+                             <div class="w-24"></div>
                         </div>
-                        <div>
-                            <p class="text-xs font-bold text-gray-400 uppercase">Student ID</p>
-                            <p class="font-mono text-lg text-gray-800">${user.id}</p>
-                        </div>
-                        <div>
-                            <p class="text-xs font-bold text-gray-400 uppercase">Class</p>
-                            <p class="font-bold text-lg text-primary">${user.class}</p>
-                        </div>
-                         ${schoolData.settings.toggles?.showPosition !== false ? `
-                            <div>
-                                <p class="text-xs font-bold text-gray-400 uppercase">Position</p>
-                                <p class="font-bold text-lg text-secondary">${user.position} <span class="text-sm font-normal text-gray-400">/ ${user.total_students}</span></p>
-                            </div>
-                        ` : ''}
+                        <h3 class="font-bold text-xl uppercase bg-primary text-white inline-block px-8 py-1 rounded-t-lg shadow-sm">Terminal Report</h3>
                     </div>
-                </div>
 
-                <div class="p-8 relative">
-                     <!-- Summary Cards -->
-                    <div class="grid grid-cols-3 gap-4 mb-8">
-                        ${schoolData.settings.toggles?.showAttendance !== false ? `
-                            <div class="border border-blue-100 bg-blue-50 p-4 rounded-xl">
-                                <p class="text-blue-600 text-xs font-bold uppercase">Attendance</p>
-                                <p class="text-2xl font-bold text-gray-800">${user.attendance.present}/${schoolData.settings.attendance?.totalDays || user.attendance.total}</p>
-                            </div>
-                        ` : ''}
-                        <div class="border border-green-100 bg-green-50 p-4 rounded-xl">
-                            <p class="text-green-600 text-xs font-bold uppercase">Average</p>
-                            <p class="text-2xl font-bold text-gray-800">${average}</p>
-                        </div>
-                         <div class="border border-purple-100 bg-purple-50 p-4 rounded-xl">
-                            <p class="text-purple-600 text-xs font-bold uppercase">Conduct</p>
-                            <p class="text-lg font-bold text-gray-800">${user.conduct}</p>
+                    <!-- STUDENT INFO GRID -->
+                    <div class="bg-blue-50/50 border border-blue-100 rounded-xl p-4 mb-6 relative z-10 shadow-sm">
+                        <div class="grid grid-cols-2 gap-y-2 gap-x-8">
+                            <div class="flex border-b border-blue-100 pb-1"><span class="font-bold text-gray-500 w-32 text-xs uppercase self-end">Student Name</span> <span class="font-serif font-bold text-xl text-primary truncate">${user.name}</span></div>
+                            <div class="flex border-b border-blue-100 pb-1"><span class="font-bold text-gray-500 w-32 text-xs uppercase self-end">Student ID</span> <span class="font-mono text-lg text-gray-800">${user.id}</span></div>
+                            
+                            <div class="flex border-b border-blue-100 pb-1"><span class="font-bold text-gray-500 w-32 text-xs uppercase self-end">Class</span> <span class="font-bold text-gray-800">${user.class}</span></div>
+                            <div class="flex border-b border-blue-100 pb-1"><span class="font-bold text-gray-500 w-32 text-xs uppercase self-end">Position</span> <span class="font-bold text-secondary text-lg">${user.position || '-'} <span class="text-xs text-gray-400 font-normal">/ ${user.total_students || '-'}</span></span></div>
+                            
+                            <div class="flex border-b border-blue-100 pb-1"><span class="font-bold text-gray-500 w-32 text-xs uppercase self-end">Year</span> <span class="font-serif text-gray-800">${user.year}</span></div>
+                            <div class="flex border-b border-blue-100 pb-1"><span class="font-bold text-gray-500 w-32 text-xs uppercase self-end">Term</span> <span class="font-serif text-gray-800">${user.term}</span></div>
                         </div>
                     </div>
 
-                    <!-- Table -->
-                    <table class="w-full text-left mb-8 border-collapse">
-                        <thead class="bg-gray-50 text-gray-500 text-xs uppercase font-bold border-y border-gray-200">
-                            <tr>
-                                <th class="px-6 py-3 border-b border-gray-200">Subject</th>
-                                <th class="px-6 py-3 text-center border-b border-gray-200">Class (30)</th>
-                                <th class="px-6 py-3 text-center border-b border-gray-200">Exam (70)</th>
-                                <th class="px-6 py-3 text-center border-b border-gray-200">Total (100)</th>
-                                <th class="px-6 py-3 text-center border-b border-gray-200">Grade</th>
-                                <th class="px-6 py-3 text-right border-b border-gray-200">Remarks</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-gray-100">${rows}</tbody>
-                    </table>
+                    <!-- ACADEMIC PERFORMANCE -->
+                    <div class="relative z-10 bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden mb-6">
+                        <table class="w-full text-black border-collapse">
+                            <thead>
+                                <tr class="bg-primary text-white">
+                                    <th class="px-3 py-3 w-1/3 text-left text-xs font-bold uppercase tracking-wider">Subject</th>
+                                    <th class="px-3 py-3 text-center text-xs font-bold uppercase tracking-wider border-l border-blue-800">Class (30)</th>
+                                    <th class="px-3 py-3 text-center text-xs font-bold uppercase tracking-wider border-l border-blue-800">Exam (70)</th>
+                                    <th class="px-3 py-3 text-center text-xs font-bold uppercase tracking-wider border-l border-blue-800">Total (100)</th>
+                                    <th class="px-3 py-3 text-center text-xs font-bold uppercase tracking-wider border-l border-blue-800">Grade</th>
+                                    <th class="px-3 py-3 text-left pl-3 text-xs font-bold uppercase tracking-wider border-l border-blue-800">Remarks</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${rows}
+                            </tbody>
+                            <tfoot>
+                                <tr class="bg-gray-50 border-t-2 border-primary">
+                                    <td class="px-3 py-3 text-right font-bold uppercase text-xs text-gray-500">Performance Summary:</td>
+                                    <td colspan="2" class="px-3 py-3 text-center font-bold text-sm text-gray-800">TOTAL: ${totalScore}</td>
+                                    <td colspan="3" class="px-3 py-3 text-center font-bold text-sm text-primary">AVG: ${average}</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
 
-                     <!-- Signatures Section -->
-                     <div class="grid grid-cols-2 gap-12 mt-12 pt-8 border-t border-gray-100 print:mt-12 print:pt-4 page-break-inside-avoid">
-                        <div>
-                            <h4 class="text-xs font-bold text-gray-400 uppercase mb-2">Class Teacher's Remark</h4>
-                            <p class="text-sm text-gray-800 font-serif italic mb-8 min-h-[40px]">"${user.teacher_remark || 'Good academic progress.'}"</p>
-                            <div class="border-t border-gray-800 pt-2 w-3/4">
-                                <p class="text-xs font-bold text-gray-500 uppercase">Signature & Date</p>
+                    <!-- ATTENDANCE & CONDUCT GRID -->
+                    <div class="grid grid-cols-2 gap-4 mb-8 relative z-10">
+                        <div class="border border-indigo-100 bg-indigo-50/50 rounded-xl overflow-hidden">
+                            <div class="bg-indigo-100 p-2 text-center font-bold text-xs uppercase text-indigo-800">Attendance Record</div>
+                            <div class="p-4 text-center">
+                                <span class="text-3xl font-bold text-indigo-900">${user.attendance.present}</span>
+                                <span class="text-sm text-indigo-400 uppercase font-bold">Days Present</span>
+                                <div class="text-xs text-indigo-400 mt-1">Out of ${user.attendance.total || 60} days</div>
                             </div>
                         </div>
-                        <div>
-                            <h4 class="text-xs font-bold text-gray-400 uppercase mb-2">Headteacher's Remark</h4>
-                            <p class="text-sm text-gray-800 font-serif italic mb-8 min-h-[40px]">"${user.head_remark || 'Promoted to next class.'}"</p>
-                            <div class="border-t border-gray-800 pt-2 w-3/4">
-                                <p class="text-xs font-bold text-gray-500 uppercase">Signature & Stamp</p>
+                        <div class="border border-amber-100 bg-amber-50/50 rounded-xl overflow-hidden">
+                            <div class="bg-amber-100 p-2 text-center font-bold text-xs uppercase text-amber-800">Conduct & Character</div>
+                            <div class="p-4 text-center flex items-center justify-center h-full">
+                                <p class="font-serif italic text-amber-900">"${user.conduct || 'Good behavior shown.'}"</p>
                             </div>
                         </div>
-                     </div>
-                     
-                     <!-- Grading Key -->
-                     <div class="mt-8 p-4 bg-gray-50 rounded-lg border border-gray-100 print:mt-6 print:border print:bg-transparent print:text-xs page-break-inside-avoid">
-                        <p class="text-[10px] font-bold text-gray-400 uppercase mb-2">Grading System</p>
-                        <div class="flex flex-wrap gap-4 text-xs text-gray-600">
-                            ${schoolData.settings.gradingSystem ? 
-                                schoolData.settings.gradingSystem.map(g => `<span><strong class="text-gray-900">${g.grade}</strong>: ${g.min}-${g.max}% (${g.remark})</span>`).join('<span class="text-gray-300">|</span>')
-                                : 
-                                '<span><strong>A</strong>: 80-100% (Excellent)</span> <span class="text-gray-300">|</span> <span><strong>B</strong>: 70-79% (Very Good)</span> <span class="text-gray-300">|</span> <span><strong>C</strong>: 60-69% (Good)</span> <span class="text-gray-300">|</span> <span><strong>D</strong>: 50-59% (Credit)</span> <span class="text-gray-300">|</span> <span><strong>E</strong>: 45-49% (Pass)</span> <span class="text-gray-300">|</span> <span><strong>F</strong>: 0-44% (Fail)</span>'
-                            }
+                    </div>
+
+                    <!-- REMARKS SECTION -->
+                    <div class="border border-gray-200 rounded-xl p-6 space-y-6 mb-8 relative z-10 bg-white shadow-sm">
+                        <!-- Class Teacher -->
+                        <div class="flex items-start gap-4">
+                            <div class="bg-gray-100 p-2 rounded text-center min-w-[100px]">
+                                <span class="block text-[10px] font-bold text-gray-400 uppercase">Class Teacher</span>
+                                <span class="block text-xl">👨‍🏫</span>
+                            </div>
+                            <div class="flex-1">
+                                <p class="text-sm font-serif italic text-gray-700 bg-gray-50 p-3 rounded-lg border border-gray-100 mb-2">"${user.teacher_remark || 'Has shown good improvement in studies.'}"</p>
+                                <div class="flex justify-end">
+                                    <div class="text-center w-32 border-t border-gray-300 pt-1">
+                                         <p class="text-[10px] font-bold uppercase text-gray-400">Signature</p>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                     </div>
+
+                        <!-- Head Teacher -->
+                        <div class="flex items-start gap-4 pt-4 border-t border-gray-100">
+                             <div class="bg-primary/10 p-2 rounded text-center min-w-[100px]">
+                                <span class="block text-[10px] font-bold text-primary uppercase">Head Teacher</span>
+                                <span class="block text-xl">🎓</span>
+                            </div>
+                            <div class="flex-1">
+                                <p class="text-sm font-serif italic text-primary bg-primary/5 p-3 rounded-lg border border-primary/10 mb-2">"${user.head_remark || 'Promoted to the next class.'}"</p>
+                                <div class="flex justify-end gap-8 items-end">
+                                    <div class="text-center">
+                                        <div class="w-24 h-24 border-2 border-dashed border-gray-300 rounded-full flex items-center justify-center text-[10px] text-gray-400 mb-1 opacity-50 rotate-[-12deg]">Official Stamp</div>
+                                    </div>
+                                    <div class="text-center w-32 border-t border-gray-300 pt-1">
+                                         <p class="text-[10px] font-bold uppercase text-gray-400">Signature</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- KEY -->
+                    <div class="text-center text-[10px] uppercase tracking-wider text-gray-400 pt-4 border-t border-gray-100 relative z-10">
+                        <span class="font-bold text-white bg-gray-400 px-1 rounded mr-2">GRADING KEY</span> 
+                        ${schoolData.settings.gradingSystem ? 
+                            schoolData.settings.gradingSystem.map(g => `<span class="inline-block mx-2"><strong class="text-gray-600">${g.grade}</strong>: ${g.min}-${g.max}</span>`).join('<span class="text-gray-200">|</span>')
+                            : 
+                            'A: 80-100 • B: 70-79 • C: 60-69 • D: 50-59 • E: 45-49 • F: 0-44'
+                        }
+                    </div>
                 </div>
-
-                <footer class="bg-gray-900 text-gray-400 text-center py-4 text-xs print:bg-white print:text-gray-600 print:border-t">
-                    ${escapeHtml(schoolData.settings.schoolName)} Assessment System • Generated Electronically on ${new Date().toLocaleDateString()}
-                </footer>
             `;
+        }
+
+        function renderAdminLookup(container) {
+            container.innerHTML = `
+                <div class="max-w-md mx-auto mt-20 bg-white p-8 rounded-xl shadow-lg border border-gray-100 text-center">
+                    <div class="w-16 h-16 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl">
+                        🔍
+                    </div>
+                    <h2 class="text-2xl font-bold text-gray-800 mb-2">Student Lookup</h2>
+                    <p class="text-gray-500 mb-6 text-sm">Enter a Student ID to view their report card.</p>
+                    <div class="flex gap-2">
+                        <input type="text" id="lookup-id" placeholder="e.g. ST_001" class="flex-1 px-4 py-3 border border-gray-300 rounded-lg outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition text-center uppercase font-mono">
+                    </div>
+                    <button onclick="lookupStudent()" class="w-full mt-4 bg-primary text-white py-3 rounded-lg font-bold hover:bg-blue-800 transition shadow-lg shadow-blue-500/20">View Report</button>
+                    
+                    <div class="mt-6 pt-6 border-t border-gray-100 flex justify-center gap-4 text-sm text-gray-400">
+                        <a href="admin-dashboard.html" class="hover:text-primary">Admin Dashboard</a>
+                        <span>•</span>
+                        <a href="teacher-portal.html" class="hover:text-primary">Teacher Portal</a>
+                    </div>
+                </div>
+            `;
+            // Focus input
+            setTimeout(() => {
+                const input = document.getElementById('lookup-id');
+                if(input) input.focus();
+            }, 100);
+            
+            // Allow Enter key
+            const input = document.getElementById('lookup-id');
+            if(input) {
+                input.addEventListener('keypress', function(e) {
+                    if(e.key === 'Enter') lookupStudent();
+                });
+            }
+        }
+        
+        function lookupStudent() {
+            const id = document.getElementById('lookup-id').value.trim();
+            if(id) {
+                window.location.search = '?student_id=' + encodeURIComponent(id);
+            }
         }
 
         init();

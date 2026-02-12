@@ -1040,6 +1040,7 @@
                     <td class="px-4 py-3"><span class="px-2 py-1 bg-green-50 text-green-600 rounded text-[10px] font-bold uppercase">Active</span></td>
                     <td class="px-4 py-3 text-right">
                          <div class="flex justify-end gap-2 group-hover:opacity-100 transition">
+                            <a href="student-report.html?student_id=${student.id}" target="_blank" class="p-1.5 hover:bg-white text-gray-400 hover:text-blue-500 rounded shadow-sm" title="View/Print Report"><ion-icon name="print"></ion-icon></a>
                             <button onclick="openAddStudentModal('${student.id}')" class="p-1.5 hover:bg-white text-gray-400 hover:text-accent rounded shadow-sm" title="Edit"><ion-icon name="create"></ion-icon></button>
                             <button onclick="openDeleteStudentModal('${student.id}')" class="p-1.5 hover:bg-white text-gray-400 hover:text-red-500 rounded shadow-sm" title="Delete"><ion-icon name="trash"></ion-icon></button>
                         </div>
