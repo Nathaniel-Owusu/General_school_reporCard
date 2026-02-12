@@ -29,36 +29,28 @@ const Storage = {
             console.log("✅ Storage: Local data found. Using existing data.");
         }
         
-        /* COMMENTED OUT - Server fetch was overwriting local changes
+        // Enable Server Sync for Live Environment
         try {
-            console.log("📡 Storage: Attempting to fetch from server...");
+            console.log("📡 Storage: Syncing with server...");
             const response = await fetch(API_URL);
             if (response.ok) {
                 const serverData = await response.json();
-                console.log("📊 Server data received:", serverData);
                 
                 if (serverData && serverData.schools && serverData.schools.length > 0) {
-                    console.log("✅ Storage: Server data found. Syncing to local.");
-                    console.log("📝 Number of schools:", serverData.schools.length);
-                    console.log("📝 Number of classes:", (serverData.classes || []).length);
-                    
-                    // Check timestamps to see if we should overwrite? 
-                    // For now, Server is master on load.
+                    console.log("✅ Storage: Server data received. Updating local cache.");
                     localStorage.setItem(DB_KEY, JSON.stringify(serverData));
                 } else {
-                     console.log("⚠️ Storage: Server empty or invalid. Using local/seed.");
+                     console.log("⚠️ Storage: Server empty. Using local data.");
                      if (!localStorage.getItem(DB_KEY)) Storage.seed();
-                     else Storage.sync(); // Push local to server if server is empty
                 }
             } else {
-                console.warn("❌ Storage: Server response not OK:", response.status);
+                console.warn("❌ Storage: Server error", response.status);
                 if (!localStorage.getItem(DB_KEY)) Storage.seed();
             }
         } catch (e) {
-            console.warn("⚠️ Storage: Offline or Server Unreachable. Using Local Data.", e);
+            console.warn("⚠️ Storage: Offline / Network Error. Using Local Data.", e);
             if (!localStorage.getItem(DB_KEY)) Storage.seed();
         }
-        */
     },
 
     /**

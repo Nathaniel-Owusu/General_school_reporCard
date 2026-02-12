@@ -82,7 +82,7 @@ function checkAuth(allowedRoles) {
 }
 
 async function login(type, credentials) {
-    // 1. Online Login (Secure)
+    // 1. Online Login (Secure) attempt
     try {
         const response = await fetch('api/login.php', {
             method: 'POST',
@@ -106,13 +106,13 @@ async function login(type, credentials) {
                 
                 return { success: true, redirect };
             }
-            return { success: false, message: data.message };
         }
     } catch (e) {
         console.warn('⚠️ Server Unreachable. Using Offline Login.', e);
     }
-
-    // 2. Offline Login (Insecure Fallback)
+    
+    // 2. Offline / Fallback Login
+    console.log("⚠️ Falling back to local offline login...");
     const db = Storage.get();
     if (!db) return { success: false, message: 'Database error.' };
 
@@ -125,6 +125,8 @@ async function login(type, credentials) {
         }
     } else {
         const user = db.users.find(u => u.email === credentials.email);
+        
+        // Very basic local auth
         if (user && user.password === credentials.password) {
             if (user.active === false) return { success: false, message: 'Account Inactive' };
             
@@ -136,7 +138,7 @@ async function login(type, credentials) {
             return { success: true, redirect };
         }
     }
-    return { success: false, message: 'Invalid Credentials (Offline)' };
+    return { success: false, message: 'Invalid Credentials (Local)' };
 }
 
 function logout() {
@@ -324,20 +326,25 @@ async function fetchAdminData(action, params = {}) {
     }
 
     else if (action === 'assign_teacher_classes') {
-        // Find user by ID (could be teacher or admin)
-        const user = db.users.find(u => u.id === params.teacher_id);
+        const uid = params.teacher_id || params.id;
+        const user = db.users.find(u => u.id === uid);
         
         if (!user) {
-            result = { success: false, message: 'User not found with ID: ' + params.teacher_id };
-        } else if (user.role !== 'teacher' && user.role !== 'admin') {
-            result = { success: false, message: 'User is not a teacher or admin. Role: ' + user.role };
+            result = { success: false, message: 'Teacher not found (ID: ' + uid + ')' };
         } else {
-            // Assign classes to the user (works for both teachers and admins)
-            user.assigned_classes = params.class_names || [];
-            user.assigned_subjects = params.assigned_subjects || []; // New: specific subject assignments
-            
-            didUpdate = true;
-            result = { success: true, message: 'Assignments updated' };
+            // Assign classes/subjects (Allow teachers and admins)
+            if(user.role === 'teacher' || user.role === 'admin' || user.role === 'super_admin') {
+                user.assigned_classes = params.class_names || [];
+                
+                // Ensure assigned_subjects is stored correctly
+                const rawSubjects = params.assigned_subjects || [];
+                user.assigned_subjects = rawSubjects.filter(as => as.subject_ids && as.subject_ids.length > 0);
+                
+                didUpdate = true;
+                result = { success: true, message: 'Assignments saved successfully' };
+            } else {
+                 result = { success: false, message: 'User is not authorized to teach (' + user.role + ')' };
+            }
         }
     }
 
@@ -378,6 +385,31 @@ async function fetchAdminData(action, params = {}) {
             didUpdate = true;
             result = { success: true };
         }
+    }
+
+    else if (action === 'generate_student_indexes') {
+        const prefix = (params.prefix || 'ST').toUpperCase();
+        const allStudents = db.students.filter(s => s.school_id === schoolId);
+        
+        // Sort by Class then Name
+        allStudents.sort((a, b) => {
+            const clsA = a.class || '';
+            const clsB = b.class || '';
+            if (clsA < clsB) return -1;
+            if (clsA > clsB) return 1;
+            return a.name.localeCompare(b.name);
+        });
+        
+        // Assign sequential IDs
+        let count = 1;
+        allStudents.forEach(s => {
+            const num = String(count).padStart(3, '0');
+            s.id = `${prefix}${num}`;
+            count++;
+        });
+        
+        didUpdate = true;
+        result = { success: true, count: allStudents.length };
     }
     
     else if (action === 'results_queue') {
@@ -471,25 +503,34 @@ async function fetchTeacherData(action, params = {}) {
         
         // Enrich with subject objects, filtering Active ones AND assigned ones
         result = classes.map(c => {
-             let allowedSubjects;
+             let allowedSubjects = [];
              
-             // If Class Teacher or Admin -> See ALL subjects
-             if(user.role === 'admin' || c.class_teacher_id === user.id) {
-                 allowedSubjects = db.subjects.filter(s => c.subjects && c.subjects.includes(s.id) && s.active !== false);
+             // Check roles
+             const isDirectClassTeacher = c.class_teacher_id === user.id;
+             const isLegacyClassTeacher = (me.assigned_classes || []).includes(c.name) || (me.assigned_classes || []).includes(c.id);
+             const isAdmin = user.role === 'admin';
+             const isGeneralAccess = isAdmin || isDirectClassTeacher || isLegacyClassTeacher;
+             
+             // Check specific assignment
+             const assignment = (me.assigned_subjects || []).find(as => as.class_id === c.id);
+             const specificSubjectIds = (assignment && assignment.subject_ids) ? assignment.subject_ids : [];
+             
+             if (!isGeneralAccess && specificSubjectIds.length > 0) {
+                 // STRICT MODE: Only assigned subjects
+                 allowedSubjects = db.subjects.filter(s => 
+                     s.active !== false &&
+                     specificSubjectIds.includes(s.id)
+                 );
              } else {
-                 // Check specific subject assignments
-                 const assignment = (me.assigned_subjects || []).find(as => as.class_id === c.id);
-                 if(assignment && assignment.subject_ids && assignment.subject_ids.length > 0) {
-                     // Strict mode: Only show assigned subjects
-                     allowedSubjects = db.subjects.filter(s => 
-                         c.subjects && c.subjects.includes(s.id) && 
-                         s.active !== false &&
-                         assignment.subject_ids.includes(s.id)
-                     );
-                 } else {
-                     // Fallback/Legacy: If assigned to class but no subjects specified, show ALL (assuming General Class Teacher)
-                     // OR should we show none? For backward compatibility, showing ALL is safer.
-                     allowedSubjects = db.subjects.filter(s => c.subjects && c.subjects.includes(s.id) && s.active !== false);
+                 // GENERAL MODE: Show Class Curriculum
+                 // 1. Try Configured Subjects
+                 if (c.subjects && c.subjects.length > 0) {
+                     allowedSubjects = db.subjects.filter(s => c.subjects.includes(s.id) && s.active !== false);
+                 }
+                 
+                 // 2. Fallback: All Subjects of Level (if config missing)
+                 if (allowedSubjects.length === 0) {
+                     allowedSubjects = db.subjects.filter(s => s.level === c.level && s.active !== false);
                  }
              }
              
