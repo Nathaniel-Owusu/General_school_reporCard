@@ -21,15 +21,15 @@
 <body class="bg-gray-50 h-screen flex overflow-hidden font-sans text-gray-800">
 
     <!-- Mobile Menu Toggle -->
-    <button onclick="toggleMobileMenu()" class="md:hidden fixed top-4 left-4 z-50 bg-primary text-white p-3 rounded-xl shadow-lg">
+    <button onclick="toggleMobileMenu()" class="lg:hidden fixed top-4 left-4 z-50 bg-primary text-white p-3 rounded-xl shadow-lg hover:bg-gray-900 transition-colors">
         <ion-icon name="menu" class="text-2xl"></ion-icon>
     </button>
 
     <!-- Mobile Overlay -->
-    <div id="mobile-overlay" class="hidden md:hidden fixed inset-0 bg-black/50 z-30" onclick="toggleMobileMenu()"></div>
+    <div id="mobile-overlay" class="hidden fixed inset-0 bg-black/50 z-30 transition-opacity backdrop-blur-sm" onclick="toggleMobileMenu()"></div>
 
     <!-- Sidebar -->
-    <aside id="mobile-sidebar" class="w-72 bg-primary text-white flex flex-col shadow-2xl relative z-40 fixed md:relative h-full transform -translate-x-full md:translate-x-0 transition-transform duration-300">
+    <aside id="mobile-sidebar" class="w-72 bg-primary text-white shadow-2xl z-50 h-full transition-transform duration-300 transform -translate-x-full lg:translate-x-0 fixed inset-y-0 left-0 lg:relative hidden lg:flex flex-col">
         <div class="h-20 flex items-center gap-3 px-8 border-b border-gray-800 bg-gray-900/50">
             <div class="w-8 h-8 rounded-lg bg-accent flex items-center justify-center text-white">
                 <ion-icon name="school" class="text-xl"></ion-icon>
@@ -72,8 +72,8 @@
     <div class="flex-1 flex flex-col bg-gray-50 h-screen overflow-hidden">
         
         <!-- Header -->
-        <header class="h-16 md:h-20 bg-white border-b border-gray-200 flex items-center justify-between px-4 md:px-8 shadow-sm z-10">
-            <div class="ml-12 md:ml-0">
+        <header class="h-16 md:h-20 bg-white border-b border-gray-200 flex items-center justify-between px-4 md:px-8 shadow-sm z-10 relative">
+            <div class="ml-12 lg:ml-0 transition-all duration-300">
                 <h2 class="text-lg md:text-2xl font-bold text-gray-800" id="page-title">Dashboard</h2>
                 <p class="text-xs md:text-sm text-gray-400 hidden sm:block">Welcome back, Admin</p>
             </div>
@@ -2037,6 +2037,38 @@
 
         function closeModal(modalId) {
             document.getElementById(modalId).classList.add('hidden');
+        }
+
+        function toggleMobileMenu() {
+            const sidebar = document.getElementById('mobile-sidebar');
+            const overlay = document.getElementById('mobile-overlay');
+            
+            // Check if active
+            const isOpen = !sidebar.classList.contains('-translate-x-full') && !sidebar.classList.contains('hidden');
+            
+            if (isOpen) {
+                // CLOSE
+                sidebar.classList.add('-translate-x-full');
+                overlay.classList.add('hidden');
+                
+                // Wait for animation then hide to free layout
+                setTimeout(() => {
+                    sidebar.classList.add('hidden');
+                    sidebar.classList.remove('flex'); 
+                }, 300);
+            } else {
+                // OPEN
+                sidebar.classList.remove('hidden');
+                sidebar.classList.add('flex');
+                
+                // Small delay to allow browser to render 'flex' before animating transform
+                requestAnimationFrame(() => {
+                    requestAnimationFrame(() => {
+                         sidebar.classList.remove('-translate-x-full');
+                         overlay.classList.remove('hidden');
+                    });
+                });
+            }
         }
 
         function openAddYearModal() {
