@@ -255,6 +255,32 @@
         </div>
     </footer>
 
+    <script src="js/storage.js"></script>
+    <script>
+        // Inject CorelTech Logo Background
+        document.addEventListener('DOMContentLoaded', () => {
+            const hero = document.querySelector('.hero-bg');
+            if(hero) {
+                const overlay = document.createElement('div');
+                overlay.style.position = 'absolute';
+                overlay.style.top = '50%';
+                overlay.style.left = '50%';
+                overlay.style.transform = 'translate(-50%, -50%)';
+                overlay.style.width = '80%'; // Keep it contained
+                overlay.style.height = '80%';
+                overlay.style.backgroundImage = "url('assets/img/corelTech.jpeg')";
+                overlay.style.backgroundRepeat = 'no-repeat';
+                overlay.style.backgroundPosition = 'center';
+                overlay.style.backgroundSize = 'contain';
+                overlay.style.opacity = '0.2'; // 20% Opacity (More visible)
+                overlay.style.pointerEvents = 'none';
+                overlay.style.zIndex = '0';
+                
+                hero.insertBefore(overlay, hero.firstChild);
+            }
+        });
+    </script>
+
     <script>
         // Navbar Glass effect on scroll
         window.addEventListener('scroll', () => {

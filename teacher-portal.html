@@ -25,7 +25,7 @@
     <div class="flex h-screen overflow-hidden">
         
         <!-- Sidebar -->
-        <aside class="w-64 bg-accent text-white hidden md:flex flex-col shadow-2xl z-20">
+        <aside id="sidebar" class="w-64 bg-accent text-white fixed inset-y-0 left-0 md:relative z-30 transform -translate-x-full md:translate-x-0 transition duration-300 flex flex-col shadow-2xl">
             <div class="h-20 flex items-center gap-3 px-6 border-b border-gray-800 bg-gray-900/50">
                 <div class="w-8 h-8 rounded-lg bg-primary flex items-center justify-center text-white">
                     <ion-icon name="school" class="text-xl"></ion-icon>
@@ -59,13 +59,21 @@
                 </button>
             </div>
         </aside>
+        
+        <!-- Mobile Sidebar Overlay -->
+        <div id="sidebar-overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/50 z-20 hidden md:hidden backdrop-blur-sm transition-opacity"></div>
 
         <!-- Main Content -->
         <div class="flex-1 flex flex-col h-screen overflow-hidden">
-            <header class="h-20 bg-white border-b border-gray-200 flex items-center justify-between px-8 shadow-sm z-10">
-                <h2 class="text-xl font-bold text-gray-800 flex items-center gap-2" id="page-title">
+            <header class="h-20 bg-white border-b border-gray-200 flex items-center justify-between px-4 md:px-8 shadow-sm z-10 sticky top-0">
+                <div class="flex items-center gap-3">
+                    <button onclick="toggleSidebar()" class="md:hidden text-2xl text-gray-600 hover:text-primary transition p-2 rounded-lg hover:bg-gray-100">
+                        <ion-icon name="menu"></ion-icon>
+                    </button>
+                    <h2 class="text-lg md:text-xl font-bold text-gray-800 flex items-center gap-2" id="page-title">
                     Teacher Dashboard
                 </h2>
+                </div>
                 <div class="flex items-center gap-4">
                     <div class="bg-blue-50 text-blue-700 px-3 py-1 rounded-lg text-xs font-bold border border-blue-100 uppercase tracking-wide" id="term-badge">
                         Loading Term...
@@ -694,6 +702,19 @@
                 btn.innerHTML = originalText;
                 btn.disabled = false;
             }
+        }
+
+        function toggleSidebar() {
+             const sidebar = document.getElementById('sidebar');
+             const overlay = document.getElementById('sidebar-overlay');
+             
+             if (sidebar.classList.contains('-translate-x-full')) {
+                 sidebar.classList.remove('-translate-x-full');
+                 overlay.classList.remove('hidden');
+             } else {
+                 sidebar.classList.add('-translate-x-full');
+                 overlay.classList.add('hidden');
+             }
         }
 
         // Init
