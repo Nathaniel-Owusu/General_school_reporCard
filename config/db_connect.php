@@ -12,15 +12,7 @@ $db_name = 'school_report_db';
 $prod_file = __DIR__ . '/prod_config.php';
 if (file_exists($prod_file)) {
     include $prod_file;
-} else {
-    // CLI Safety Check
-    $http_host = isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : 'localhost';
-
-    // If no file found, maybe check domain name (optional fallback)
-    if ($http_host !== 'localhost' && $http_host !== '127.0.0.1') {
-        // We are on a live server but no config file found!
-        // You can hardcode here if you prefer, but external file is safer.
-    }
+    // Production config loaded successfully
 }
 
 // Enable error reporting
@@ -31,10 +23,23 @@ try {
     $conn = new mysqli($db_host, $db_user, $db_pass, $db_name);
     $conn->set_charset("utf8mb4");
 } catch (Exception $e) {
-    // Show a user-friendly message on production, full error on local
-    if ($_SERVER['HTTP_HOST'] === 'localhost') {
-        die("Database Connection Failed (Local): " . $e->getMessage());
-    } else {
-        die("<h1>Site Maintenance</h1><p>We are currently establishing connection to the database. Please check your configuration.</p>");
-    }
+    // Log error for debugging
+    error_log("Database Connection Error: " . $e->getMessage());
+
+    // Return JSON error for API endpoints
+    header('Content-Type: application/json');
+    http_response_code(500);
+    echo json_encode([
+        'success' => false,
+        'error' => 'Database connection failed',
+        'message' => 'Cannot connect to database. Please check configuration.',
+        'details' => $e->getMessage(),
+        'config' => [
+            'host' => $db_host,
+            'database' => $db_name,
+            'user' => $db_user,
+            'prod_file_exists' => file_exists($prod_file)
+        ]
+    ]);
+    exit;
 }
