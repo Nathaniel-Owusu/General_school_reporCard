@@ -31,6 +31,7 @@ CREATE TABLE IF NOT EXISTS `users` (
   `password` varchar(255) DEFAULT NULL,
   `role` varchar(20) DEFAULT NULL,
   `assigned_classes` json DEFAULT NULL,
+  `assigned_subjects` json DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
@@ -43,6 +44,9 @@ CREATE TABLE IF NOT EXISTS `classes` (
   `school_id` varchar(50) DEFAULT NULL,
   `name` varchar(50) DEFAULT NULL,
   `subjects` json DEFAULT NULL,
+  `class_teacher_id` varchar(50) DEFAULT NULL,
+  `level` varchar(20) DEFAULT NULL,
+  `active` tinyint(1) DEFAULT 1,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

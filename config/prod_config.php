@@ -1,14 +1,33 @@
 <?php
-// Hostinger Production Database Credentials
-// IMPORTANT: Replace these with YOUR actual Hostinger database details
 
-$db_host = 'localhost';  // Usually 'localhost' on Hostinger
-$db_user = 'u123456789_school_admin';  // YOUR Hostinger DB username
-$db_pass = 'YourPassword123!';  // YOUR Hostinger DB password
-$db_name = 'u123456789_school_report_db';  // YOUR Hostinger DB name
+/**
+ * Production Database Configuration (Hostinger)
+ * ALL DEVICES WILL USE THIS REMOTE DATABASE
+ */
 
-// Example values - REPLACE with your actual credentials from Hostinger:
-// $db_host = 'localhost';
-// $db_user = 'u987654321_admin';
-// $db_pass = 'Secure#Pass2024';
-// $db_name = 'u987654321_school_db';
+// Hostinger MySQL Server Details - Using YOUR existing database
+$db_host = 'localhost';  // Hostinger server (localhost when on Hostinger)
+$db_name = 'school_report';  // Your existing database
+$db_user = 'owusuansahnath.';  // Your existing MySQL username
+$db_pass = 'reportCard@1234';  // Your existing MySQL password
+
+/**
+ * ✅ CONFIGURATION NOTES:
+ * 
+ * - Using your existing Hostinger database: school_report
+ * - This works when files are hosted ON Hostinger servers
+ * - 'localhost' is correct when running on the same server as database
+ * - All devices access via your domain URL
+ * 
+ * 🌐 HOW IT WORKS:
+ * 
+ * Device A → yourdomain.com → Hostinger Server → localhost → school_report ✅
+ * Device B → yourdomain.com → Hostinger Server → localhost → school_report ✅
+ * 
+ * All devices connect to SAME database through your domain!
+ * 
+ * ⚠️ IMPORTANT:
+ * - Files MUST be uploaded to Hostinger
+ * - Access ONLY via your domain (not localhost on PC)
+ * - Database schema must be imported to school_report
+ */

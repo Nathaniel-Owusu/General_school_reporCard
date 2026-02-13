@@ -1,0 +1,96 @@
+<?php
+/**
+ * EXAMPLE Production Configuration
+ * Copy this to prod_config.php and fill in your actual credentials
+ */
+
+// ============================================
+// HOSTINGER MYSQL CONFIGURATION
+// ============================================
+
+// Database Host (choose one)
+$db_host = 'srv1711.hstgr.io';  // Recommended: Use hostname
+// $db_host = '82.197.82.92';   // Alternative: Use IP address
+
+// Database Name (DO NOT CHANGE - this is your database name)
+$db_name = 'u957056558_school_repord';
+
+// Database Username
+// Find this in: Hostinger cPanel → Databases → MySQL Databases
+// Usually starts with: u957056558_
+$db_user = 'u957056558_XXXXX';  // ← REPLACE XXXXX with your actual username
+
+// Database Password
+// Find this in: Hostinger cPanel → Databases → MySQL Databases
+// If forgotten, you can reset it there
+$db_pass = 'YOUR_STRONG_PASSWORD_HERE';  // ← REPLACE with your actual password
+
+
+// ============================================
+// SETUP INSTRUCTIONS
+// ============================================
+/*
+ * 1. GET CREDENTIALS:
+ *    - Login to Hostinger cPanel
+ *    - Go to: Databases → MySQL Databases
+ *    - Find your database: u957056558_school_repord
+ *    - Copy the username (starts with u957056558_)
+ *    - Copy or reset the password
+ *
+ * 2. ENABLE REMOTE ACCESS:
+ *    - In cPanel: Databases → Remote MySQL
+ *    - Add your IP address (or use % for testing)
+ *    - Select database: u957056558_school_repord
+ *    - Click "Add Host"
+ *
+ * 3. UPDATE THIS FILE:
+ *    - Replace $db_user with your actual username
+ *    - Replace $db_pass with your actual password
+ *    - Save as: config/prod_config.php (remove .example)
+ *
+ * 4. TEST CONNECTION:
+ *    - Visit: http://localhost/general_report_card/test_connection.php
+ *    - Should show: "✅ SUCCESS! Connected to remote database"
+ *
+ * 5. IMPORT SCHEMA (if needed):
+ *    - Login to Hostinger phpMyAdmin
+ *    - Select: u957056558_school_repord
+ *    - Import: database_schema.sql
+ */
+
+
+// ============================================
+// SECURITY NOTES
+// ============================================
+/*
+ * ⚠️ IMPORTANT:
+ * - Never commit this file to Git (it's in .gitignore)
+ * - Use a strong password (16+ characters)
+ * - Restrict IP access in Hostinger (don't use % in production)
+ * - Keep credentials secure
+ * - Regular backups recommended
+ */
+
+
+// ============================================
+// TROUBLESHOOTING
+// ============================================
+/*
+ * CONNECTION REFUSED:
+ * - Verify IP is whitelisted in Hostinger Remote MySQL
+ * - Try using IP instead of hostname
+ * - Check firewall settings
+ *
+ * ACCESS DENIED:
+ * - Double-check username and password
+ * - Ensure user has permissions on database
+ * - Try resetting password in cPanel
+ *
+ * UNKNOWN DATABASE:
+ * - Verify database name is exactly: u957056558_school_repord
+ * - Check database exists in cPanel
+ *
+ * NO TABLES FOUND:
+ * - Import database_schema.sql via phpMyAdmin
+ * - Or run: install.php to seed initial data
+ */

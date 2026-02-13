@@ -111,34 +111,39 @@ async function login(type, credentials) {
         console.warn('⚠️ Server Unreachable. Using Offline Login.', e);
     }
     
-    // 2. Offline / Fallback Login
-    console.log("⚠️ Falling back to local offline login...");
-    const db = Storage.get();
-    if (!db) return { success: false, message: 'Database error.' };
+    // 2. Fallback: Direct Database Login (if API unavailable)
+    console.log("⚠️ API unavailable. Attempting direct database login...");
+    try {
+        const db = await Storage.get();
+        if (!db) return { success: false, message: 'Database error.' };
 
-    if (type === 'student') {
-        const student = db.students.find(s => s.id === credentials.id);
-        if (student) {
-             const user = { ...student, role: 'student' };
-             sessionStorage.setItem('currentUser', JSON.stringify(user));
-             return { success: true, redirect: `student-report.html?student_id=${user.id}` };
-        }
-    } else {
-        const user = db.users.find(u => u.email === credentials.email);
-        
-        // Very basic local auth
-        if (user && user.password === credentials.password) {
-            if (user.active === false) return { success: false, message: 'Account Inactive' };
+        if (type === 'student') {
+            const student = db.students.find(s => s.id === credentials.id);
+            if (student) {
+                 const user = { ...student, role: 'student' };
+                 sessionStorage.setItem('currentUser', JSON.stringify(user));
+                 return { success: true, redirect: `student-report.html?student_id=${user.id}` };
+            }
+        } else {
+            const user = db.users.find(u => u.email === credentials.email);
             
-            sessionStorage.setItem('currentUser', JSON.stringify(user));
-            let redirect = 'teacher-portal.html';
-            if (user.role === 'super_admin') redirect = 'super-admin.html';
-            else if (user.role === 'admin') redirect = 'admin-dashboard.html';
-            
-            return { success: true, redirect };
+            // Very basic auth
+            if (user && user.password === credentials.password) {
+                if (user.active === false) return { success: false, message: 'Account Inactive' };
+                
+                sessionStorage.setItem('currentUser', JSON.stringify(user));
+                let redirect = 'teacher-portal.html';
+                if (user.role === 'super_admin') redirect = 'super-admin.html';
+                else if (user.role === 'admin') redirect = 'admin-dashboard.html';
+                
+                return { success: true, redirect };
+            }
         }
+        return { success: false, message: 'Invalid Credentials' };
+    } catch (dbError) {
+        console.error('❌ Database login failed:', dbError);
+        return { success: false, message: 'Cannot connect to database. Please try again later.' };
     }
-    return { success: false, message: 'Invalid Credentials (Local)' };
 }
 
 function logout() {
@@ -152,7 +157,7 @@ async function fetchAdminData(action, params = {}) {
     const user = JSON.parse(sessionStorage.getItem('currentUser'));
     if (!user || user.role !== 'admin') return null;
     
-    const db = Storage.get();
+    const db = await Storage.get();
     const schoolId = user.school_id;
     let result = null;
     let didUpdate = false;
@@ -219,7 +224,7 @@ async function fetchAdminData(action, params = {}) {
 
     else if (action === 'restore') {
         if(params.data) {
-             Storage.save(params.data); // Full replace
+             await Storage.save(params.data); // Full replace
              return { success: true };
         }
         return { success: false, message: 'No data provided' };
@@ -460,7 +465,7 @@ async function fetchAdminData(action, params = {}) {
         result = { success: true };
     }
 
-    if (didUpdate) Storage.save(db);
+    if (didUpdate) await Storage.save(db);
     return result;
 }
 
@@ -471,7 +476,7 @@ async function fetchTeacherData(action, params = {}) {
     const user = JSON.parse(sessionStorage.getItem('currentUser'));
     if (!user || (user.role !== 'teacher' && user.role !== 'admin')) return null;
 
-    const db = Storage.get();
+    const db = await Storage.get();
     const schoolId = user.school_id;
     let result = null;
     let didUpdate = false;
@@ -631,14 +636,14 @@ async function fetchTeacherData(action, params = {}) {
         }
     }
 
-    if (didUpdate) Storage.save(db);
+    if (didUpdate) await Storage.save(db);
     return result;
 }
 
 // --- Student Controller ---
 
 async function fetchStudentReport(studentId) {
-    const db = Storage.get();
+    const db = await Storage.get();
     const student = db.students.find(s => s.id === studentId);
     
     if (student) {
@@ -663,7 +668,7 @@ async function fetchSuperAdminData(action, params = {}) {
     const user = JSON.parse(sessionStorage.getItem('currentUser'));
     if (!user || user.role !== 'super_admin') return null;
     
-    const db = Storage.get();
+    const db = await Storage.get();
     let result = null;
     let didUpdate = false;
 
@@ -821,7 +826,7 @@ async function fetchSuperAdminData(action, params = {}) {
         }
     }
 
-    if (didUpdate) Storage.save(db);
+    if (didUpdate) await Storage.save(db);
     return result;
 }
 
@@ -830,7 +835,7 @@ async function fetchSuperAdminData(action, params = {}) {
 
 // Register School (Public)
 async function registerSchool(data) {
-    const db = Storage.get();
+    const db = await Storage.get();
     const schoolId = Storage.generateId('SCH');
     
     db.schools.push({
@@ -881,7 +886,7 @@ async function registerSchool(data) {
         });
     }
 
-    Storage.save(db);
+    await Storage.save(db);
     return { success: true, school_id: schoolId };
 }
 

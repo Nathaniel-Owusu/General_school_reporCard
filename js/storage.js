@@ -1,133 +1,134 @@
 /**
- * Centralized Data Storage Module
- * Bridges localStorage (offline first) with Remote MySQL Database
+ * Remote Database Storage Module
+ * All operations go directly to MySQL via API
+ * NO localStorage dependency
  */
 
-const DB_KEY = 'school_report_card_db';
 const API_URL = 'api/db_handler.php';
 
-const Storage = {
-    // --- Core Operations ---
+// In-memory cache (session only, not persisted)
+let _dbCache = null;
 
+const Storage = {
     /**
-     * Initialize the database.
-     * MODIFIED: Server sync disabled on load to preserve local changes
-     * Tries to fetch latest from server first, falls back to local.
+     * Initialize the database connection.
+     * Fetches initial data from server and seeds if empty.
      */
     init: async () => {
-        // TEMPORARY FIX: Disable server fetch to prevent localStorage overwrite
-        // This ensures your local changes persist across refreshes
-        // Server sync still happens when you SAVE (one-way push)
+        console.log("🌐 Storage: Initializing remote database connection...");
         
-        console.log("📦 Storage: Using localStorage (server fetch disabled)");
-        
-        // Just use localStorage - don't fetch from server
-        if (!localStorage.getItem(DB_KEY)) {
-            console.log("🌱 Storage: No local data. Seeding database...");
-            Storage.seed();
-        } else {
-            console.log("✅ Storage: Local data found. Using existing data.");
-        }
-        
-        // Enable Server Sync for Live Environment
         try {
-            console.log("📡 Storage: Syncing with server...");
             const response = await fetch(API_URL);
-            if (response.ok) {
-                const serverData = await response.json();
-                
-                if (serverData && serverData.schools && serverData.schools.length > 0) {
-                    console.log("✅ Storage: Server data received. Updating local cache.");
-                    localStorage.setItem(DB_KEY, JSON.stringify(serverData));
-                } else {
-                     console.log("⚠️ Storage: Server empty. Using local data.");
-                     if (!localStorage.getItem(DB_KEY)) Storage.seed();
-                }
+            
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+            
+            const serverData = await response.json();
+            
+            // Check if database has data
+            if (serverData && serverData.schools && serverData.schools.length > 0) {
+                console.log("✅ Storage: Connected to remote database");
+                _dbCache = serverData;
             } else {
-                console.warn("❌ Storage: Server error", response.status);
-                if (!localStorage.getItem(DB_KEY)) Storage.seed();
+                console.log("🌱 Storage: Database is empty. Seeding initial data...");
+                await Storage.seed();
             }
         } catch (e) {
-            console.warn("⚠️ Storage: Offline / Network Error. Using Local Data.", e);
-            if (!localStorage.getItem(DB_KEY)) Storage.seed();
+            console.error("❌ Storage: Failed to connect to database", e);
+            alert("⚠️ Database Connection Failed\n\nCannot connect to the remote database. Please ensure:\n1. XAMPP/MySQL is running\n2. Database 'school_report_db' exists\n3. API endpoint is accessible\n\nError: " + e.message);
+            throw e;
         }
     },
 
     /**
-     * Get the entire database object.
-     * @returns {Object} The database object.
+     * Get the entire database from server.
+     * @returns {Promise<Object>} The database object.
      */
-    get: () => {
+    get: async () => {
         try {
-            const data = localStorage.getItem(DB_KEY);
-            return data ? JSON.parse(data) : null;
+            const response = await fetch(API_URL);
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}`);
+            }
+            const data = await response.json();
+            _dbCache = data; // Update cache
+            return data;
         } catch (e) {
-            console.error("Database corruption detected!", e);
-            return null;
+            console.error("❌ Storage.get() failed:", e);
+            // Return cache if available
+            if (_dbCache) {
+                console.warn("⚠️ Using cached data due to network error");
+                return _dbCache;
+            }
+            throw new Error("Database unavailable and no cache available");
         }
     },
 
     /**
-     * Save the entire database object to LocalStorage and Sync to Server.
+     * Save the entire database to server.
      * @param {Object} data 
+     * @returns {Promise<Object>} Result of save operation
      */
-    save: (data) => {
+    save: async (data) => {
         data.last_updated = Date.now();
-        localStorage.setItem(DB_KEY, JSON.stringify(data));
         
-        // Notify other tabs/components
-        window.dispatchEvent(new Event('db-updated'));
-        
-        // Trigger Background Sync
-        Storage.sync(data);
-    },
-
-    /**
-     * Sync data to the server.
-     * @param {Object} data (Optional)
-     */
-    sync: async (data = null) => {
-        if (!data) data = Storage.get();
-        if (!data) return;
-
         try {
-            console.log("🔄 Storage: Syncing to server...", {
-                schools: (data.schools || []).length,
-                classes: (data.classes || []).length,
-                subjects: (data.subjects || []).length
-            });
+            console.log("💾 Storage: Saving to remote database...");
             
             const response = await fetch(API_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(data)
             });
+            
             const result = await response.json();
-            if(!result.success) {
-                console.error("❌ Storage: Sync Failed", result.message);
-            } else {
-                console.log("✅ Storage: Sync Complete");
+            
+            if (!result.success) {
+                throw new Error(result.message || "Save failed");
             }
+            
+            console.log("✅ Storage: Data saved successfully");
+            _dbCache = data; // Update cache
+            
+            // Notify other tabs/components
+            window.dispatchEvent(new Event('db-updated'));
+            
+            return result;
         } catch (e) {
-            console.error("⚠️ Storage: Sync Network Error", e);
+            console.error("❌ Storage.save() failed:", e);
+            throw e;
         }
     },
 
     /**
-     * Reset the database to factory settings (Seeded data).
+     * Sync is now same as save (kept for compatibility)
      */
-    reset: () => {
-        if(confirm("Factory Reset? This clears EVERYTHING.")) {
-            localStorage.removeItem(DB_KEY);
-            Storage.seed(); // Generate fresh seed
-            Storage.sync(); // Force push fresh seed to wipe server
-            location.reload();
+    sync: async (data = null) => {
+        if (!data) {
+            data = await Storage.get();
         }
+        return await Storage.save(data);
     },
 
-    // --- Seeding ---
+    /**
+     * Reset the database to factory settings.
+     */
+    reset: async () => {
+        if (!confirm("⚠️ Factory Reset Warning\n\nThis will DELETE ALL DATA and reset to default.\n\nAre you sure?")) {
+            return;
+        }
+        
+        console.log("🔄 Storage: Performing factory reset...");
+        await Storage.seed();
+        alert("✅ Database has been reset to factory defaults.");
+        location.reload();
+    },
 
-    seed: () => {
+    /**
+     * Seed the database with initial data.
+     */
+    seed: async () => {
         const initialData = {
             schools: [{
                 id: 'SCH_DEFAULT',
@@ -183,8 +184,8 @@ const Storage = {
                 }
             ],
             classes: [
-                { id: 'CLS_001', school_id: 'SCH_DEFAULT', name: 'JHS 1 A', level: 'JHS', active: true, subjects: ['SUB_MATH', 'SUB_ENG', 'SUB_SCI'] },
-                { id: 'CLS_002', school_id: 'SCH_DEFAULT', name: 'JHS 1 B', level: 'JHS', active: true, subjects: ['SUB_MATH', 'SUB_ENG'] }
+                { id: 'CLS_001', school_id: 'SCH_DEFAULT', name: 'JHS 1 A', level: 'JHS', active: true, subjects: ['SUB_JHS_MATH', 'SUB_JHS_ENG', 'SUB_JHS_SCI'] },
+                { id: 'CLS_002', school_id: 'SCH_DEFAULT', name: 'JHS 1 B', level: 'JHS', active: true, subjects: ['SUB_JHS_MATH', 'SUB_JHS_ENG'] }
             ],
             subjects: [
                 // KG Subjects
@@ -226,7 +227,7 @@ const Storage = {
                     name: 'Kwame Mensah', 
                     class: 'JHS 1 A', 
                     gender: 'Male', 
-                    active: true,
+                    status: 'Active',
                     scores: [
                         { subject_id: 'SUB_JHS_MATH', subject: 'Mathematics', class_score: 25, exam_score: 60, status: 'Pending' },
                         { subject_id: 'SUB_JHS_ENG', subject: 'English Language', class_score: 20, exam_score: 55, status: 'Pending' },
@@ -241,7 +242,7 @@ const Storage = {
                     name: 'Ama Serwaa', 
                     class: 'JHS 1 A', 
                     gender: 'Female', 
-                    active: true,
+                    status: 'Active',
                     scores: [
                         { subject_id: 'SUB_JHS_MATH', subject: 'Mathematics', class_score: 28, exam_score: 65, status: 'Pending' },
                         { subject_id: 'SUB_JHS_ENG', subject: 'English Language', class_score: 26, exam_score: 62, status: 'Pending' }
@@ -249,13 +250,23 @@ const Storage = {
                     attendance: { present: 58, total: 60 },
                     conduct: 'Excellent'
                 }
-            ]
+            ],
+            last_updated: Date.now()
         };
-        localStorage.setItem(DB_KEY, JSON.stringify(initialData));
-        console.log("Database seeded.");
+        
+        try {
+            await Storage.save(initialData);
+            console.log("✅ Database seeded successfully");
+            _dbCache = initialData;
+        } catch (e) {
+            console.error("❌ Failed to seed database:", e);
+            throw e;
+        }
     },
 
-    // --- Helpers ---
+    /**
+     * Generate a unique ID with prefix.
+     */
     generateId: (prefix = 'ID') => {
         return prefix + '_' + Math.random().toString(36).substr(2, 9).toUpperCase();
     }

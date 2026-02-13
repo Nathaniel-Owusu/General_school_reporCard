@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Remote Database Setup - General School</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-8">
+    <div class="max-w-4xl mx-auto">
+        <div class="bg-white rounded-2xl shadow-xl p-8">
+            <h1 class="text-3xl font-bold text-gray-900 mb-6">🌐 Remote Database Setup</h1>
+            
+            <div class="bg-blue-50 border-l-4 border-blue-500 p-4 mb-6">
+                <p class="text-blue-900">
+                    <strong>Hostinger Database Details:</strong><br>
+                    <span class="font-mono text-sm">
+                        Host: srv1711.hstgr.io (or 82.197.82.92)<br>
+                        Database: u957056558_school_repord
+                    </span>
+                </p>
+            </div>
+
+            <!-- Step 1 -->
+            <div class="mb-8">
+                <h2 class="text-xl font-bold text-gray-800 mb-3">📝 Step 1: Get Your Credentials</h2>
+                <ol class="list-decimal list-inside space-y-2 text-gray-700">
+                    <li>Login to <a href="https://hpanel.hostinger.com" target="_blank" class="text-blue-600 hover:underline">Hostinger cPanel</a></li>
+                    <li>Go to <strong>Databases → MySQL Databases</strong></li>
+                    <li>Find your database: <code class="bg-gray-100 px-2 py-1 rounded">u957056558_school_repord</code></li>
+                    <li>Note down:
+                        <ul class="list-disc list-inside ml-6 mt-2">
+                            <li>MySQL Username (usually starts with u957056558_)</li>
+                            <li>MySQL Password (reset if forgotten)</li>
+                        </ul>
+                    </li>
+                </ol>
+            </div>
+
+            <!-- Step 2 -->
+            <div class="mb-8">
+                <h2 class="text-xl font-bold text-gray-800 mb-3">🔓 Step 2: Enable Remote Access</h2>
+                <ol class="list-decimal list-inside space-y-2 text-gray-700">
+                    <li>In Hostinger cPanel, go to <strong>Databases → Remote MySQL</strong></li>
+                    <li>Add your IP address:
+                        <div class="bg-gray-50 p-3 rounded mt-2">
+                            <p class="text-sm mb-2">Your current IP: <span id="userIP" class="font-mono font-bold">Loading...</span></p>
+                            <button onclick="copyIP()" class="bg-blue-600 text-white px-4 py-2 rounded text-sm hover:bg-blue-700">
+                                Copy IP Address
+                            </button>
+                        </div>
+                    </li>
+                    <li>Or use <code class="bg-yellow-100 px-2 py-1 rounded">%</code> for "Any Host" (testing only)</li>
+                    <li>Select database: <code class="bg-gray-100 px-2 py-1 rounded">u957056558_school_repord</code></li>
+                    <li>Click <strong>"Add Host"</strong></li>
+                </ol>
+            </div>
+
+            <!-- Step 3 -->
+            <div class="mb-8">
+                <h2 class="text-xl font-bold text-gray-800 mb-3">⚙️ Step 3: Configure Application</h2>
+                <p class="text-gray-700 mb-3">Edit the file: <code class="bg-gray-100 px-2 py-1 rounded">config/prod_config.php</code></p>
+                
+                <div class="bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto">
+                    <pre class="text-sm"><code>&lt;?php
+$db_host = 'srv1711.hstgr.io';
+$db_user = '<span class="text-yellow-300">YOUR_USERNAME_HERE</span>';  // From Step 1
+$db_pass = '<span class="text-yellow-300">YOUR_PASSWORD_HERE</span>';  // From Step 1
+$db_name = 'u957056558_school_repord';</code></pre>
+                </div>
+            </div>
+
+            <!-- Step 4 -->
+            <div class="mb-8">
+                <h2 class="text-xl font-bold text-gray-800 mb-3">🧪 Step 4: Test Connection</h2>
+                <p class="text-gray-700 mb-3">After updating credentials, test the connection:</p>
+                
+                <a href="test_connection.php" target="_blank" class="inline-block bg-green-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-green-700 shadow-lg">
+                    🔍 Test Database Connection
+                </a>
+                
+                <p class="text-sm text-gray-500 mt-2">This will verify your remote database is accessible</p>
+            </div>
+
+            <!-- Step 5 -->
+            <div class="mb-8">
+                <h2 class="text-xl font-bold text-gray-800 mb-3">📊 Step 5: Import Schema (If Needed)</h2>
+                <p class="text-gray-700 mb-3">If test shows "No tables found":</p>
+                <ol class="list-decimal list-inside space-y-2 text-gray-700">
+                    <li>Login to Hostinger phpMyAdmin</li>
+                    <li>Select database: <code class="bg-gray-100 px-2 py-1 rounded">u957056558_school_repord</code></li>
+                    <li>Click <strong>"Import"</strong> tab</li>
+                    <li>Upload file: <code class="bg-gray-100 px-2 py-1 rounded">database_schema.sql</code></li>
+                    <li>Click <strong>"Go"</strong></li>
+                </ol>
+            </div>
+
+            <!-- Documentation -->
+            <div class="bg-gradient-to-r from-purple-50 to-blue-50 rounded-xl p-6 mb-6">
+                <h3 class="text-lg font-bold text-gray-800 mb-3">📚 Documentation</h3>
+                <div class="space-y-2">
+                    <a href="REMOTE_DATABASE_SETUP.md" class="block text-blue-600 hover:underline">
+                        📖 Complete Setup Guide
+                    </a>
+                    <a href="DATABASE_MIGRATION.md" class="block text-blue-600 hover:underline">
+                        🔄 Database Migration Guide
+                    </a>
+                    <a href="DEPLOY.md" class="block text-blue-600 hover:underline">
+                        🚀 Deployment Instructions
+                    </a>
+                </div>
+            </div>
+
+            <!-- Status Check -->
+            <div class="bg-gray-50 rounded-xl p-6">
+                <h3 class="text-lg font-bold text-gray-800 mb-3">✅ Setup Checklist</h3>
+                <div class="space-y-2">
+                    <label class="flex items-center space-x-2">
+                        <input type="checkbox" class="w-4 h-4">
+                        <span class="text-gray-700">Got MySQL credentials from Hostinger</span>
+                    </label>
+                    <label class="flex items-center space-x-2">
+                        <input type="checkbox" class="w-4 h-4">
+                        <span class="text-gray-700">Added IP to Remote MySQL whitelist</span>
+                    </label>
+                    <label class="flex items-center space-x-2">
+                        <input type="checkbox" class="w-4 h-4">
+                        <span class="text-gray-700">Updated config/prod_config.php</span>
+                    </label>
+                    <label class="flex items-center space-x-2">
+                        <input type="checkbox" class="w-4 h-4">
+                        <span class="text-gray-700">Tested connection successfully</span>
+                    </label>
+                    <label class="flex items-center space-x-2">
+                        <input type="checkbox" class="w-4 h-4">
+                        <span class="text-gray-700">Imported database schema</span>
+                    </label>
+                    <label class="flex items-center space-x-2">
+                        <input type="checkbox" class="w-4 h-4">
+                        <span class="text-gray-700">Application connects to remote database</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="mt-6 text-center">
+                <a href="login.html" class="text-blue-600 hover:underline">← Back to Login</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Fetch user's IP address
+        fetch('https://api.ipify.org?format=json')
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('userIP').textContent = data.ip;
+            })
+            .catch(error => {
+                document.getElementById('userIP').textContent = 'Unable to detect';
+            });
+
+        function copyIP() {
+            const ip = document.getElementById('userIP').textContent;
+            navigator.clipboard.writeText(ip).then(() => {
+                alert('✅ IP address copied to clipboard!\n\nPaste this in Hostinger Remote MySQL settings.');
+            });
+        }
+    </script>
+</body>
+</html>
