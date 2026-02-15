@@ -7,9 +7,9 @@
 
 // Hostinger MySQL Server Details - Using YOUR existing database
 $db_host = 'localhost';  // Hostinger server (localhost when on Hostinger)
-$db_name = 'school_report';  // Your existing database
-$db_user = 'u957056558_school_admin';  // ✅ Correct Hostinger MySQL username
-$db_pass = 'reportCard@1234';  // Your existing MySQL password
+$db_name = 'u957056558_report_card';  // Updated database name to likely match convention
+$db_user = 'u957056558_school_admin';  // Correct Hostinger MySQL username
+$db_pass = 'Esther@0242';  // Correct Hostinger MySQL password
 
 /**
  * ✅ CONFIGURATION NOTES:
