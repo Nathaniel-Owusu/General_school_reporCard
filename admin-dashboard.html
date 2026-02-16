@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard | General School</title>
+    <link rel="icon" type="image/png" href="favicon.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -790,7 +791,7 @@
     <!-- Modals -->
     <!-- Add/Edit Student Modal -->
     <div id="add-student-modal" class="fixed inset-0 bg-gray-900/50 backdrop-blur-sm hidden flex items-center justify-center z-50 transition-opacity">
-        <div class="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md mx-4 transform transition-all scale-100 animate-fade-in">
+        <div class="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md mx-4 transform transition-all scale-100 animate-fade-in max-h-[90vh] overflow-y-auto">
             <h2 class="text-2xl font-bold mb-6 text-gray-800" id="modal-title">Register New Student</h2>
             <form id="add-student-form" onsubmit="handleSaveStudent(event)" class="space-y-4">
                 <input type="hidden" name="editModeId" id="edit-mode-id">
@@ -859,7 +860,7 @@
 
      <!-- Add Class Modal -->
     <div id="add-class-modal" class="fixed inset-0 bg-gray-900/50 backdrop-blur-sm hidden flex items-center justify-center z-50">
-        <div class="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md mx-4">
+        <div class="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md mx-4 max-h-[90vh] overflow-y-auto">
             <h2 class="text-2xl font-bold mb-6 text-gray-800">New Class</h2>
              <form onsubmit="handleAddClass(event)" class="space-y-4">
                 <input type="hidden" name="id">
@@ -900,7 +901,7 @@
 
      <!-- Add Teacher Modal -->
     <div id="add-teacher-modal" class="fixed inset-0 bg-gray-900/50 backdrop-blur-sm hidden flex items-center justify-center z-50">
-        <div class="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md mx-4">
+        <div class="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md mx-4 max-h-[90vh] overflow-y-auto">
             <h2 class="text-2xl font-bold mb-6 text-gray-800">New Teacher</h2>
              <form onsubmit="handleAddTeacher(event)" class="space-y-4">
                 <input type="hidden" name="id">
@@ -948,7 +949,7 @@
     <!-- Add/Edit Subject Modal -->
 
     <div id="add-subject-modal" class="fixed inset-0 bg-gray-900/50 backdrop-blur-sm hidden flex items-center justify-center z-50">
-        <div class="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md mx-4">
+        <div class="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md mx-4 max-h-[90vh] overflow-y-auto">
             <h2 class="text-2xl font-bold mb-6 text-gray-800" id="subject-modal-title">New Subject</h2>
              <form onsubmit="handleSaveSubject(event)" class="space-y-4">
                 <input type="hidden" name="id">
@@ -1059,6 +1060,13 @@
         function switchView(viewName) {
             viewList.forEach(v => document.getElementById(`view-${v}`).classList.add('hidden'));
             document.getElementById(`view-${viewName}`).classList.remove('hidden');
+            
+            // Close Mobile Menu if open
+            const sidebar = document.getElementById('mobile-sidebar');
+            const overlay = document.getElementById('mobile-overlay');
+            if (window.innerWidth < 1024 && !sidebar.classList.contains('-translate-x-full')) {
+                 toggleMobileMenu();
+            }
             
             // Update Nav
             viewList.forEach(v => {
@@ -1351,43 +1359,80 @@
 
         // --- MODAL & FORM HANDLERS ---
         // --- MODAL & FORM HANDLERS ---
-        async function openAddStudentModal(studentId = null) {
+        async function openAddStudentModal(studentId = null, preSelectClassId = null) {
              const modal = document.getElementById('add-student-modal');
              const form = document.getElementById('add-student-form');
              const title = document.getElementById('modal-title');
              
-             // Populate Classes
-             const classes = await fetchAdminData('classes');
-             const classSelect = document.getElementById('student-class-select');
-             classSelect.innerHTML = (classes || []).map(c => `<option value="${c.name}">${c.name}</option>`).join('');
-
-             if(studentId) {
-                 title.innerText = "Edit Student";
-                 const student = allStudents.find(s => s.id == studentId);
-                 if(student) {
-                      document.getElementById('edit-mode-id').value = student.id;
-                      document.getElementById('input-name').value = student.name;
-                      const idInput = document.getElementById('input-id');
-                      idInput.value = student.id;
-                      idInput.readOnly = true; 
-                      idInput.classList.add('bg-gray-100', 'cursor-not-allowed');
-                      
-                      document.getElementById('student-class-select').value = student.class;
-                      document.getElementById('input-gender').value = student.gender || 'Male';
-                      document.getElementById('input-status').value = student.status || 'Active';
-                 }
-             } else {
-                 title.innerText = "Register New Student";
-                 form.reset();
-                 document.getElementById('edit-mode-id').value = "";
-                 const idInput = document.getElementById('input-id');
-                 idInput.readOnly = false;
-                 idInput.classList.remove('bg-gray-100', 'cursor-not-allowed');
-                 idInput.value = "";
-                 document.getElementById('input-status').value = "Active";
+             if (!modal) {
+                 console.error("Add Student Modal not found in DOM");
+                 alert("Error: Modal interface missing. Please refresh."); 
+                 return;
              }
              
+             // Show modal immediately for responsiveness
              modal.classList.remove('hidden');
+             
+             // Show loading state in class select
+             const classSelect = document.getElementById('student-class-select');
+             if(classSelect) classSelect.innerHTML = '<option>Loading classes...</option>';
+
+             try {
+                 // Populate Classes
+                 const classes = await fetchAdminData('classes');
+                 
+                 if(classSelect) {
+                     if (classes && classes.length > 0) {
+                         classSelect.innerHTML = classes.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
+                     } else {
+                         classSelect.innerHTML = '<option value="">No classes available. Create one first.</option>';
+                     }
+                 }
+    
+                 if(studentId) {
+                     if(title) title.innerText = "Edit Student";
+                     const student = allStudents.find(s => s.id == studentId);
+                     if(student) {
+                          const editModeId = document.getElementById('edit-mode-id');
+                          if(editModeId) editModeId.value = student.id;
+                          
+                          document.getElementById('input-name').value = student.name;
+                          const idInput = document.getElementById('input-id');
+                          idInput.value = student.id;
+                          idInput.readOnly = true; 
+                          idInput.classList.add('bg-gray-100', 'cursor-not-allowed');
+                          
+                          if(classSelect) classSelect.value = student.class;
+                          document.getElementById('input-gender').value = student.gender || 'Male';
+                          document.getElementById('input-status').value = student.status || 'Active';
+                     }
+                 } else {
+                     if(title) title.innerText = "Register New Student";
+                     if(form) form.reset();
+                     
+                     const editModeId = document.getElementById('edit-mode-id');
+                     if(editModeId) editModeId.value = "";
+                     
+                     const idInput = document.getElementById('input-id');
+                     if(idInput) {
+                         idInput.readOnly = false;
+                         idInput.classList.remove('bg-gray-100', 'cursor-not-allowed');
+                         idInput.value = "";
+                     }
+                     document.getElementById('input-status').value = "Active";
+                     
+                     // Pre-select Class if provided
+                     if(preSelectClassId && classSelect) {
+                         const cls = (classes || []).find(c => c.id === preSelectClassId);
+                         if(cls) {
+                             classSelect.value = cls.name;
+                         }
+                     }
+                 }
+             } catch (error) {
+                 console.error("Error in openAddStudentModal:", error);
+                 alert("An error occurred while loading the form. Please check your connection.");
+             }
         }
 
         async function handleSaveStudent(e) {

@@ -5,9 +5,9 @@
 ```php
 <?php
 $db_host = 'localhost';
-$db_name = 'school_report';
+$db_name = 'u957056558_report_card';
 $db_user = 'u957056558_school_admin';  // ✅ CORRECT!
-$db_pass = 'reportCard@1234';
+$db_pass = 'Esther@0242';
 ?>
 ```
 
@@ -29,13 +29,11 @@ $db_pass = 'reportCard@1234';
 **Or edit directly in File Manager:**
 
 1. Open: `public_html/config/prod_config.php`
-2. Change line 10 from:
+2. Change the credentials to:
    ```php
-   $db_user = 'owusuansahnath.';  // ❌ WRONG
-   ```
-   To:
-   ```php
-   $db_user = 'u957056558_school_admin';  // ✅ CORRECT
+   $db_name = 'u957056558_report_card';
+   $db_user = 'u957056558_school_admin';
+   $db_pass = 'Esther@0242';
    ```
 3. Save the file
 
@@ -55,7 +53,7 @@ https://studentreport.net/diagnose.php
 "database_test": {
     "success": true,  ← Should be TRUE now!
     "host": "localhost",
-    "database": "school_report",
+    "database": "u957056558_report_card",
     "user": "u957056558_school_admin",
     "tables": ["schools", "users", "classes", "subjects", "students"]
 }
@@ -114,9 +112,9 @@ Password: password123
 
 ## 🔐 Your Correct Credentials
 
-**Database:** school_report
+**Database:** u957056558_report_card
 **Username:** u957056558_school_admin
-**Password:** reportCard@1234
+**Password:** Esther@0242
 **Host:** localhost (when on Hostinger server)
 
 ---
@@ -127,18 +125,18 @@ Password: password123
 
 1. **Password is correct:**
    - In Hostinger → Databases → MySQL Databases
-   - Click "Change Password" to reset to `reportCard@1234`
+   - Click "Change Password" to reset to `Esther@0242`
 
 2. **User has permissions:**
    - In Hostinger → Databases
-   - Verify `u957056558_school_admin` has access to `school_report`
+   - Verify `u957056558_school_admin` has access to `u957056558_report_card`
 
 3. **Database exists:**
    - In Hostinger → phpMyAdmin
-   - Check `school_report` database exists
+   - Check `u957056558_report_card` database exists
 
 4. **Tables are created:**
-   - In phpMyAdmin → school_report
+   - In phpMyAdmin → u957056558_report_card
    - Should have: schools, users, classes, subjects, students
    - If missing, import `database_schema.sql`
 
