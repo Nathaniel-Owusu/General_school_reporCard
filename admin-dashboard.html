@@ -1006,9 +1006,9 @@
         </div>
     </div>
 
-    <script src="js/storage.js?v=2"></script>
-    <script src="js/app.js?v=2"></script>
-    <script src="js/settings.js?v=2"></script>
+    <script src="js/storage.js?v=3"></script>
+    <script src="js/app.js?v=3"></script>
+    <script src="js/settings.js?v=3"></script>
 
     <script>
         checkAuth(['admin']);
@@ -1440,24 +1440,49 @@
             const form = e.target;
             const editId = document.getElementById('edit-mode-id').value;
             
-            const data = {
-                id: editId || document.getElementById('input-id').value, 
-                name: document.getElementById('input-name').value,
-                class: document.getElementById('student-class-select').value,
-                gender: document.getElementById('input-gender').value,
-                status: document.getElementById('input-status').value
-            };
-            
-            if(!data.id) { alert("ID is required"); return; }
+            // Get Submit Button to show loading
+            const btn = form.querySelector('button[type="submit"]');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<ion-icon name="sync" class="animate-spin"></ion-icon> Saving...';
+            btn.disabled = true;
 
-            const result = await fetchAdminData('add_student', data, 'POST');
-            if (result && result.success) {
-                alert('Student saved successfully');
-                closeModal('add-student-modal');
-                initDashboard();
-                if(!editId) form.reset(); 
-            } else {
-                alert('Error: ' + (result?.message || 'Failed to save student'));
+            try {
+                const data = {
+                    id: editId || document.getElementById('input-id').value, 
+                    name: document.getElementById('input-name').value,
+                    class: document.getElementById('student-class-select').value,
+                    gender: document.getElementById('input-gender').value,
+                    status: document.getElementById('input-status').value
+                };
+                
+                // Allow empty ID for auto-generation if we decide to remove 'required' attribute later,
+                // but validation logic logic in app.js handles generation.
+                // However, for now, let's warn if strictly needed or just pass through.
+                // data.id is effectively required by the HTML form.
+                
+                const result = await fetchAdminData('add_student', data, 'POST');
+                
+                if (result && result.success) {
+                    alert('Student saved successfully');
+                    closeModal('add-student-modal');
+                    // Refresh current view (Students or Class Manager)
+                    if(typeof initDashboard === 'function') initDashboard();
+                    
+                    // If we are in Class Manager, refresh that too
+                    if(typeof loadManagerStudents === 'function' && !document.getElementById('view-class-details').classList.contains('hidden')) {
+                        loadManagerStudents();
+                    }
+                    
+                    if(!editId) form.reset(); 
+                } else {
+                    throw new Error(result?.message || 'Failed to save student');
+                }
+            } catch (error) {
+                console.error("Save Error:", error);
+                alert('Error saving student: ' + error.message);
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
             }
         }
         
