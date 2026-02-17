@@ -802,9 +802,9 @@
                     <input type="text" name="name" id="input-name" required placeholder="e.g. John Doe" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-accent outline-none">
                 </div>
                 
-                <div class="space-y-1">
+                <div class="space-y-1" id="input-id-container">
                     <label class="text-xs font-bold text-gray-500 uppercase">Index Number</label>
-                    <input type="text" name="id" id="input-id" required placeholder="e.g. ST005" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-accent outline-none">
+                    <input type="text" name="id" id="input-id" placeholder="e.g. ST005" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-accent outline-none">
                 </div>
 
                 <div class="space-y-1">
@@ -1398,10 +1398,12 @@
                           if(editModeId) editModeId.value = student.id;
                           
                           document.getElementById('input-name').value = student.name;
-                          const idInput = document.getElementById('input-id');
-                          idInput.value = student.id;
-                          idInput.readOnly = true; 
-                          idInput.classList.add('bg-gray-100', 'cursor-not-allowed');
+                     const idInputContainer = document.getElementById('input-id-container');
+             if(idInputContainer) idInputContainer.classList.remove('hidden');
+             const idInput = document.getElementById('input-id');
+             idInput.value = student.id;
+             idInput.readOnly = true; 
+             idInput.classList.add('bg-gray-100', 'cursor-not-allowed');
                           
                           if(classSelect) classSelect.value = student.class;
                           document.getElementById('input-gender').value = student.gender || 'Male';
@@ -1414,13 +1416,15 @@
                      const editModeId = document.getElementById('edit-mode-id');
                      if(editModeId) editModeId.value = "";
                      
-                     const idInput = document.getElementById('input-id');
-             if(idInput) {
-                 idInput.readOnly = true;
-                 idInput.classList.add('bg-gray-100', 'cursor-not-allowed');
-                 idInput.value = "";
-                 idInput.placeholder = "Auto-generated (School + Class)";
-             }
+                     const idInputContainer = document.getElementById('input-id-container');
+             if(idInputContainer) idInputContainer.classList.add('hidden');
+             const idInput = document.getElementById('input-id');
+     if(idInput) {
+         idInput.readOnly = true;
+         idInput.classList.add('bg-gray-100', 'cursor-not-allowed');
+         idInput.value = "";
+         idInput.placeholder = "Auto-generated (School + Class)";
+     }
              document.getElementById('input-status').value = "Active";
                      
                      // Pre-select Class if provided
