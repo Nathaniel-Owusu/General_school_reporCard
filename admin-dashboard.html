@@ -1837,8 +1837,8 @@
             const subjects = await fetchAdminData('subjects') || [];
             
             // Filter by Level
-            // Filter by Level (Include matching level OR uncategorized subjects)
-            const levelSubjects = subjects.filter(s => s.level === cls.level || !s.level || !['KG', 'Primary', 'JHS'].includes(s.level));
+            // Disable filtering to ensure all subjects are visible
+            const levelSubjects = subjects;
             const assigned = cls.subjects || [];
 
             if(levelSubjects.length === 0) {
@@ -1892,8 +1892,8 @@
              if(!cls) return;
 
              const subjects = await fetchAdminData('subjects') || [];
-             // Filter subjects by class level (e.g. only show Primary subjects for Primary class)
-             const levelSubjects = subjects.filter(s => s.level === cls.level || !s.level || !['KG', 'Primary', 'JHS'].includes(s.level));
+             // Disable filtering to ensure all subjects are visible
+             const levelSubjects = subjects;
              
              const assigned = cls.subjects || [];
 
