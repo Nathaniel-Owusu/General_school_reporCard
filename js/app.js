@@ -236,8 +236,31 @@ async function fetchAdminData(action, params = {}) {
         if (index >= 0) {
             db.students[index] = { ...db.students[index], ...params };
         } else {
+            let newId = params.id;
+            
+            if (!newId) {
+                // Auto-generate ID: [SchoolName]-[Class]-[Seq]
+                const school = db.schools.find(s => s.id === schoolId);
+                const schCode = school ? (school.name.match(/\b(\w)/g) || ['S']).join('').toUpperCase().substring(0, 3) : 'SCH';
+                
+                const className = params.class || 'GEN';
+                const clsCode = className.replace(/[^a-zA-Z0-9]/g, '').toUpperCase().substring(0, 5); // e.g., JHS1A
+                
+                // Find next sequence for this class
+                const classStudents = db.students.filter(s => s.school_id === schoolId && s.class === params.class);
+                
+                // Ensure uniqueness (loop if collision)
+                let counter = classStudents.length + 1;
+                newId = `${schCode}-${clsCode}-${counter.toString().padStart(3, '0')}`;
+                
+                while(db.students.find(s => s.id === newId)) {
+                    counter++;
+                    newId = `${schCode}-${clsCode}-${counter.toString().padStart(3, '0')}`;
+                }
+            }
+
             db.students.push({
-                id: params.id || Storage.generateId('ST'),
+                id: newId,
                 school_id: schoolId,
                 name: params.name,
                 class: params.class,

@@ -1415,12 +1415,13 @@
                      if(editModeId) editModeId.value = "";
                      
                      const idInput = document.getElementById('input-id');
-                     if(idInput) {
-                         idInput.readOnly = false;
-                         idInput.classList.remove('bg-gray-100', 'cursor-not-allowed');
-                         idInput.value = "";
-                     }
-                     document.getElementById('input-status').value = "Active";
+             if(idInput) {
+                 idInput.readOnly = true;
+                 idInput.classList.add('bg-gray-100', 'cursor-not-allowed');
+                 idInput.value = "";
+                 idInput.placeholder = "Auto-generated (School + Class)";
+             }
+             document.getElementById('input-status').value = "Active";
                      
                      // Pre-select Class if provided
                      if(preSelectClassId && classSelect) {
