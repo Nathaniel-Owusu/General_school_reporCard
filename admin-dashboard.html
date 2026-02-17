@@ -378,6 +378,13 @@
                         </table>
                         
                         <div class="mt-6 flex justify-end pt-6 border-t border-gray-100">
+                            <label class="bg-green-50 text-green-600 px-6 py-3 rounded-xl font-bold hover:bg-green-100 cursor-pointer flex items-center gap-2 mr-auto transition border border-green-200">
+                                <input type="file" id="import_csv_file" accept=".csv" class="hidden" onchange="importGradesFromCSV(this)">
+                                <ion-icon name="cloud-upload"></ion-icon> Import CSV
+                            </label>
+                            
+                            <a href="#" onclick="downloadCSVTemplate()" class="text-xs text-blue-500 font-bold underline mr-4 self-center">Download Template</a>
+
                             <button onclick="saveManagerGrades()" class="bg-secondary text-white px-8 py-3 rounded-xl font-bold hover:bg-amber-600 shadow-lg shadow-amber-500/30 transition flex items-center gap-2">
                                 <ion-icon name="save"></ion-icon> Save All Grades
                             </button>
@@ -2519,6 +2526,93 @@
             } else {
                 alert('Error saving grades');
             }
+        }
+
+        function downloadCSVTemplate() {
+            const csvContent = "data:text/csv;charset=utf-8," + "Student ID,Student Name,Class Score (30%),Exam Score (70%)\nST001,John Doe,25,60";
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "grades_template.csv");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function importGradesFromCSV(input) {
+            if (!input.files || !input.files[0]) return;
+            const file = input.files[0];
+            const reader = new FileReader();
+
+            reader.onload = function(e) {
+                const text = e.target.result;
+                const rows = text.split('\n').map(row => row.split(','));
+                
+                // Simple heuristic: Look for header row
+                let idCol = 0;
+                let classCol = 2;
+                let examCol = 3;
+                
+                // Check header
+                const header = rows[0].map(h => h.toLowerCase().trim());
+                if(header.includes('student id') || header.includes('id')) {
+                    idCol = header.findIndex(h => h.includes('id'));
+                    classCol = header.findIndex(h => h.includes('class'));
+                    if(classCol === -1) classCol = 2; // Fallback
+                    examCol = header.findIndex(h => h.includes('exam'));
+                    if(examCol === -1) examCol = 3; // Fallback
+                }
+
+                let updatedCount = 0;
+                const tbody = document.getElementById('mgr-grade-table'); // Current table
+                
+                // Iterate (skip header if detected)
+                const startRow = (header.includes('id') || header.includes('student')) ? 1 : 0;
+                
+                for(let i = startRow; i < rows.length; i++) {
+                    const row = rows[i];
+                    if(row.length < 2) continue; // Skip empty
+                    
+                    const sId = row[idCol]?.trim();
+                    if(!sId) continue;
+                    
+                    // Find row in table
+                    // Try specific ID match
+                    let tr = tbody.querySelector(`tr[data-student-id="${sId}"]`);
+                    
+                    // If not found, try lax match (case insensitive)
+                    if(!tr) {
+                         const allTrs = Array.from(tbody.querySelectorAll('tr[data-student-id]'));
+                         tr = allTrs.find(t => t.dataset.studentId.toUpperCase() === sId.toUpperCase());
+                    }
+
+                    if(tr) {
+                        const classInput = tr.querySelector('input[data-type="class"]');
+                        const examInput = tr.querySelector('input[data-type="exam"]');
+                        
+                        if(classInput && row[classCol]) classInput.value = parseInt(row[classCol]) || 0;
+                        if(examInput && row[examCol]) examInput.value = parseInt(row[examCol]) || 0;
+                        
+                        // Trigger calculation visual update
+                        const totalCell = tr.querySelector('td:nth-child(4)'); // 4th column is Total
+                        const gradeCell = tr.querySelector('td:nth-child(5) span'); // 5th is Grade
+                        
+                        if(totalCell && gradeCell) {
+                            const total = (parseInt(classInput.value)||0) + (parseInt(examInput.value)||0);
+                            totalCell.innerText = total;
+                            // Simple grade calc for preview (logic duplicated from loadManagerGrades, ideally shared)
+                            const grade = calculateGrade(total); 
+                            gradeCell.innerText = grade.grade;
+                        }
+                        updatedCount++;
+                    }
+                }
+                
+                alert(`Imported grades for ${updatedCount} students.\n\nPlease review and click 'Save All Grades' to confirm.`);
+                input.value = ''; // Reset
+            };
+            
+            reader.readAsText(file);
         }
         
         function calculateGrade(score) {
