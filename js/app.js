@@ -533,9 +533,9 @@ async function fetchTeacherData(action, params = {}) {
                      allowedSubjects = db.subjects.filter(s => c.subjects.includes(s.id) && s.active !== false);
                  }
                  
-                 // 2. Fallback: All Subjects of Level (if config missing)
+                     // 2. Fallback: All Subjects of Level OR Uncategorized (if config missing)
                  if (allowedSubjects.length === 0) {
-                     allowedSubjects = db.subjects.filter(s => s.level === c.level && s.active !== false);
+                     allowedSubjects = db.subjects.filter(s => (s.level === c.level || !s.level) && s.active !== false);
                  }
              }
              
@@ -544,11 +544,38 @@ async function fetchTeacherData(action, params = {}) {
     }
 
     else if (action === 'stats') {
-        const classes = getMyClasses();
-        const subjectsCount = classes.reduce((acc, c) => acc + (c.subjects ? c.subjects.length : 0), 0);
+        // Reuse the logic from 'classes' action to ensure consistency
+        // getMyClasses returns raw classes, we need to enrich them to count visible subjects
+        const rawClasses = getMyClasses();
+        const me = db.users.find(u => u.id === user.id);
+        
+        const enrichedClasses = rawClasses.map(c => {
+             let allowedSubjects = [];
+             const isDirectClassTeacher = c.class_teacher_id === user.id;
+             const isLegacyClassTeacher = (me.assigned_classes || []).includes(c.name) || (me.assigned_classes || []).includes(c.id);
+             const isAdmin = user.role === 'admin';
+             const isGeneralAccess = isAdmin || isDirectClassTeacher || isLegacyClassTeacher;
+             
+             const assignment = (me.assigned_subjects || []).find(as => as.class_id === c.id);
+             const specificSubjectIds = (assignment && assignment.subject_ids) ? assignment.subject_ids : [];
+             
+             if (!isGeneralAccess && specificSubjectIds.length > 0) {
+                 allowedSubjects = db.subjects.filter(s => s.active !== false && specificSubjectIds.includes(s.id));
+             } else {
+                 if (c.subjects && c.subjects.length > 0) {
+                     allowedSubjects = db.subjects.filter(s => c.subjects.includes(s.id) && s.active !== false);
+                 }
+                 if (allowedSubjects.length === 0) {
+                     allowedSubjects = db.subjects.filter(s => (s.level === c.level || !s.level) && s.active !== false);
+                 }
+             }
+             return { ...c, subjects: allowedSubjects };
+        });
+
+        const subjectsCount = enrichedClasses.reduce((acc, c) => acc + (c.subjects ? c.subjects.length : 0), 0);
         
         // Count unique students
-        const classNames = classes.map(c => c.name);
+        const classNames = enrichedClasses.map(c => c.name);
         const myStudents = db.students.filter(s => s.school_id === schoolId && classNames.includes(s.class));
         
         let pending = 0;
@@ -557,7 +584,7 @@ async function fetchTeacherData(action, params = {}) {
         });
 
         result = {
-            classes: classes.length,
+            classes: enrichedClasses.length,
             subjects: subjectsCount,
             students: myStudents.length,
             pending: pending
