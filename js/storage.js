@@ -34,6 +34,9 @@ const Storage = {
                 console.log("🌱 Storage: Database is empty. Seeding initial data...");
                 await Storage.seed();
             }
+            
+            // Auto-fix schema for large JSON fields (silently)
+            try { fetch('api/fix_schema.php'); } catch(e) {}
         } catch (e) {
             console.error("❌ Storage: Failed to connect to database", e);
             alert("⚠️ Database Connection Failed\n\nCannot connect to the remote database. Please ensure:\n1. XAMPP/MySQL is running\n2. Database 'school_report_db' exists\n3. API endpoint is accessible\n\nError: " + e.message);
