@@ -102,7 +102,7 @@ async function login(type, credentials) {
                 if (user.role === 'super_admin') redirect = 'super-admin.html';
                 else if (user.role === 'admin') redirect = 'admin-dashboard.html';
                 else if (user.role === 'teacher') redirect = 'teacher-portal.html';
-                else if (user.role === 'student') redirect = `student-report.html?student_id=${user.id}`;
+                else if (user.role === 'student') redirect = 'student-dashboard.html';
                 
                 return { success: true, redirect };
             }
@@ -118,11 +118,10 @@ async function login(type, credentials) {
         if (!db) return { success: false, message: 'Database error.' };
 
         if (type === 'student') {
-            const student = db.students.find(s => s.id === credentials.id);
-            if (student) {
+             if (student) {
                  const user = { ...student, role: 'student' };
                  sessionStorage.setItem('currentUser', JSON.stringify(user));
-                 return { success: true, redirect: `student-report.html?student_id=${user.id}` };
+                 return { success: true, redirect: 'student-dashboard.html' };
             }
         } else {
             const user = db.users.find(u => u.email === credentials.email);

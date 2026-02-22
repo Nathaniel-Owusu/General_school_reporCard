@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard | General School</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: { colors: { primary: '#1e3a8a', secondary: '#0ea5e9', accent: '#0f172a' }, fontFamily: { sans: ['Outfit', 'sans-serif'] } }
+            }
+        }
+    </script>
+    <style>
+        .fade-in { animation: fadeIn 0.5s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        /* Decorative background element */
+        .dash-bg {
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 300px;
+            background: linear-gradient(135deg, #1e3a8a 0%, #0ea5e9 100%);
+            z-index: 0;
+            border-bottom-left-radius: 50px;
+            border-bottom-right-radius: 50px;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 font-sans min-h-screen relative overflow-x-hidden">
+    
+    <div class="dash-bg hidden md:block"></div>
+    
+    <!-- Top Nav -->
+    <nav class="relative z-10 w-full bg-primary md:bg-transparent text-white py-4 px-6 flex justify-between items-center shadow-md md:shadow-none">
+        <div class="flex items-center gap-2">
+            <div class="w-10 h-10 bg-white/20 backdrop-blur rounded-lg flex items-center justify-center text-xl shadow-inner">
+                🎓
+            </div>
+            <span class="font-bold text-lg md:text-xl tracking-wide heading-school-name">General School</span>
+        </div>
+        <button onclick="logout()" class="px-4 py-2 bg-white/10 hover:bg-white/20 backdrop-blur rounded-lg font-medium transition text-sm flex items-center gap-2 border border-white/10">
+            <ion-icon name="log-out-outline" class="text-lg"></ion-icon> Sign Out
+        </button>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="relative z-10 max-w-6xl mx-auto px-4 md:px-8 py-8 fade-in flex flex-col gap-8">
+        
+        <!-- Welcome Banner -->
+        <div class="bg-white rounded-3xl p-8 md:p-10 shadow-xl border border-gray-100 flex flex-col md:flex-row items-center gap-8 md:gap-12 relative overflow-hidden">
+            <!-- Decorative circle -->
+            <div class="absolute -right-20 -top-20 w-64 h-64 bg-secondary/10 rounded-full blur-3xl"></div>
+            
+            <div class="w-32 h-32 rounded-full border-4 border-gray-50 bg-gray-100 flex-shrink-0 flex items-center justify-center text-5xl text-gray-400 overflow-hidden shadow-inner relative z-10">
+                 <ion-icon name="person"></ion-icon>
+            </div>
+            
+            <div class="flex-1 text-center md:text-left relative z-10">
+                <p class="text-sm font-bold text-secondary uppercase tracking-wider mb-1">Student Portal</p>
+                <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-2 truncate" id="student-name">Loading...</h1>
+                <div class="flex flex-wrap justify-center md:justify-start gap-3 mt-4">
+                    <span class="px-4 py-1.5 bg-blue-50 text-blue-700 font-bold rounded-lg text-sm border border-blue-100 flex items-center gap-2">
+                        <ion-icon name="id-card-outline"></ion-icon> Index: <span id="student-id" class="font-mono">---</span>
+                    </span>
+                    <span class="px-4 py-1.5 bg-purple-50 text-purple-700 font-bold rounded-lg text-sm border border-purple-100 flex items-center gap-2">
+                        <ion-icon name="easel-outline"></ion-icon> Class: <span id="student-class">---</span>
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dashboard Cards Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            
+            <!-- Report Card -->
+            <div onclick="openReportCard()" class="bg-white rounded-3xl p-6 shadow-md border border-gray-100 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer group relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-32 h-32 bg-blue-50 rounded-bl-full -mr-8 -mt-8 transition-transform group-hover:scale-110"></div>
+                
+                <div class="w-14 h-14 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center text-3xl mb-6 relative z-10 shadow-sm border border-blue-200">
+                    <ion-icon name="document-text"></ion-icon>
+                </div>
+                
+                <h3 class="text-xl font-bold text-gray-900 mb-2 relative z-10 group-hover:text-blue-600 transition-colors">Academic Report</h3>
+                <p class="text-gray-500 text-sm leading-relaxed mb-6 relative z-10">View your full terminal report card, exam scores, and teacher remarks.</p>
+                
+                <div class="flex items-center text-sm font-bold text-blue-600 relative z-10 group-hover:gap-2 transition-all">
+                    View Report <ion-icon name="arrow-forward-outline" class="ml-1"></ion-icon>
+                </div>
+            </div>
+
+            <!-- Elections Card (Coming Soon/Active) -->
+            <div onclick="openElections()" class="bg-white rounded-3xl p-6 shadow-md border border-gray-100 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer group relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-32 h-32 bg-purple-50 rounded-bl-full -mr-8 -mt-8 transition-transform group-hover:scale-110"></div>
+                
+                <div class="w-14 h-14 bg-purple-100 text-purple-600 rounded-2xl flex items-center justify-center text-3xl mb-6 relative z-10 shadow-sm border border-purple-200">
+                    <ion-icon name="podium"></ion-icon>
+                </div>
+                
+                <div class="flex justify-between items-start mb-2 relative z-10">
+                    <h3 class="text-xl font-bold text-gray-900 group-hover:text-purple-600 transition-colors">Student Elections</h3>
+                </div>
+                
+                <p class="text-gray-500 text-sm leading-relaxed mb-6 relative z-10">Participate in school elections, view candidates, and cast your vote.</p>
+                
+                <div class="flex items-center justify-between mt-auto relative z-10">
+                    <div class="flex items-center text-sm font-bold text-purple-600 group-hover:gap-2 transition-all">
+                        Enter Voting Booth <ion-icon name="arrow-forward-outline" class="ml-1"></ion-icon>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Profile / Settings -->
+            <div class="bg-white rounded-3xl p-6 shadow-md border border-gray-100 hover:shadow-xl transition-all duration-300 relative overflow-hidden flex flex-col justify-between opacity-80 decoration-slate-400">
+                <div class="relative z-10">
+                    <div class="w-14 h-14 bg-gray-100 text-gray-400 rounded-2xl flex items-center justify-center text-3xl mb-6 border border-gray-200">
+                        <ion-icon name="settings"></ion-icon>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">Account Settings</h3>
+                    <p class="text-gray-500 text-sm leading-relaxed mb-6">Manage your student profile, password, and system preferences.</p>
+                </div>
+                <div class="inline-flex py-1 px-3 bg-gray-100 text-gray-500 text-xs font-bold rounded-lg w-fit">
+                    Under Construction
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Footer -->
+        <div class="text-center mt-12 text-sm text-gray-400 font-medium">
+            <p>&copy; <script>document.write(new Date().getFullYear())</script> <span class="heading-school-name">General School</span>. All rights reserved.</p>
+            <p class="mt-1">Powered by StudentReport.net</p>
+        </div>
+
+    </main>
+
+    <script src="js/storage.js?v=7"></script>
+    <script src="js/app.js?v=7"></script>
+    <script>
+        // Check Authentication
+        const student = checkAuth(['student']);
+        
+        if (student) {
+            // Populate Student Data
+            document.getElementById('student-name').innerText = student.name;
+            document.getElementById('student-id').innerText = student.id;
+            document.getElementById('student-class').innerText = student.class;
+        }
+
+        // --- Navigation Actions ---
+        
+        function openReportCard() {
+            // Add a small loading state
+            document.body.style.cursor = 'wait';
+            setTimeout(() => {
+                window.location.href = `student-report.html?student_id=${student.id}`;
+            }, 300);
+        }
+
+        function openElections() {
+            // For now, show an alert since we haven't built the UI yet!
+            alert("The Student Elections module is currently being built! Check back soon.");
+            // Eventually this will load: window.location.href = `student-elections.html`;
+        }
+
+    </script>
+</body>
+</html>
