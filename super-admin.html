@@ -519,8 +519,9 @@
             renderSchools();
         }
 
-        function renderSchools() {
-            const schools = Storage.get().schools.filter(s => !s.deleted) || [];
+        async function renderSchools() {
+            const db = await Storage.get();
+            const schools = db.schools.filter(s => !s.deleted) || [];
             const searchTerm = document.getElementById('search-school').value.toLowerCase();
             const statusFilter = document.getElementById('filter-status').value;
 
@@ -544,7 +545,6 @@
                 return;
             }
 
-            const db = Storage.get();
             grid.innerHTML = filtered.map(school => {
                 const students = db.students.filter(s => s.school_id === school.id).length;
                 const teachers = db.users.filter(u => u.school_id === school.id && u.role === 'teacher').length;
@@ -657,8 +657,8 @@
             }
         }
 
-        function editSchool(schoolId) {
-            const db = Storage.get();
+        async function editSchool(schoolId) {
+            const db = await Storage.get();
             const school = db.schools.find(s => s.id === schoolId);
             
             if (!school) {
@@ -721,8 +721,8 @@
 
         // ==== ADMIN MANAGEMENT FUNCTIONS ====
 
-        function renderAdmins() {
-            const db = Storage.get();
+        async function renderAdmins() {
+            const db = await Storage.get();
             const admins = db.users.filter(u => u.role === 'admin') || [];
             const searchTerm = document.getElementById('search-admin').value.toLowerCase();
             const schoolFilter = document.getElementById('filter-admin-school').value;
@@ -799,8 +799,8 @@
             }).join('');
         }
 
-        function populateSchoolDropdowns() {
-            const db = Storage.get();
+        async function populateSchoolDropdowns() {
+            const db = await Storage.get();
             const schools = db.schools.filter(s => !s.deleted && s.active !== false);
             
             const options = schools.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
@@ -810,8 +810,8 @@
             document.getElementById('filter-admin-school').innerHTML = '<option value="">All Schools</option>' + options;
         }
 
-        function openAddAdminModal() {
-            populateSchoolDropdowns();
+        async function openAddAdminModal() {
+            await populateSchoolDropdowns();
             document.getElementById('add-admin-modal').classList.remove('hidden');
         }
 
@@ -837,8 +837,8 @@
             }
         }
 
-        function editAdmin(adminId) {
-            const db = Storage.get();
+        async function editAdmin(adminId) {
+            const db = await Storage.get();
             const admin = db.users.find(u => u.id === adminId);
             
             if (!admin) {
@@ -846,7 +846,7 @@
                 return;
             }
 
-            populateSchoolDropdowns();
+            await populateSchoolDropdowns();
             
             document.getElementById('edit-admin-id').value = admin.id;
             document.getElementById('edit-admin-name').value = admin.name;
