@@ -5,355 +5,595 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Student Report Card | General School</title>
     <link rel="icon" type="image/png" href="favicon.png">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: { primary: '#1e3a8a', secondary: '#d97706', paper: '#f8fafc' },
-                    fontFamily: { sans: ['Outfit', 'sans-serif'], serif: ['Times New Roman', 'Playfair Display', 'serif'], mono: ['Courier New', 'monospace'] }
-                }
-            }
-        }
-    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Times+New+Roman&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        @page { size: A4; margin: 0; }
-        body { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-        @media print {
-            body { background: white; padding: 0; }
-            #report-card { box-shadow: none; border: none; margin: 0; width: 100%; max-width: none; border-radius: 0; }
-            .print\:hidden { display: none !important; }
-            .print\:block { display: block !important; }
-            /* Force background colors */
-            * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background: #d1d5db;
+            font-family: 'Times New Roman', Times, serif;
+            min-height: 100vh;
+            padding: 24px 16px;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
         }
+
+        /* ─── Top Controls ─── */
+        .top-bar {
+            max-width: 210mm;
+            margin: 0 auto 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .top-bar a, .top-bar button {
+            font-family: 'Roboto', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            background: none;
+            color: #1e3a8a;
+            text-decoration: none;
+        }
+        .top-bar button { color: #dc2626; }
+
+        /* ─── Print Button ─── */
+        .print-btn-wrap {
+            max-width: 210mm;
+            margin: 18px auto 0;
+            text-align: center;
+        }
+        .print-btn {
+            font-family: 'Roboto', sans-serif;
+            background: #1e3a8a;
+            color: #fff;
+            border: none;
+            padding: 12px 36px;
+            border-radius: 40px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 4px 18px rgba(30,58,138,.35);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: background .2s;
+        }
+        .print-btn:hover { background: #1e40af; }
+
+        /* ─── Report Sheet ─── */
+        #report-card {
+            max-width: 210mm;
+            margin: 0 auto;
+        }
+
+        .report-sheet {
+            background: #fff;
+            width: 100%;
+            border: 1px solid #111;
+            padding: 4px;
+            min-height: 297mm;
+            position: relative;
+        }
+        
+        .report-sheet-inner {
+            border: 3px solid #111;
+            padding: 20px 24px;
+            height: 100%;
+            min-height: calc(297mm - 10px);
+            position: relative;
+        }
+
+        /* ─── Watermark ─── */
         .watermark {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 70%;
-            opacity: 0.08;
+            width: 55%;
+            opacity: 0.1;
             pointer-events: none;
             z-index: 0;
         }
+        .watermark img { width: 100%; height: auto; }
+
+        .report-sheet-inner > *:not(.watermark) { position: relative; z-index: 1; }
+
+        /* ─── Header ─── */
+        .report-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 4px;
+        }
+        .header-logo, .header-logo-placeholder {
+            width: 90px;
+            height: 90px;
+            flex-shrink: 0;
+            object-fit: contain;
+        }
+        .header-logo-placeholder {
+            border: 1.5px solid #ccc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            color: #aaa;
+        }
+        .header-center {
+            flex: 1;
+            text-align: center;
+            padding: 0 10px;
+        }
+        .header-center .school-authority {
+            font-size: 14px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        .header-center .school-name {
+            font-size: 16px;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin: 4px 0;
+        }
+        .header-center .school-address {
+            font-size: 13px;
+            color: #222;
+        }
+        .header-center .school-address a { color: #1e40af; text-decoration: none; }
+        .passport-box {
+            width: 90px;
+            height: 110px;
+            flex-shrink: 0;
+            border: 1.5px solid #111;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            color: #111;
+        }
+        .passport-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* ─── Title Bar ─── */
+        .title-bar {
+            background: #000;
+            color: #fff;
+            text-align: center;
+            font-weight: bold;
+            font-size: 16px;
+            text-transform: uppercase;
+            padding: 6px 0;
+            margin: 12px 0 16px;
+            border: 1px solid #000;
+            letter-spacing: 0.05em;
+        }
+        
+        /* ─── Info Lines ─── */
+        .info-row {
+            display: flex;
+            align-items: flex-end;
+            margin-bottom: 12px;
+            flex-wrap: nowrap;
+        }
+        .info-label {
+            font-weight: bold;
+            font-size: 13px;
+            text-transform: uppercase;
+            margin-right: 4px;
+            white-space: nowrap;
+        }
+        .dotted-line {
+            flex: 1;
+            border-bottom: 1.5px dotted #111;
+            min-width: 50px;
+            margin-right: 12px;
+            display: inline-flex;
+            align-items: flex-end;
+            color: #333;
+            font-size: 14px;
+            padding: 0 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            height: 18px;
+        }
+        .dotted-line:last-child { margin-right: 0; }
+
+        /* ─── Subjects Table ─── */
+        .subjects-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 16px 0;
+            font-size: 14px;
+        }
+        .subjects-table th, .subjects-table td {
+            border: 1.5px solid #000;
+            padding: 6px;
+            text-align: center;
+            vertical-align: middle;
+        }
+        .subjects-table th {
+            font-weight: bold;
+            font-size: 13px;
+            background: #eee;
+        }
+        .subjects-table td.subject-name {
+            text-align: left;
+            font-weight: normal;
+            background: #fff;
+        }
+        .subjects-table .col-subject { width: 28%; }
+        
+        .empty-row td { height: 26px; }
+
+        /* ─── Bottom Sections ─── */
+        .bottom-line-row {
+            display: flex;
+            align-items: flex-end;
+            margin-bottom: 12px;
+            flex-wrap: nowrap;
+        }
+        .bl-label {
+            font-weight: bold;
+            font-size: 13px;
+            text-transform: uppercase;
+            margin-right: 4px;
+            white-space: nowrap;
+        }
+        .bl-dots {
+            flex: 1;
+            border-bottom: 1.5px dotted #111;
+            display: inline-flex;
+            align-items: flex-end;
+            margin-right: 12px;
+            font-size: 14px;
+            padding: 0 4px;
+            height: 18px;
+            color: #333;
+        }
+        .bl-dots:last-child { margin-right: 0; }
+        
+        .full-dots-group {
+            margin-bottom: 16px;
+            display: flex;
+            flex-direction: column;
+        }
+        .full-dots-group .bl-label-block {
+            font-weight: bold;
+            font-size: 13px;
+            text-transform: uppercase;
+            margin-bottom: -2px;
+        }
+        .full-dots {
+            width: 100%;
+            border-bottom: 1.5px dotted #111;
+            height: 22px;
+            margin-bottom: 4px;
+            font-size: 14px;
+            color: #333;
+            line-height: 22px;
+            padding: 0 2px;
+        }
+
+        /* ─── Print Styles ─── */
+        @page { size: A4; margin: 10mm; }
+        @media print {
+            body { background: white; padding: 0; }
+            .report-sheet { border: 1px solid #111; padding: 4px; box-shadow: none; min-height: auto; }
+            .report-sheet-inner { min-height: auto; border: 3px solid #111; }
+            .top-bar, .print-btn-wrap { display: none !important; }
+        }
+
+        /* ─── Lookup Form ─── */
+        .lookup-wrap {
+            max-width: 400px;
+            margin: 60px auto;
+            background: #fff;
+            border: 2px solid #111;
+            padding: 40px 32px;
+            text-align: center;
+            font-family: 'Roboto', sans-serif;
+        }
+        .lookup-wrap h2 { font-size: 22px; margin-bottom: 8px; }
+        .lookup-wrap p { font-size: 13px; color: #555; margin-bottom: 20px; }
+        .lookup-wrap input {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1.5px solid #999;
+            font-size: 14px;
+            font-family: 'Courier New', monospace;
+            letter-spacing: .05em;
+            text-transform: uppercase;
+            outline: none;
+            margin-bottom: 12px;
+        }
+        .lookup-wrap input:focus { border-color: #1e3a8a; }
+        .lookup-wrap button {
+            width: 100%;
+            padding: 11px;
+            background: #111;
+            color: #fff;
+            font-weight: 700;
+            font-size: 14px;
+            border: none;
+            cursor: pointer;
+            letter-spacing: .05em;
+            text-transform: uppercase;
+        }
+        .lookup-wrap button:hover { background: #1e3a8a; }
+        .lookup-links { margin-top: 18px; font-size: 12px; color: #999; }
+        .lookup-links a { color: #1e3a8a; margin: 0 6px; }
     </style>
 </head>
-<body class="bg-gray-100 min-h-screen p-4 print:p-0 print:bg-white">
+<body>
 
     <!-- Top Bar -->
-    <div class="max-w-[210mm] mx-auto mb-6 flex justify-between items-center print:hidden">
-        <a href="index.html" class="flex items-center gap-2 text-primary font-bold">
-            <span>&larr; Back Home</span>
-        </a>
-        <button onclick="logout()" class="text-red-500 hover:text-red-700 font-medium">Logout</button>
+    <div class="top-bar">
+        <a href="index.html">&larr; Back Home</a>
+        <button onclick="logout()">Logout</button>
     </div>
 
     <!-- Report Card Container -->
-    <div id="report-card" class="w-full max-w-[210mm] mx-auto bg-white shadow-xl rounded-xl overflow-hidden print:shadow-none print:w-full print:max-w-none print:rounded-none relative">
-        <!-- Content will be injected via JS -->
-    </div>
+    <div id="report-card"></div>
 
-    <div class="max-w-[210mm] mx-auto mt-8 text-center print:hidden">
-        <button onclick="window.print()" class="bg-primary text-white px-8 py-3 rounded-full shadow-lg hover:bg-blue-800 transition flex items-center gap-2 mx-auto font-bold">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
-            Print Report
+    <!-- Print Button -->
+    <div class="print-btn-wrap">
+        <button class="print-btn" onclick="window.print()">
+            <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+            Print / Download
         </button>
     </div>
 
     <script src="js/storage.js"></script>
     <script src="js/app.js"></script>
     <script>
-        // Protect Page / Init
+        /* ─────────────── INIT ─────────────── */
         async function init() {
-            // PUBLIC ACCESS: No login required
             const session = sessionStorage.getItem('currentUser');
             const auth = session ? JSON.parse(session) : null;
 
-            // Determine which student to show
             let targetStudentId = auth?.type === 'student' ? auth.id : null;
-            
             const urlParams = new URLSearchParams(window.location.search);
             const queryStudentId = urlParams.get('student_id');
+            if (queryStudentId) targetStudentId = queryStudentId;
 
-            // Query parameter overrides session
-            if (queryStudentId) {
-                targetStudentId = queryStudentId;
-            }
-
-            // If we don't have an ID yet, show the lookup form
             if (!targetStudentId) {
                 renderAdminLookup(document.getElementById('report-card'));
+                document.querySelector('.print-btn-wrap').style.display = 'none';
                 return;
             }
-            
-            // Show loading state
+
             const container = document.getElementById('report-card');
-            container.innerHTML = `<div class="p-12 text-center text-gray-500">Loading Report Card for ${targetStudentId}...</div>`;
+            container.innerHTML = `<div style="padding:60px;text-align:center;font-family:sans-serif;color:#555;">Loading Report Card…</div>`;
 
             try {
                 const data = await fetchStudentReport(targetStudentId);
-                
                 if (data && data.student) {
                     renderReport(data.student, data.settings);
                 } else {
-                    container.innerHTML = `<div class="p-12 text-center text-red-500">
-                        <h3 class="font-bold text-xl">Report Not Found</h3>
-                        <p class="mt-2 text-sm">No academic record found for Student ID: ${targetStudentId}</p>
-                        <button onclick="renderAdminLookup(document.getElementById('report-card'))" class="mt-4 text-blue-600 hover:underline">Try Another Search</button>
+                    container.innerHTML = `<div style="padding:60px;text-align:center;font-family:sans-serif;color:#c00;">
+                        <h3 style="font-size:20px;margin-bottom:8px;">Report Not Found</h3>
+                        <p>No record found for ID: <strong>${targetStudentId}</strong></p>
+                        <button onclick="renderAdminLookup(document.getElementById('report-card'))" style="margin-top:16px;color:#1e3a8a;border:none;background:none;cursor:pointer;font-size:14px;">Try Another &rarr;</button>
                     </div>`;
+                    document.querySelector('.print-btn-wrap').style.display = 'none';
                 }
             } catch (e) {
                 console.error(e);
-                container.innerHTML = `<div class="p-12 text-center text-red-500">Error loading report. Please try again.</div>`;
+                container.innerHTML = `<div style="padding:60px;text-align:center;color:#c00;">Error loading report. Please try again.</div>`;
             }
         }
 
+        /* ─────────────── GRADE CALC ─────────────── */
         function calculateGrade(score, gradingSystem) {
-             // Use custom grading system if available
-             if(gradingSystem && gradingSystem.length > 0) {
-                 for(let g of gradingSystem) {
-                     if(score >= g.min && score <= g.max) {
-                         return { 
-                             grade: g.grade, 
-                             remark: g.remark, 
-                             bg: g.bg || 'bg-blue-50', 
-                             color: g.color || 'text-blue-700' 
-                         };
-                     }
-                 }
-             }
-
-            // Default Colors
-            if (score >= 80) return { grade: 'A', remark: 'Excellent', bg: 'bg-green-100', color: 'text-green-700' };
-            if (score >= 70) return { grade: 'B', remark: 'Very Good', bg: 'bg-blue-100', color: 'text-blue-700' };
-            if (score >= 60) return { grade: 'C', remark: 'Good', bg: 'bg-yellow-100', color: 'text-yellow-700' };
-            if (score >= 50) return { grade: 'D', remark: 'Credit', bg: 'bg-orange-100', color: 'text-orange-700' };
-            if (score >= 45) return { grade: 'E', remark: 'Pass', bg: 'bg-gray-100', color: 'text-gray-700' };
-            return { grade: 'F', remark: 'Fail', bg: 'bg-red-100', color: 'text-red-700' };
+            if (gradingSystem && gradingSystem.length > 0) {
+                for (let g of gradingSystem) {
+                    if (score >= g.min && score <= g.max) return { grade: g.grade, remark: g.remark };
+                }
+            }
+            if (score >= 80) return { grade: 'A', remark: 'Excellent' };
+            if (score >= 70) return { grade: 'B', remark: 'Very Good' };
+            if (score >= 60) return { grade: 'C', remark: 'Good' };
+            if (score >= 50) return { grade: 'D', remark: 'Credit' };
+            if (score >= 45) return { grade: 'E', remark: 'Pass' };
+            return { grade: 'F', remark: 'Fail' };
         }
 
-        function escapeHtml(text) {
-             if(!text) return '';
-             return text.toString().replace(/[&<>"']/g, function(m) { return {'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;'}[m]; });
+        function escapeHtml(t) {
+            if (!t) return '';
+            return t.toString().replace(/[&<>"']/g, m => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;' }[m]));
         }
 
-        // Render Report (Colorful + Watermark)
+        /* ─────────────── RENDER ─────────────── */
         function renderReport(user, settings) {
             const container = document.getElementById('report-card');
-            const schoolData = { settings };
-            
-            // Calculate Totals and Rows
-            let totalScore = 0;
-            let approvedCount = 0;
-            const rows = user.scores.map(s => {
-                // Only show approved
-                if(s.status !== 'Approved') return '';
-                
-                const total = (s.class || 0) + (s.exam || 0);
-                totalScore += total;
-                approvedCount++;
-                const gradeInfo = calculateGrade(total, schoolData.settings.gradingSystem);
-                
+            const gs = settings || {};
+            const gradingSystem = gs.gradingSystem || null;
+
+            /* collect approved scores */
+            const approvedScores = (user.scores || []).filter(s => s.status === 'Approved');
+
+            /* build table rows */
+            const subjectRows = approvedScores.map((s, idx) => {
+                const total = (Number(s.class) || 0) + (Number(s.exam) || 0);
+                const gi = calculateGrade(total, gradingSystem);
                 return `
-                    <tr class="border-b border-gray-200">
-                        <td class="px-3 py-3 border-r border-gray-200 text-left font-sans font-medium text-gray-800 text-sm">${s.subject}</td>
-                        <td class="px-3 py-3 border-r border-gray-200 text-center font-mono text-sm text-gray-600">${s.class}</td>
-                        <td class="px-3 py-3 border-r border-gray-200 text-center font-mono text-sm text-gray-600">${s.exam}</td>
-                        <td class="px-3 py-3 border-r border-gray-200 text-center font-bold font-mono text-sm text-gray-900">${total}</td>
-                        <td class="px-3 py-3 border-r border-gray-200 text-center text-sm">
-                            <span class="${gradeInfo.bg} ${gradeInfo.color} px-2 py-1 rounded font-bold shadow-sm inline-block min-w-[30px]">${gradeInfo.grade}</span>
-                        </td>
-                        <td class="px-3 py-3 border-gray-200 text-left pl-3 text-sm italic text-gray-500">${gradeInfo.remark}</td>
-                    </tr>
-                `;
+                <tr>
+                    <td class="subject-name">${escapeHtml(s.subject)}</td>
+                    <td>${s.class !== undefined && s.class !== null && s.class !== '' ? s.class : ''}</td>
+                    <td>${s.exam  !== undefined && s.exam  !== null && s.exam  !== '' ? s.exam  : ''}</td>
+                    <td>${s.class !== '' && s.exam !== '' ? total : ''}</td>
+                    <td>${s.position || ''}</td>
+                    <td>${gi.remark}</td>
+                </tr>`;
             }).join('');
 
-            const average = approvedCount > 0 ? (totalScore / approvedCount).toFixed(2) : "0.00";
+            /* pad with empty rows (min 10 visible rows) */
+            const minRows = 10;
+            let emptyRows = '';
+            const empties = minRows - approvedScores.length;
+            if (empties > 0) {
+                for (let i = 0; i < empties; i++) {
+                    emptyRows += `<tr class="empty-row"><td class="subject-name">&nbsp;</td><td></td><td></td><td></td><td></td><td></td></tr>`;
+                }
+            }
+
+            /* attendance */
+            const att = user.attendance || {};
+            const attPresent = att.present !== undefined ? att.present : '';
+            const attTotal   = att.total   !== undefined ? att.total   : '';
+
+            /* logo */
+            const logoHtml = gs.schoolLogo
+                ? `<img src="${gs.schoolLogo}" class="header-logo" alt="School Logo">`
+                : `<div class="header-logo-placeholder">LOGO</div>`;
+
+            /* watermark */
+            const wmHtml = gs.schoolLogo
+                ? `<div class="watermark"><img src="${gs.schoolLogo}" alt="watermark"></div>`
+                : '';
+
+            /* passport photo */
+            const passportHtml = user.photo
+                ? `<div class="passport-box"><img src="${user.photo}" alt="Photo"></div>`
+                : `<div class="passport-box">Passport</div>`;
 
             container.innerHTML = `
-                <div class="max-w-[210mm] mx-auto bg-white p-8 border border-gray-200 print:border-none print:p-0 min-h-[297mm] relative">
-                    
-                    <!-- WATERMARK -->
-                    ${schoolData.settings.schoolLogo ? 
-                        `<div class="watermark">
-                            <img src="${schoolData.settings.schoolLogo}" class="w-full h-full object-contain opacity-20 filter grayscale-0">
-                        </div>` : ''
-                    }
+            <div class="report-sheet">
+              <div class="report-sheet-inner">
+                ${wmHtml}
 
-                    <!-- HEADER -->
-                    <div class="text-center mb-6 pb-4 relative z-10 border-b-2 border-primary">
-                        <div class="flex flex-col md:flex-row justify-between items-center mb-4 gap-6 text-center md:text-left">
-                             <!-- Left Logo -->
-                             ${schoolData.settings.schoolLogo ? 
-                                `<img src="${schoolData.settings.schoolLogo}" class="h-24 w-24 object-contain">` : 
-                                `<div class="w-20 h-20 bg-blue-50 rounded-lg flex items-center justify-center font-bold text-primary text-xl shadow-sm">LOGO</div>`
-                             }
-                             
-                             <!-- Center Info -->
-                             <div class="flex-1 px-4">
-                                <h1 class="text-3xl font-black uppercase text-primary tracking-tight" style="font-family: 'Playfair Display', serif;">${escapeHtml(schoolData.settings.schoolName || 'General School')}</h1>
-                                <p class="text-xs font-bold text-gray-500 uppercase tracking-[0.2em] mb-1">${escapeHtml(schoolData.settings.schoolMotto || 'Excellence in Education')}</p>
-                                <p class="text-sm text-gray-600 font-medium">${escapeHtml(schoolData.settings.schoolAddress || '')}</p>
-                                <p class="text-sm text-gray-600">${escapeHtml(schoolData.settings.contactPhone || '')} • ${escapeHtml(schoolData.settings.contactEmail || '')}</p>
-                             </div>
+                <!-- ═══ HEADER ═══ -->
+                <div class="report-header">
+                    ${logoHtml}
 
-                             <!-- Right (Empty for balance or QR code) -->
-                             <div class="w-24"></div>
-                        </div>
-                        <h3 class="font-bold text-xl uppercase bg-primary text-white inline-block px-8 py-1 rounded-t-lg shadow-sm">Terminal Report</h3>
-                    </div>
-
-                    <!-- STUDENT INFO GRID -->
-                    <div class="bg-blue-50/50 border border-blue-100 rounded-xl p-4 mb-6 relative z-10 shadow-sm">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-y-2 gap-x-8">
-                            <div class="flex border-b border-blue-100 pb-1"><span class="font-bold text-gray-500 w-32 text-xs uppercase self-end">Student Name</span> <span class="font-serif font-bold text-xl text-primary truncate">${user.name}</span></div>
-                            <div class="flex border-b border-blue-100 pb-1"><span class="font-bold text-gray-500 w-32 text-xs uppercase self-end">Student ID</span> <span class="font-mono text-lg text-gray-800">${user.id}</span></div>
-                            
-                            <div class="flex border-b border-blue-100 pb-1"><span class="font-bold text-gray-500 w-32 text-xs uppercase self-end">Class</span> <span class="font-bold text-gray-800">${user.class}</span></div>
-                            <div class="flex border-b border-blue-100 pb-1"><span class="font-bold text-gray-500 w-32 text-xs uppercase self-end">Position</span> <span class="font-bold text-secondary text-lg">${user.position || '-'} <span class="text-xs text-gray-400 font-normal">/ ${user.total_students || '-'}</span></span></div>
-                            
-                            <div class="flex border-b border-blue-100 pb-1"><span class="font-bold text-gray-500 w-32 text-xs uppercase self-end">Year</span> <span class="font-serif text-gray-800">${user.year}</span></div>
-                            <div class="flex border-b border-blue-100 pb-1"><span class="font-bold text-gray-500 w-32 text-xs uppercase self-end">Term</span> <span class="font-serif text-gray-800">${user.term}</span></div>
+                    <div class="header-center">
+                        <div class="school-authority">${escapeHtml(gs.schoolAuthority || 'GHANA EDUCATION SERVICE')}</div>
+                        <div class="school-name">${escapeHtml(gs.schoolName || 'AKROKERRI METHODIST BASIC JUNIOR HIGH SCHOOL')}</div>
+                        <div class="school-address">
+                            ${escapeHtml(gs.schoolAddress || 'P. O. Box 50, Akrokerri Adansi')}<br>
+                            Email: <a href="mailto:${escapeHtml(gs.contactEmail || 'akrokerrimethodistbasicschool@gmail.com')}">${escapeHtml(gs.contactEmail || 'akrokerrimethodistbasicschool@gmail.com')}</a>
+                            ${gs.contactPhone ? '<br>Tel: ' + escapeHtml(gs.contactPhone) : ''}
                         </div>
                     </div>
 
-                    <!-- ACADEMIC PERFORMANCE -->
-                    <div class="relative z-10 bg-white rounded-lg shadow-sm border border-gray-200 overflow-x-auto mb-6">
-                        <table class="w-full text-black border-collapse">
-                            <thead>
-                                <tr class="bg-primary text-white">
-                                    <th class="px-3 py-3 w-1/3 text-left text-xs font-bold uppercase tracking-wider">Subject</th>
-                                    <th class="px-3 py-3 text-center text-xs font-bold uppercase tracking-wider border-l border-blue-800">Class (30)</th>
-                                    <th class="px-3 py-3 text-center text-xs font-bold uppercase tracking-wider border-l border-blue-800">Exam (70)</th>
-                                    <th class="px-3 py-3 text-center text-xs font-bold uppercase tracking-wider border-l border-blue-800">Total (100)</th>
-                                    <th class="px-3 py-3 text-center text-xs font-bold uppercase tracking-wider border-l border-blue-800">Grade</th>
-                                    <th class="px-3 py-3 text-left pl-3 text-xs font-bold uppercase tracking-wider border-l border-blue-800">Remarks</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                ${rows}
-                            </tbody>
-                            <tfoot>
-                                <tr class="bg-gray-50 border-t-2 border-primary">
-                                    <td class="px-3 py-3 text-right font-bold uppercase text-xs text-gray-500">Performance Summary:</td>
-                                    <td colspan="2" class="px-3 py-3 text-center font-bold text-sm text-gray-800">TOTAL: ${totalScore}</td>
-                                    <td colspan="3" class="px-3 py-3 text-center font-bold text-sm text-primary">AVG: ${average}</td>
-                                </tr>
-                            </tfoot>
-                        </table>
-                    </div>
-
-                    <!-- ATTENDANCE & CONDUCT GRID -->
-                    <div class="grid grid-cols-2 gap-4 mb-8 relative z-10">
-                        <div class="border border-indigo-100 bg-indigo-50/50 rounded-xl overflow-hidden">
-                            <div class="bg-indigo-100 p-2 text-center font-bold text-xs uppercase text-indigo-800">Attendance Record</div>
-                            <div class="p-4 text-center">
-                                <span class="text-3xl font-bold text-indigo-900">${user.attendance.present}</span>
-                                <span class="text-sm text-indigo-400 uppercase font-bold">Days Present</span>
-                                <div class="text-xs text-indigo-400 mt-1">Out of ${user.attendance.total || 60} days</div>
-                            </div>
-                        </div>
-                        <div class="border border-amber-100 bg-amber-50/50 rounded-xl overflow-hidden">
-                            <div class="bg-amber-100 p-2 text-center font-bold text-xs uppercase text-amber-800">Conduct & Character</div>
-                            <div class="p-4 text-center flex items-center justify-center h-full">
-                                <p class="font-serif italic text-amber-900">"${user.conduct || 'Good behavior shown.'}"</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- REMARKS SECTION -->
-                    <div class="border border-gray-200 rounded-xl p-6 space-y-6 mb-8 relative z-10 bg-white shadow-sm">
-                        <!-- Class Teacher -->
-                        <div class="flex items-start gap-4">
-                            <div class="bg-gray-100 p-2 rounded text-center min-w-[100px]">
-                                <span class="block text-[10px] font-bold text-gray-400 uppercase">Class Teacher</span>
-                                <span class="block text-xl">👨‍🏫</span>
-                            </div>
-                            <div class="flex-1">
-                                <p class="text-sm font-serif italic text-gray-700 bg-gray-50 p-3 rounded-lg border border-gray-100 mb-2">"${user.teacher_remark || 'Has shown good improvement in studies.'}"</p>
-                                <div class="flex justify-end">
-                                    <div class="text-center w-32 border-t border-gray-300 pt-1">
-                                         <p class="text-[10px] font-bold uppercase text-gray-400">Signature</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Head Teacher -->
-                        <div class="flex items-start gap-4 pt-4 border-t border-gray-100">
-                             <div class="bg-primary/10 p-2 rounded text-center min-w-[100px]">
-                                <span class="block text-[10px] font-bold text-primary uppercase">Head Teacher</span>
-                                <span class="block text-xl">🎓</span>
-                            </div>
-                            <div class="flex-1">
-                                <p class="text-sm font-serif italic text-primary bg-primary/5 p-3 rounded-lg border border-primary/10 mb-2">"${user.head_remark || 'Promoted to the next class.'}"</p>
-                                <div class="flex justify-end gap-8 items-end">
-                                    <div class="text-center">
-                                        <div class="w-24 h-24 border-2 border-dashed border-gray-300 rounded-full flex items-center justify-center text-[10px] text-gray-400 mb-1 opacity-50 rotate-[-12deg]">Official Stamp</div>
-                                    </div>
-                                    <div class="text-center w-32 border-t border-gray-300 pt-1">
-                                         <p class="text-[10px] font-bold uppercase text-gray-400">Signature</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- KEY -->
-                    <div class="text-center text-[10px] uppercase tracking-wider text-gray-400 pt-4 border-t border-gray-100 relative z-10">
-                        <span class="font-bold text-white bg-gray-400 px-1 rounded mr-2">GRADING KEY</span> 
-                        ${schoolData.settings.gradingSystem ? 
-                            schoolData.settings.gradingSystem.map(g => `<span class="inline-block mx-2"><strong class="text-gray-600">${g.grade}</strong>: ${g.min}-${g.max}</span>`).join('<span class="text-gray-200">|</span>')
-                            : 
-                            'A: 80-100 • B: 70-79 • C: 60-69 • D: 50-59 • E: 45-49 • F: 0-44'
-                        }
-                    </div>
+                    ${passportHtml}
                 </div>
-            `;
+
+                <!-- ═══ TITLE BAR ═══ -->
+                <div class="title-bar">TERMINAL REPORT SHEET</div>
+
+                <!-- ═══ STUDENT INFO ═══ -->
+                <div class="info-row">
+                    <span class="info-label">NAME:</span>
+                    <span class="dotted-line">${escapeHtml(user.name || '')}</span>
+                    <span class="info-label">CLASS:</span>
+                    <span class="dotted-line" style="flex:0; min-width:120px;">${escapeHtml(user.class || '')}</span>
+                </div>
+
+                <div class="info-row">
+                    <span class="info-label">ACADEMIC YEAR:</span>
+                    <span class="dotted-line" style="flex:0; min-width:120px;">${escapeHtml(user.year || '')}</span>
+                    <span class="info-label">TERM:</span>
+                    <span class="dotted-line" style="flex:0; min-width:110px;">${escapeHtml(user.term || '')}</span>
+                    <span class="info-label">CLASS NO.:</span>
+                    <span class="dotted-line" style="flex:0; min-width:60px;">${escapeHtml(user.class_no || user.total_students || '')}</span>
+                </div>
+
+                <div class="info-row">
+                    <span class="info-label">CLASS TEACHER:</span>
+                    <span class="dotted-line">${escapeHtml(user.class_teacher || '')}</span>
+                    <span class="info-label">POSITION:</span>
+                    <span class="dotted-line" style="flex:0; min-width:80px;">${user.position ? user.position + (user.total_students ? ' / ' + user.total_students : '') : ''}</span>
+                </div>
+
+                <div class="info-row">
+                    <span class="info-label">REOPENING DATE:</span>
+                    <span class="dotted-line">${escapeHtml(user.reopening_date || gs.reopeningDate || '')}</span>
+                </div>
+
+                <!-- ═══ SUBJECTS TABLE ═══ -->
+                <table class="subjects-table">
+                    <thead>
+                        <tr>
+                            <th class="col-subject">SUBJECTS</th>
+                            <th>Class Score<br>50%</th>
+                            <th>Exams<br>Score 50%</th>
+                            <th>Total Score<br>100%</th>
+                            <th>Position</th>
+                            <th>Remarks</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${subjectRows}
+                        ${emptyRows}
+                    </tbody>
+                </table>
+
+                <!-- ═══ ATTENDANCE ═══ -->
+                <div class="bottom-line-row">
+                    <span class="bl-label">ATTENDANCE:</span>
+                    <span class="bl-dots" style="flex:0; min-width:80px;">${attPresent}</span>
+                    <span class="bl-label">OUT OF:</span>
+                    <span class="bl-dots" style="flex:0; min-width:80px;">${attTotal}</span>
+                    <span class="bl-label">PROMOTED TO:</span>
+                    <span class="bl-dots">${escapeHtml(user.promoted_to || '')}</span>
+                </div>
+
+                <div class="full-dots-group">
+                    <div class="bl-label-block">CONDUCT:</div>
+                    <div class="full-dots">${user.conduct ? escapeHtml(user.conduct) : ''}</div>
+                    <div class="full-dots"></div>
+                    <div class="full-dots"></div>
+                </div>
+
+                <div class="bottom-line-row">
+                    <span class="bl-label">ATTITUDE:</span>
+                    <span class="bl-dots">${user.attitude ? escapeHtml(user.attitude) : ''}</span>
+                    <span class="bl-label">INTEREST:</span>
+                    <span class="bl-dots">${user.interest ? escapeHtml(user.interest) : ''}</span>
+                </div>
+
+                <div class="full-dots-group">
+                    <div class="bl-label-block">CLASS TEACHER'S REMARKS:</div>
+                    <div class="full-dots">${user.teacher_remark ? escapeHtml(user.teacher_remark) : ''}</div>
+                    <div class="full-dots"></div>
+                </div>
+
+              </div>
+            </div>`;
         }
 
+        /* ─────────────── LOOKUP FORM ─────────────── */
         function renderAdminLookup(container) {
             container.innerHTML = `
-                <div class="max-w-md mx-auto mt-20 bg-white p-8 rounded-xl shadow-lg border border-gray-100 text-center">
-                    <div class="w-16 h-16 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl">
-                        🔍
+                <div class="lookup-wrap">
+                    <h2>Student Lookup</h2>
+                    <p>Enter a Student ID to view their Terminal Report Sheet.</p>
+                    <input type="text" id="lookup-id" placeholder="e.g. ST_001" autocomplete="off">
+                    <button onclick="lookupStudent()">View Report &rarr;</button>
+                    <div class="lookup-links">
+                        <a href="admin-dashboard.html">Admin Dashboard</a> &bull;
+                        <a href="teacher-portal.html">Teacher Portal</a>
                     </div>
-                    <h2 class="text-2xl font-bold text-gray-800 mb-2">Student Lookup</h2>
-                    <p class="text-gray-500 mb-6 text-sm">Enter a Student ID to view their report card.</p>
-                    <div class="flex gap-2">
-                        <input type="text" id="lookup-id" placeholder="e.g. ST_001" class="flex-1 px-4 py-3 border border-gray-300 rounded-lg outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition text-center uppercase font-mono">
-                    </div>
-                    <button onclick="lookupStudent()" class="w-full mt-4 bg-primary text-white py-3 rounded-lg font-bold hover:bg-blue-800 transition shadow-lg shadow-blue-500/20">View Report</button>
-                    
-                    <div class="mt-6 pt-6 border-t border-gray-100 flex justify-center gap-4 text-sm text-gray-400">
-                        <a href="admin-dashboard.html" class="hover:text-primary">Admin Dashboard</a>
-                        <span>•</span>
-                        <a href="teacher-portal.html" class="hover:text-primary">Teacher Portal</a>
-                    </div>
-                </div>
-            `;
-            // Focus input
+                </div>`;
+
             setTimeout(() => {
-                const input = document.getElementById('lookup-id');
-                if(input) input.focus();
+                const inp = document.getElementById('lookup-id');
+                if (inp) {
+                    inp.focus();
+                    inp.addEventListener('keypress', e => { if (e.key === 'Enter') lookupStudent(); });
+                }
             }, 100);
-            
-            // Allow Enter key
-            const input = document.getElementById('lookup-id');
-            if(input) {
-                input.addEventListener('keypress', function(e) {
-                    if(e.key === 'Enter') lookupStudent();
-                });
-            }
         }
-        
+
         function lookupStudent() {
             const id = document.getElementById('lookup-id').value.trim();
-            if(id) {
-                window.location.search = '?student_id=' + encodeURIComponent(id);
-            }
+            if (id) window.location.search = '?student_id=' + encodeURIComponent(id);
         }
 
         init();
