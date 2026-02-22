@@ -546,6 +546,7 @@ async function fetchTeacherData(action, params = {}) {
              if (!isGeneralAccess && specificSubjectIds.length > 0) {
                  // STRICT MODE: Only assigned subjects
                  allowedSubjects = db.subjects.filter(s => 
+                     s.school_id === schoolId &&
                      s.active !== false &&
                      specificSubjectIds.includes(s.id)
                  );
@@ -553,12 +554,12 @@ async function fetchTeacherData(action, params = {}) {
                  // GENERAL MODE: Show Class Curriculum
                  // 1. Try Configured Subjects
                  if (c.subjects && c.subjects.length > 0) {
-                     allowedSubjects = db.subjects.filter(s => c.subjects.includes(s.id) && s.active !== false);
+                     allowedSubjects = db.subjects.filter(s => s.school_id === schoolId && c.subjects.includes(s.id) && s.active !== false);
                  }
                  
                      // 2. Fallback: All Subjects of Level OR Uncategorized (if config missing)
                  if (allowedSubjects.length === 0) {
-                     allowedSubjects = db.subjects.filter(s => (s.level === c.level || !s.level) && s.active !== false);
+                     allowedSubjects = db.subjects.filter(s => s.school_id === schoolId && (s.level === c.level || !s.level) && s.active !== false);
                  }
              }
              
@@ -583,13 +584,13 @@ async function fetchTeacherData(action, params = {}) {
              const specificSubjectIds = (assignment && assignment.subject_ids) ? assignment.subject_ids : [];
              
              if (!isGeneralAccess && specificSubjectIds.length > 0) {
-                 allowedSubjects = db.subjects.filter(s => s.active !== false && specificSubjectIds.includes(s.id));
+                 allowedSubjects = db.subjects.filter(s => s.school_id === schoolId && s.active !== false && specificSubjectIds.includes(s.id));
              } else {
                  if (c.subjects && c.subjects.length > 0) {
-                     allowedSubjects = db.subjects.filter(s => c.subjects.includes(s.id) && s.active !== false);
+                     allowedSubjects = db.subjects.filter(s => s.school_id === schoolId && c.subjects.includes(s.id) && s.active !== false);
                  }
                  if (allowedSubjects.length === 0) {
-                     allowedSubjects = db.subjects.filter(s => (s.level === c.level || !s.level) && s.active !== false);
+                     allowedSubjects = db.subjects.filter(s => s.school_id === schoolId && (s.level === c.level || !s.level) && s.active !== false);
                  }
              }
              return { ...c, subjects: allowedSubjects };
