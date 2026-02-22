@@ -706,7 +706,14 @@ async function fetchStudentReport(studentId) {
                 position: student.position || 'N/A', // Assuming position is calc somewhere or static
                 total_students: db.students.filter(s => s.class === student.class && s.school_id === student.school_id).length
             },
-            settings: school.settings
+            settings: {
+                ...school.settings,
+                schoolName: school.name,
+                schoolLogo: school.logo,
+                schoolAddress: school.address,
+                contactPhone: school.contact_phone,
+                contactEmail: school.contact_email
+            }
         };
     }
     return null;
