@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Explore the academic curriculum and grading system at General School. We provide comprehensive education from Kindergarten to Junior High School.">
+    <title>Academics | General School</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Playfair+Display:ital@0;1&display=swap" rel="stylesheet">
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: { primary: '#0f172a', accent: '#3b82f6', secondary: '#f59e0b' },
+                    fontFamily: { sans: ['Outfit', 'sans-serif'], serif: ['Playfair Display', 'serif'] }
+                }
+            }
+        }
+    </script>
+    <style>
+        .hero-bg {
+            background-color: #0f172a;
+            background-image: 
+                radial-gradient(at 0% 0%, hsla(253,16%,7%,1) 0, transparent 50%), 
+                radial-gradient(at 50% 100%, hsla(225,39%,30%,1) 0, transparent 50%), 
+                radial-gradient(at 100% 0%, hsla(339,49%,30%,1) 0, transparent 50%);
+        }
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s ease-out;
+        }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans selection:bg-accent selection:text-white">
+
+    <!-- Navigation -->
+    <nav class="fixed w-full z-50 transition-all duration-300" id="navbar">
+        <div class="container mx-auto px-6 py-4">
+            <div class="bg-white/80 backdrop-blur-md rounded-2xl shadow-lg border border-white/20 p-4 flex justify-between items-center">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-gradient-to-br from-accent to-blue-700 text-white flex items-center justify-center rounded-xl font-bold text-xl shadow-lg">G</div>
+                    <a href="index.html" class="text-xl font-bold text-gray-900 tracking-tight">General School</a>
+                </div>
+                <div class="hidden md:flex gap-8">
+                    <a href="index.html" class="text-gray-600 hover:text-accent font-medium transition">Home</a>
+                    <a href="academics.html" class="text-accent font-medium transition">Academics</a>
+                    <a href="#" class="text-gray-600 hover:text-accent font-medium transition">Admissions</a>
+                    <a href="#" class="text-gray-600 hover:text-accent font-medium transition">Contact</a>
+                </div>
+                <div class="hidden md:flex items-center gap-4">
+                    <a href="register.html" class="text-gray-500 hover:text-gray-900 font-medium transition">Register School</a>
+                    <a href="login.html" class="bg-gray-900 text-white px-6 py-2.5 rounded-xl font-medium hover:bg-black transition shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
+                         Login Portal
+                    </a>
+                </div>
+                <!-- Mobile Menu Button -->
+                <button id="mobile-menu-btn" class="md:hidden text-gray-900 text-3xl focus:outline-none">
+                    <ion-icon name="menu-outline"></ion-icon>
+                </button>
+            </div>
+            <!-- Mobile Menu -->
+            <div id="mobile-menu" class="hidden md:hidden absolute top-full left-0 w-full bg-white/95 backdrop-blur-xl border-t border-gray-100 shadow-xl flex-col p-6 gap-4 transition-all duration-300">
+                <a href="index.html" class="text-gray-800 font-medium hover:text-accent">Home</a>
+                <a href="academics.html" class="text-accent font-medium">Academics</a>
+                <a href="#" class="text-gray-800 font-medium hover:text-accent">Admissions</a>
+                <a href="#" class="text-gray-800 font-medium hover:text-accent">Contact</a>
+                <a href="login.html" class="bg-accent text-white px-6 py-3 rounded-xl font-medium text-center shadow-lg">Login Portal</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Page Header -->
+    <header class="hero-bg pt-32 pb-20 relative overflow-hidden">
+        <div class="container mx-auto px-6 relative z-10 text-center">
+            <h1 class="text-4xl md:text-6xl font-bold text-white mb-4">Academic Programs</h1>
+            <p class="text-blue-100/80 text-lg max-w-2xl mx-auto">
+                Fostering intellectual growth, critical thinking, and a lifelong love for learning through a comprehensive and dynamic curriculum.
+            </p>
+        </div>
+    </header>
+
+    <!-- Curriculum Structure -->
+    <section class="py-20 bg-white">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-16 reveal">
+                <span class="text-accent font-bold tracking-wider uppercase text-sm">Our Curriculum</span>
+                <h2 class="text-3xl font-bold text-gray-900 mt-2">Structured for Success</h2>
+                <div class="w-16 h-1 bg-accent mx-auto mt-4 rounded-full"></div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
+                <!-- Kindergarten -->
+                <div class="bg-gray-50 rounded-3xl p-8 border border-gray-100 hover:shadow-xl transition-all reveal">
+                    <div class="w-14 h-14 bg-pink-100 text-pink-500 rounded-2xl flex items-center justify-center text-3xl mb-6">
+                        <ion-icon name="shapes-outline"></ion-icon>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-900 mb-4">Kindergarten (KG)</h3>
+                    <p class="text-gray-600 mb-6 leading-relaxed">Early childhood education focused on foundational literacy, numeracy, and creative arts through play-based learning.</p>
+                    <ul class="space-y-3 text-gray-700 font-medium">
+                        <li class="flex items-center gap-2"><ion-icon name="checkmark-circle" class="text-accent"></ion-icon> Language & Literacy</li>
+                        <li class="flex items-center gap-2"><ion-icon name="checkmark-circle" class="text-accent"></ion-icon> Numeracy</li>
+                        <li class="flex items-center gap-2"><ion-icon name="checkmark-circle" class="text-accent"></ion-icon> Environmental Studies</li>
+                        <li class="flex items-center gap-2"><ion-icon name="checkmark-circle" class="text-accent"></ion-icon> Creative Arts</li>
+                    </ul>
+                </div>
+
+                <!-- Primary -->
+                <div class="bg-gray-50 rounded-3xl p-8 border border-gray-100 hover:shadow-xl transition-all reveal" style="transition-delay: 100ms;">
+                    <div class="w-14 h-14 bg-blue-100 text-blue-500 rounded-2xl flex items-center justify-center text-3xl mb-6">
+                        <ion-icon name="book-outline"></ion-icon>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-900 mb-4">Primary School</h3>
+                    <p class="text-gray-600 mb-6 leading-relaxed">A robust six-year program building strong academic pillars in core subjects while encouraging critical thinking.</p>
+                    <ul class="space-y-3 text-gray-700 font-medium">
+                        <li class="flex items-center gap-2"><ion-icon name="checkmark-circle" class="text-accent"></ion-icon> English Language</li>
+                        <li class="flex items-center gap-2"><ion-icon name="checkmark-circle" class="text-accent"></ion-icon> Mathematics</li>
+                        <li class="flex items-center gap-2"><ion-icon name="checkmark-circle" class="text-accent"></ion-icon> Science & Tech</li>
+                        <li class="flex items-center gap-2"><ion-icon name="checkmark-circle" class="text-accent"></ion-icon> Ghanaian Language</li>
+                    </ul>
+                </div>
+
+                <!-- JHS -->
+                <div class="bg-gray-50 rounded-3xl p-8 border border-gray-100 hover:shadow-xl transition-all reveal" style="transition-delay: 200ms;">
+                    <div class="w-14 h-14 bg-purple-100 text-purple-500 rounded-2xl flex items-center justify-center text-3xl mb-6">
+                        <ion-icon name="school-outline"></ion-icon>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-900 mb-4">Junior High (JHS)</h3>
+                    <p class="text-gray-600 mb-6 leading-relaxed">Three years of intense preparation for secondary education, focusing on advanced concepts and career orientation.</p>
+                    <ul class="space-y-3 text-gray-700 font-medium">
+                        <li class="flex items-center gap-2"><ion-icon name="checkmark-circle" class="text-accent"></ion-icon> Core Mathematics</li>
+                        <li class="flex items-center gap-2"><ion-icon name="checkmark-circle" class="text-accent"></ion-icon> Integrated Science</li>
+                        <li class="flex items-center gap-2"><ion-icon name="checkmark-circle" class="text-accent"></ion-icon> Computing</li>
+                        <li class="flex items-center gap-2"><ion-icon name="checkmark-circle" class="text-accent"></ion-icon> Career Technology</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Grading System -->
+    <section class="py-20 bg-gray-900 text-white relative overflow-hidden">
+        <div class="container mx-auto px-6 relative z-10">
+            <div class="flex flex-col md:flex-row items-center gap-16">
+                <div class="w-full md:w-1/2 reveal">
+                    <h2 class="text-3xl font-bold mb-6">Fair & Transparent Grading</h2>
+                    <p class="text-gray-400 mb-6 text-lg">
+                        Our student evaluation is based on a modern, standard grading scale to ensure students clearly understand their academic standing.
+                    </p>
+                    <p class="text-gray-400 mb-8">
+                        The End of Term Terminal Report Sheets are calculated automatically based on 50% Class Scores (Continuous Assessment) and 50% Exam Scores.
+                    </p>
+                    <a href="login.html" class="inline-flex items-center gap-2 bg-accent hover:bg-blue-600 text-white px-8 py-3 rounded-xl font-bold transition-all">
+                        View Portal <ion-icon name="arrow-forward-outline"></ion-icon>
+                    </a>
+                </div>
+                
+                <div class="w-full md:w-1/2 reveal">
+                    <div class="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/10">
+                        <table class="w-full text-left">
+                            <thead>
+                                <tr class="text-gray-300 border-b border-white/20">
+                                    <th class="py-3 px-4 font-semibold">Score Range</th>
+                                    <th class="py-3 px-4 font-semibold">Grade</th>
+                                    <th class="py-3 px-4 font-semibold">Remarks</th>
+                                </tr>
+                            </thead>
+                            <tbody class="text-white">
+                                <tr class="border-b border-white/10 hover:bg-white/5 transition">
+                                    <td class="py-3 px-4">80 - 100</td>
+                                    <td class="py-3 px-4 font-bold text-green-400">A</td>
+                                    <td class="py-3 px-4">Excellent</td>
+                                </tr>
+                                <tr class="border-b border-white/10 hover:bg-white/5 transition">
+                                    <td class="py-3 px-4">70 - 79</td>
+                                    <td class="py-3 px-4 font-bold text-blue-400">B</td>
+                                    <td class="py-3 px-4">Very Good</td>
+                                </tr>
+                                <tr class="border-b border-white/10 hover:bg-white/5 transition">
+                                    <td class="py-3 px-4">60 - 69</td>
+                                    <td class="py-3 px-4 font-bold text-yellow-400">C</td>
+                                    <td class="py-3 px-4">Good</td>
+                                </tr>
+                                <tr class="border-b border-white/10 hover:bg-white/5 transition">
+                                    <td class="py-3 px-4">50 - 59</td>
+                                    <td class="py-3 px-4 font-bold text-orange-400">D</td>
+                                    <td class="py-3 px-4">Credit</td>
+                                </tr>
+                                <tr class="border-b border-white/10 hover:bg-white/5 transition">
+                                    <td class="py-3 px-4">45 - 49</td>
+                                    <td class="py-3 px-4 font-bold text-gray-400">E</td>
+                                    <td class="py-3 px-4">Pass</td>
+                                </tr>
+                                <tr class="hover:bg-white/5 transition">
+                                    <td class="py-3 px-4">0 - 44</td>
+                                    <td class="py-3 px-4 font-bold text-red-500">F</td>
+                                    <td class="py-3 px-4">Fail</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Decoration -->
+        <div class="absolute top-1/2 right-0 w-96 h-96 bg-accent/10 rounded-full blur-3xl transform -translate-y-1/2"></div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white pt-20 pb-10 border-t border-gray-800">
+        <div class="container mx-auto px-6">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-8 mb-16">
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 bg-accent rounded-xl flex items-center justify-center text-2xl font-bold">G</div>
+                    <span class="text-2xl font-bold">General School</span>
+                </div>
+                <div class="flex gap-6">
+                    <a href="#" class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center hover:bg-accent transition"><ion-icon name="logo-facebook"></ion-icon></a>
+                    <a href="#" class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center hover:bg-accent transition"><ion-icon name="logo-twitter"></ion-icon></a>
+                    <a href="#" class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center hover:bg-accent transition"><ion-icon name="logo-instagram"></ion-icon></a>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center text-gray-500 text-sm">
+                <p>&copy; 2026 General School System. All rights reserved. <span class="hidden md:inline mx-2">|</span> <span class="opacity-75 flex items-center gap-2">Built by <a href="#" class="flex items-center gap-2 hover:opacity-80 transition-opacity"><img src="assets/img/corelTech.jpeg" alt="CorelTech" class="h-6 w-auto"> <span class="font-medium hover:text-accent transition-colors">CorelTech</span></a></span></p>
+                <div class="flex gap-6 mt-4 md:mt-0">
+                    <a href="#" class="hover:text-white transition">Privacy Policy</a>
+                    <a href="#" class="hover:text-white transition">Terms of Service</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Navbar Glass effect on scroll
+        window.addEventListener('scroll', () => {
+            const nav = document.getElementById('navbar');
+            if (window.scrollY > 50) {
+                nav.classList.add('py-2');
+                nav.classList.remove('py-4');
+            } else {
+                nav.classList.add('py-4');
+                nav.classList.remove('py-2');
+            }
+        });
+
+        // Mobile Menu Toggle
+        const mobileBtn = document.getElementById('mobile-menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+        
+        mobileBtn.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+            mobileMenu.classList.toggle('flex');
+            const icon = mobileBtn.querySelector('ion-icon');
+            if (mobileMenu.classList.contains('flex')) {
+                icon.setAttribute('name', 'close-outline');
+            } else {
+                icon.setAttribute('name', 'menu-outline');
+            }
+        });
+
+        // Scroll Reveal Animation
+        function reveal() {
+            var reveals = document.querySelectorAll(".reveal");
+            for (var i = 0; i < reveals.length; i++) {
+                var windowHeight = window.innerHeight;
+                var elementTop = reveals[i].getBoundingClientRect().top;
+                var elementVisible = 100;
+                if (elementTop < windowHeight - elementVisible) {
+                    reveals[i].classList.add("active");
+                }
+            }
+        }
+        window.addEventListener("scroll", reveal);
+        // Trigger once on load
+        reveal();
+    </script>
+    <a href="https://wa.me/233595027787" target="_blank" rel="noopener noreferrer" class="fixed bottom-6 right-6 z-50 bg-green-500 hover:bg-green-600 text-white w-14 h-14 rounded-full shadow-lg flex items-center justify-center transition-all duration-300 transform hover:scale-110 group animate-bounce cursor-pointer">
+        <ion-icon name="logo-whatsapp" class="text-3xl"></ion-icon>
+        <div class="absolute right-16 bg-white text-gray-800 px-3 py-1 rounded-lg shadow-md text-sm font-bold opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+            Chat with us
+        </div>
+    </a>
+</body>
+</html>
