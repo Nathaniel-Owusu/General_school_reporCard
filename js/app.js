@@ -595,7 +595,13 @@ async function fetchTeacherData(action, params = {}) {
              return { ...c, subjects: allowedSubjects };
         });
 
-        const subjectsCount = enrichedClasses.reduce((acc, c) => acc + (c.subjects ? c.subjects.length : 0), 0);
+        const uniqueSubjects = new Set();
+        enrichedClasses.forEach(c => {
+            if (c.subjects) {
+                c.subjects.forEach(s => uniqueSubjects.add(s.id));
+            }
+        });
+        const subjectsCount = uniqueSubjects.size;
         
         // Count unique students
         const classNames = enrichedClasses.map(c => c.name);
