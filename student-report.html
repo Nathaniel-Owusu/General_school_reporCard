@@ -283,9 +283,32 @@
         @page { size: A4; margin: 10mm; }
         @media print {
             body { background: white; padding: 0; }
-            .report-sheet { border: 1px solid #111; padding: 4px; box-shadow: none; min-height: auto; }
+            .report-sheet { border: 1px solid #111; padding: 4px; box-shadow: none; min-height: auto; width: 100%; max-width: none; }
             .report-sheet-inner { min-height: auto; border: 3px solid #111; }
             .top-bar, .print-btn-wrap { display: none !important; }
+        }
+
+        /* ─── Mobile Styles ─── */
+        @media screen and (max-width: 768px) {
+            body { padding: 12px 8px; }
+            .report-sheet { padding: 2px; }
+            .report-sheet-inner { padding: 12px 10px; border-width: 2px; }
+            .report-header { flex-direction: column; text-align: center; gap: 10px; }
+            .header-logo, .header-logo-placeholder, .passport-box { width: 70px; height: 70px; margin: 0 auto; }
+            .header-center { padding: 0; }
+            .header-center .school-name { font-size: 14px; line-height: 1.2; }
+            .header-center .school-authority { font-size: 12px; }
+            .header-center .school-address { font-size: 11px; }
+            .title-bar { font-size: 13px; padding: 4px 0; margin: 8px 0; }
+            .info-row { flex-direction: column; align-items: flex-start; gap: 4px; margin-bottom: 8px; }
+            .info-label { margin-right: 0; margin-bottom: 2px; font-size: 11px; }
+            .dotted-line { width: 100%; margin-right: 0; min-width: 100%; }
+            .subjects-table { font-size: 11px; }
+            .subjects-table th, .subjects-table td { padding: 4px 2px; }
+            .subjects-table th { font-size: 10px; }
+            .bottom-line-row { flex-direction: column; align-items: flex-start; gap: 4px; margin-bottom: 8px; }
+            .bl-label { margin-right: 0; font-size: 11px; }
+            .bl-dots { width: 100%; margin-right: 0; min-width: 100%; }
         }
 
         /* ─── Lookup Form ─── */
