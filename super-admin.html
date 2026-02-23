@@ -109,6 +109,40 @@
             </div>
         </div>
 
+        <!-- Inbox Management -->
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 fade-in mt-2 mb-8">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+                <div>
+                    <h2 class="text-xl font-bold text-gray-900">Platform Messages (Inbox)</h2>
+                    <p class="text-sm text-gray-500">View and manage inquiries sent through the public contact form.</p>
+                </div>
+                <button onclick="renderMessages()" class="bg-gray-100 text-gray-700 px-4 py-2 rounded-xl font-bold hover:bg-gray-200 transition-all flex items-center gap-2">
+                    <ion-icon name="refresh"></ion-icon>
+                    Refresh Inbox
+                </button>
+            </div>
+
+            <!-- Messages List -->
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead>
+                        <tr class="border-b border-gray-200">
+                            <th class="text-left py-3 px-4 text-xs font-bold text-gray-500 uppercase">Status</th>
+                            <th class="text-left py-3 px-4 text-xs font-bold text-gray-500 uppercase">Sender</th>
+                            <th class="text-left py-3 px-4 text-xs font-bold text-gray-500 uppercase">Inquiry Type</th>
+                            <th class="text-left py-3 px-4 text-xs font-bold text-gray-500 uppercase">Message Preview</th>
+                            <th class="text-left py-3 px-4 text-xs font-bold text-gray-500 uppercase">Date Received</th>
+                            <th class="text-right py-3 px-4 text-xs font-bold text-gray-500 uppercase">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="messages-table">
+                        <!-- Populated by JS -->
+                        <tr><td colspan="6" class="text-center py-6 text-gray-500">Loading messages...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
         <!-- Schools Management -->
         <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 fade-in">
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
@@ -185,40 +219,6 @@
                     </thead>
                     <tbody id="admins-table">
                         <!-- Populated by JS -->
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- Inbox Management -->
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 fade-in mt-8">
-            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
-                <div>
-                    <h2 class="text-xl font-bold text-gray-900">Platform Messages (Inbox)</h2>
-                    <p class="text-sm text-gray-500">View and manage inquiries sent through the public contact form.</p>
-                </div>
-                <button onclick="renderMessages()" class="bg-gray-100 text-gray-700 px-4 py-2 rounded-xl font-bold hover:bg-gray-200 transition-all flex items-center gap-2">
-                    <ion-icon name="refresh"></ion-icon>
-                    Refresh Inbox
-                </button>
-            </div>
-
-            <!-- Messages List -->
-            <div class="overflow-x-auto">
-                <table class="w-full">
-                    <thead>
-                        <tr class="border-b border-gray-200">
-                            <th class="text-left py-3 px-4 text-xs font-bold text-gray-500 uppercase">Status</th>
-                            <th class="text-left py-3 px-4 text-xs font-bold text-gray-500 uppercase">Sender</th>
-                            <th class="text-left py-3 px-4 text-xs font-bold text-gray-500 uppercase">Inquiry Type</th>
-                            <th class="text-left py-3 px-4 text-xs font-bold text-gray-500 uppercase">Message Preview</th>
-                            <th class="text-left py-3 px-4 text-xs font-bold text-gray-500 uppercase">Date Received</th>
-                            <th class="text-right py-3 px-4 text-xs font-bold text-gray-500 uppercase">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="messages-table">
-                        <!-- Populated by JS -->
-                        <tr><td colspan="6" class="text-center py-6 text-gray-500">Loading messages...</td></tr>
                     </tbody>
                 </table>
             </div>
