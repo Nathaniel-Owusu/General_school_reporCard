@@ -262,7 +262,7 @@
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
                     
                     <!-- Subject Master List -->
-                    <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-8 flex flex-col h-[750px]">
+                    <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-6 md:p-8 flex flex-col h-[650px] lg:h-[800px]">
                         <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4 shrink-0">
                              <div>
                                 <h3 class="font-extrabold text-2xl text-gray-900">Curriculum</h3>
@@ -272,7 +272,7 @@
                                 <ion-icon name="add-circle"></ion-icon> New Subject
                             </button>
                         </div>
-                        <div class="overflow-y-auto flex-1 rounded-2xl border border-gray-100 bg-gray-50/30">
+                        <div class="overflow-y-auto flex-1 rounded-2xl border border-gray-100 bg-gray-50/30 min-h-0">
                             <table class="w-full text-left text-sm whitespace-nowrap">
                                 <thead class="bg-gray-50/80 text-gray-500 font-bold uppercase text-xs tracking-wider sticky top-0 backdrop-blur-md z-10">
                                     <tr>
@@ -287,7 +287,7 @@
                     </div>
 
                     <!-- Class Assignment -->
-                    <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-8 flex flex-col h-[750px] relative overflow-hidden">
+                    <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-6 md:p-8 flex flex-col h-[650px] lg:h-[800px] relative overflow-hidden">
                         <!-- BG Decoration -->
                         <div class="absolute -right-20 -top-20 w-64 h-64 bg-accent/5 rounded-full blur-3xl pointer-events-none"></div>
 
@@ -296,7 +296,7 @@
                             <p class="text-gray-500 text-sm font-medium">Map subjects to specific classes.</p>
                         </div>
                         
-                        <div class="space-y-6 flex-1 flex flex-col relative z-10">
+                        <div class="space-y-6 flex-1 flex flex-col relative z-10 min-h-0">
                             <div class="space-y-2 shrink-0">
                                 <label class="text-xs font-bold text-gray-400 uppercase tracking-widest pl-1">Select A Class</label>
                                 <div class="relative">
@@ -312,7 +312,7 @@
                             </div>
 
                             <!-- Builder Area (Hidden by default) -->
-                            <div id="subject-builder-area" class="flex-1 flex flex-col gap-6 hidden">
+                            <div id="subject-builder-area" class="flex-1 flex flex-col gap-6 hidden min-h-0">
                                 <!-- Add new subject -->
                                 <div class="space-y-2 shrink-0 bg-indigo-50/50 p-4 rounded-2xl border border-indigo-100/50 shadow-inner">
                                     <label class="text-xs font-bold text-indigo-500 uppercase tracking-widest pl-1 flex items-center gap-1"><ion-icon name="add-circle" class="text-lg"></ion-icon> Add Subject To Class</label>
@@ -323,7 +323,7 @@
                                 </div>
 
                                 <!-- Current Subjects List -->
-                                <div class="flex-1 overflow-hidden flex flex-col">
+                                <div class="flex-1 overflow-hidden flex flex-col min-h-0">
                                     <label class="text-xs font-bold text-gray-400 uppercase tracking-widest pl-1 mb-3">Currently Assigned (<span id="builder-count">0</span>)</label>
                                     <div id="builder-assigned-list" class="flex-1 overflow-y-auto space-y-3 pr-2 custom-scrollbar">
                                         <!-- Pills / List Items injected here -->
