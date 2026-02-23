@@ -271,20 +271,20 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
                                 <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Student First Name *</label>
-                                <input type="text" required class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all font-medium text-gray-800">
+                                <input type="text" id="app-firstname" required class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all font-medium text-gray-800">
                             </div>
                             <div>
                                 <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Student Last Name *</label>
-                                <input type="text" required class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all font-medium text-gray-800">
+                                <input type="text" id="app-lastname" required class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all font-medium text-gray-800">
                             </div>
                             <div>
                                 <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Date of Birth *</label>
-                                <input type="date" required class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all font-medium text-gray-700">
+                                <input type="date" id="app-dob" required class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all font-medium text-gray-700">
                             </div>
                             <div>
                                 <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Gender *</label>
                                 <div class="relative">
-                                    <select required class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all font-medium text-gray-700 appearance-none">
+                                    <select id="app-gender" required class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all font-medium text-gray-700 appearance-none">
                                         <option value="">Select Gender</option>
                                         <option value="Male">Male</option>
                                         <option value="Female">Female</option>
@@ -294,15 +294,15 @@
                             </div>
                             <div class="md:col-span-2">
                                 <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Parent / Guardian Name *</label>
-                                <input type="text" required class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all font-medium text-gray-800">
+                                <input type="text" id="app-parent" required class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all font-medium text-gray-800">
                             </div>
                             <div>
                                 <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Contact Phone *</label>
-                                <input type="tel" required class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all font-medium text-gray-800">
+                                <input type="tel" id="app-phone" required class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all font-medium text-gray-800">
                             </div>
                             <div>
                                 <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Email Address</label>
-                                <input type="email" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all font-medium text-gray-800">
+                                <input type="email" id="app-email" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all font-medium text-gray-800">
                             </div>
                         </div>
                         
@@ -491,19 +491,47 @@
                 step1.classList.remove('hidden');
             });
 
-            // Form Submit Simulation
-            admissionForm.addEventListener('submit', (e) => {
+            // Form Submit Network Request
+            admissionForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const btn = document.getElementById('submit-btn');
                 btn.innerHTML = 'Submitting... <ion-icon class="animate-spin" name="sync-outline"></ion-icon>';
                 btn.disabled = true;
 
-                // Simulate network request
-                setTimeout(() => {
-                    step2.classList.add('hidden');
-                    formSuccess.classList.remove('hidden');
-                    formSuccess.classList.add('animate-fade-in');
-                }, 1500);
+                const payload = {
+                    school_id: schoolSelect.value,
+                    first_name: document.getElementById('app-firstname').value,
+                    last_name: document.getElementById('app-lastname').value,
+                    dob: document.getElementById('app-dob').value,
+                    gender: document.getElementById('app-gender').value,
+                    parent_name: document.getElementById('app-parent').value,
+                    contact_phone: document.getElementById('app-phone').value,
+                    email: document.getElementById('app-email').value
+                };
+
+                try {
+                    const response = await fetch('api/submit_admission.php', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if(result.success) {
+                        step2.classList.add('hidden');
+                        formSuccess.classList.remove('hidden');
+                        formSuccess.classList.add('animate-fade-in');
+                    } else {
+                        alert("Submission Failed: " + result.message);
+                        btn.innerHTML = 'Submit Application <ion-icon name="paper-plane-outline"></ion-icon>';
+                        btn.disabled = false;
+                    }
+                } catch(error) {
+                    alert("Network error: Could not submit the application.");
+                    btn.innerHTML = 'Submit Application <ion-icon name="paper-plane-outline"></ion-icon>';
+                    btn.disabled = false;
+                }
             });
         });
     </script>
