@@ -301,29 +301,37 @@
                                 <label class="text-xs font-bold text-gray-400 uppercase tracking-widest pl-1">Select A Class</label>
                                 <div class="relative">
                                     <ion-icon name="easel-outline" class="absolute left-4 top-3.5 text-gray-400 text-lg"></ion-icon>
-                                    <select id="assign-class-select" onchange="loadClassSubjects()" class="w-full pl-12 pr-4 py-3 bg-gray-50/50 border border-gray-200 rounded-xl outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all font-bold text-gray-700 cursor-pointer appearance-none"></select>
+                                <select id="assign-class-select" onchange="loadClassSubjectsBuilder()" class="w-full pl-12 pr-4 py-3 bg-gray-50/50 border border-gray-200 rounded-xl outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all font-bold text-gray-700 cursor-pointer appearance-none"></select>
                                 </div>
                             </div>
 
-                            <div class="bg-indigo-50/30 rounded-2xl border border-indigo-100/50 p-5 flex-1 overflow-hidden flex flex-col shadow-inner">
-                                <div class="flex justify-between items-center mb-4 shrink-0">
-                                    <label class="text-xs font-bold text-indigo-400 uppercase tracking-widest flex items-center gap-1.5"><ion-icon name="book"></ion-icon> Subject Checklist</label>
-                                    <div class="space-x-3 bg-white px-3 py-1.5 rounded-lg shadow-sm border border-gray-100">
-                                         <button type="button" onclick="toggleAllSubjects(true)" class="text-xs font-bold text-indigo-600 hover:text-indigo-800 transition-colors uppercase">All</button>
-                                         <span class="text-gray-300">|</span>
-                                         <button type="button" onclick="toggleAllSubjects(false)" class="text-xs font-bold text-red-400 hover:text-red-600 transition-colors uppercase">Clear</button>
+                            <!-- Empty State -->
+                            <div id="builder-empty-state" class="flex-1 flex flex-col items-center justify-center opacity-50 bg-gray-50/50 rounded-2xl border border-gray-100">
+                                <ion-icon name="options-outline" class="text-5xl text-gray-300 mb-3"></ion-icon>
+                                <p class="text-gray-400 text-sm font-medium text-center">Select a class to begin configuring.</p>
+                            </div>
+
+                            <!-- Builder Area (Hidden by default) -->
+                            <div id="subject-builder-area" class="flex-1 flex flex-col gap-6 hidden">
+                                <!-- Add new subject -->
+                                <div class="space-y-2 shrink-0 bg-indigo-50/50 p-4 rounded-2xl border border-indigo-100/50 shadow-inner">
+                                    <label class="text-xs font-bold text-indigo-500 uppercase tracking-widest pl-1 flex items-center gap-1"><ion-icon name="add-circle" class="text-lg"></ion-icon> Add Subject To Class</label>
+                                    <div class="flex gap-3">
+                                        <select id="builder-add-subject" class="flex-1 px-4 py-3 bg-white border border-indigo-200 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 font-medium text-gray-700 cursor-pointer appearance-none shadow-sm"></select>
+                                        <button onclick="addSubjectToBuilder()" class="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-md shadow-indigo-500/30 transition-all flex items-center justify-center gap-2 hover:-translate-y-0.5 whitespace-nowrap"><ion-icon name="add"></ion-icon> Add</button>
                                     </div>
                                 </div>
-                                <div id="assignment-checkboxes" class="space-y-2 overflow-y-auto flex-1 pr-2 custom-scrollbar">
-                                    <!-- Checkboxes -->
-                                    <div class="h-full flex flex-col items-center justify-center opacity-50">
-                                        <ion-icon name="options-outline" class="text-5xl text-gray-300 mb-3"></ion-icon>
-                                        <p class="text-gray-400 text-sm font-medium text-center">Select a class to configure subjects.</p>
+
+                                <!-- Current Subjects List -->
+                                <div class="flex-1 overflow-hidden flex flex-col">
+                                    <label class="text-xs font-bold text-gray-400 uppercase tracking-widest pl-1 mb-3">Currently Assigned (<span id="builder-count">0</span>)</label>
+                                    <div id="builder-assigned-list" class="flex-1 overflow-y-auto space-y-3 pr-2 custom-scrollbar">
+                                        <!-- Pills / List Items injected here -->
                                     </div>
                                 </div>
                             </div>
                             
-                            <button onclick="saveClassSubjects()" class="w-full py-3.5 bg-gradient-to-r from-secondary to-amber-500 text-white rounded-xl font-bold border-none shadow-lg shadow-amber-500/30 hover:shadow-xl hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2 shrink-0">
+                            <button id="builder-save-btn" onclick="saveClassSubjectsBuilder()" class="w-full py-3.5 bg-gradient-to-r from-secondary to-amber-500 text-white rounded-xl font-bold border-none shadow-lg shadow-amber-500/30 hover:shadow-xl hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2 shrink-0 opacity-50 pointer-events-none">
                                 <ion-icon name="save" class="text-lg"></ion-icon> Save Subject Mapping
                             </button>
                         </div>
@@ -1917,77 +1925,131 @@
              }
          }
 
-        // --- SUBJECT ASSIGNMENT PANEL HANDLERS ---
-        async function loadClassSubjects() {
+        // --- SUBJECT ASSIGNMENT BUILDER HANDLERS ---
+        let currentBuilderClassId = null;
+        let currentBuilderAssignedSubjects = []; // array of subject IDs
+
+        async function loadClassSubjectsBuilder() {
             const classId = document.getElementById('assign-class-select').value;
-            const container = document.getElementById('assignment-checkboxes');
+            const builderArea = document.getElementById('subject-builder-area');
+            const emptyState = document.getElementById('builder-empty-state');
+            const saveBtn = document.getElementById('builder-save-btn');
             
             if(!classId) {
-                container.innerHTML = `
-                    <div class="h-full flex flex-col items-center justify-center opacity-50">
-                        <ion-icon name="options-outline" class="text-5xl text-gray-300 mb-3"></ion-icon>
-                        <p class="text-gray-400 text-sm font-medium text-center">Select a class to configure subjects.</p>
-                    </div>`;
+                builderArea.classList.add('hidden');
+                emptyState.classList.remove('hidden');
+                saveBtn.classList.add('opacity-50', 'pointer-events-none');
+                currentBuilderClassId = null;
                 return;
             }
 
+            currentBuilderClassId = classId;
             const classes = await fetchAdminData('classes');
             const cls = classes.find(c => c.id === classId);
-            const subjects = await fetchAdminData('subjects') || [];
             
-            // Filter by Level
-            // Disable filtering to ensure all subjects are visible
-            const levelSubjects = subjects;
-            const assigned = cls.subjects || [];
+            // Wait for subjects if not loaded
+            if(allSubjects.length === 0) allSubjects = await fetchAdminData('subjects') || [];
+            
+            currentBuilderAssignedSubjects = [...(cls.subjects || [])];
+            
+            builderArea.classList.remove('hidden');
+            emptyState.classList.add('hidden');
+            saveBtn.classList.remove('opacity-50', 'pointer-events-none');
+            
+            renderBuilderSubjects();
+            renderBuilderDropdown();
+        }
 
-            if(levelSubjects.length === 0) {
-                 container.innerHTML = `
-                    <div class="h-full flex flex-col items-center justify-center opacity-50">
-                        <ion-icon name="alert-circle-outline" class="text-5xl text-gray-300 mb-3"></ion-icon>
-                        <p class="text-gray-400 text-sm font-medium text-center">No subjects defined in the system yet.</p>
-                    </div>`;
+        function renderBuilderDropdown() {
+            const select = document.getElementById('builder-add-subject');
+            const unassigned = allSubjects.filter(s => !currentBuilderAssignedSubjects.includes(s.id));
+            
+            if (unassigned.length === 0) {
+                select.innerHTML = '<option value="">All available subjects are already assigned</option>';
+                select.disabled = true;
             } else {
-                 container.innerHTML = levelSubjects.map(s => {
-                     const isChecked = assigned.includes(s.id);
-                     const statusColor = s.status === 'Active' ? 'emerald' : 'red';
-                     
-                     return `
-                        <label class="flex items-center gap-4 p-3.5 rounded-2xl border border-white/60 bg-white/40 hover:bg-white/80 cursor-pointer transition-all shadow-sm group">
-                            <input type="checkbox" name="assign_subject_ids" value="${s.id}" ${isChecked ? 'checked' : ''} class="w-5 h-5 rounded-md border-gray-300 text-indigo-600 focus:ring-indigo-500 shadow-inner">
-                            <div class="flex-1">
-                                <span class="block text-gray-900 font-bold text-sm group-hover:text-indigo-700 transition-colors">${s.name}</span>
-                                <span class="block text-[10px] text-gray-500 font-bold uppercase tracking-wider mt-0.5">${s.code}</span>
-                            </div>
-                            <span class="ml-auto text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-lg bg-${statusColor}-50 text-${statusColor}-600 border border-${statusColor}-100">${s.status || 'Active'}</span>
-                        </label>
-                     `;
-                 }).join('');
+                select.disabled = false;
+                select.innerHTML = '<option value="">-- Choose Subject to Add --</option>' + 
+                    unassigned.map(s => `<option value="${s.id}">${s.name} (${s.code})</option>`).join('');
             }
         }
 
-        async function saveClassSubjects() {
-             const classId = document.getElementById('assign-class-select').value;
-             // Use specific container to avoid conflict if modal is open (unlikely but safe)
-             const container = document.getElementById('assignment-checkboxes');
-             const checkedBoxes = container.querySelectorAll('input[type="checkbox"]:checked');
-             const subjectIds = Array.from(checkedBoxes).map(cb => cb.value);
-
-             if(!classId) { alert('Please select a class first.'); return; }
-
-             const result = await fetchAdminData('assign_class_subjects', { class_id: classId, subjects: subjectIds }, 'POST');
-             if(result && result.success) {
-                 alert('Class assignments saved!');
-                 // Optionally refresh lists
-                 renderClasses();
-             } else {
-                 alert('Failed to save assignments.');
-             }
+        function renderBuilderSubjects() {
+            const list = document.getElementById('builder-assigned-list');
+            document.getElementById('builder-count').innerText = currentBuilderAssignedSubjects.length;
+            
+            if (currentBuilderAssignedSubjects.length === 0) {
+                list.innerHTML = `
+                    <div class="bg-gray-50 border border-dashed border-gray-200 rounded-2xl p-6 flex flex-col items-center justify-center text-gray-400 h-full opacity-70">
+                        <ion-icon name="alert-circle-outline" class="text-4xl mb-2"></ion-icon>
+                        <p class="text-sm font-medium">No subjects currently assigned.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            list.innerHTML = currentBuilderAssignedSubjects.map(id => {
+                const s = allSubjects.find(sub => sub.id === id);
+                if(!s) return '';
+                return `
+                    <div class="flex items-center justify-between p-3.5 bg-white border border-gray-100 hover:border-indigo-200 rounded-2xl shadow-sm hover:shadow-md transition-all group animate-fade-in">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-gray-50 to-gray-100 group-hover:from-indigo-50 group-hover:to-indigo-100 text-gray-500 group-hover:text-indigo-600 flex items-center justify-center font-bold text-sm shadow-inner transition-colors">
+                                ${s.code.substring(0,2)}
+                            </div>
+                            <div>
+                                <p class="text-sm font-bold text-gray-900 leading-tight group-hover:text-indigo-700 transition-colors">${s.name}</p>
+                                <p class="text-[10px] text-gray-500 font-bold uppercase tracking-widest mt-0.5">${s.code}</p>
+                            </div>
+                        </div>
+                        <button onclick="removeSubjectFromBuilder('${s.id}')" class="w-9 h-9 flex items-center justify-center rounded-xl border border-gray-100 text-gray-400 hover:bg-red-50 hover:text-red-500 hover:border-red-200 transition-all shadow-sm"><ion-icon name="trash"></ion-icon></button>
+                    </div>
+                `;
+            }).join('');
         }
-        
-        function toggleAllSubjects(check) {
-            const container = document.getElementById('assignment-checkboxes');
-            const checkboxes = container.querySelectorAll('input[type="checkbox"]');
-            checkboxes.forEach(cb => cb.checked = check);
+
+        function addSubjectToBuilder() {
+            const select = document.getElementById('builder-add-subject');
+            const id = select.value;
+            if(!id) return;
+            
+            if(!currentBuilderAssignedSubjects.includes(id)) {
+                currentBuilderAssignedSubjects.push(id);
+            }
+            
+            renderBuilderSubjects();
+            renderBuilderDropdown();
+        }
+
+        function removeSubjectFromBuilder(id) {
+            currentBuilderAssignedSubjects = currentBuilderAssignedSubjects.filter(subId => subId !== id);
+            renderBuilderSubjects();
+            renderBuilderDropdown();
+        }
+
+        async function saveClassSubjectsBuilder() {
+            if(!currentBuilderClassId) return;
+            
+            const btn = document.getElementById('builder-save-btn');
+            const originalHtml = btn.innerHTML;
+            btn.innerHTML = '<ion-icon name="sync" class="animate-spin text-lg"></ion-icon> Saving...';
+            btn.disabled = true;
+            
+            try {
+                const result = await fetchAdminData('assign_class_subjects', { class_id: currentBuilderClassId, subjects: currentBuilderAssignedSubjects }, 'POST');
+                if(result && result.success) {
+                    alert('Class assignments saved successfully!');
+                    renderClasses();
+                } else {
+                    alert('Failed to save assignments.');
+                }
+            } catch (err) {
+                console.error(err);
+                alert("Network error.");
+            } finally {
+                btn.innerHTML = originalHtml;
+                btn.disabled = false;
+            }
         }
 
         // --- MANAGE SUBJECTS MODAL (Legacy/Duplicate support) ---
