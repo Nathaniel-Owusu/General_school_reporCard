@@ -97,68 +97,83 @@
             
             <!-- VIEW: DASHBOARD -->
             <div id="view-dashboard" class="space-y-8 animate-fade-in">
-                <!-- Data Management Bar -->
-                <div class="bg-gray-900 rounded-2xl p-6 text-white flex flex-col md:flex-row justify-between items-center shadow-xl mask-pattern relative overflow-hidden">
-                     <div class="absolute inset-0 bg-accent opacity-10 pattern-dots"></div>
-                     <div class="relative z-10 flex flex-col md:flex-row items-center gap-6 w-full justify-between">
-                         <div class="flex items-center gap-4">
-                             <div class="w-12 h-12 rounded-xl bg-white/10 flex items-center justify-center text-2xl">💾</div>
-                             <div>
-                                 <h3 class="font-bold text-lg">System Data Control</h3>
-                                 <p class="text-blue-200 text-sm">Backup or restore your database safely.</p>
-                             </div>
-                         </div>
-                         <div class="flex gap-4">
-                             <button onclick="backupData()" class="px-4 py-2 bg-accent hover:bg-blue-600 rounded-lg font-bold shadow-lg transition flex items-center gap-2">
-                                 <ion-icon name="cloud-download-outline"></ion-icon> Backup
-                             </button>
-                             <label class="px-4 py-2 bg-white/10 hover:bg-white/20 border border-white/20 rounded-lg font-bold transition flex items-center gap-2 cursor-pointer">
-                                 <ion-icon name="cloud-upload-outline"></ion-icon> Restore
-                                 <input type="file" id="restore-file" accept=".json" class="hidden" onchange="restoreData(this)">
-                             </label>
-                             <button onclick="hardResetSystem()" class="px-4 py-2 bg-red-500/80 hover:bg-red-600 rounded-lg font-bold transition flex items-center gap-2" title="Reset to Factory Settings">
-                                <ion-icon name="refresh-circle-outline" class="text-xl"></ion-icon> Reset
+                
+                <!-- Welcome Banner -->
+                <div class="bg-gradient-to-r from-primary to-accent rounded-3xl p-8 text-white shadow-xl relative overflow-hidden">
+                    <div class="absolute inset-0 bg-white/5 opacity-50" style="background-image: radial-gradient(circle at 2px 2px, white 1px, transparent 0); background-size: 20px 20px;"></div>
+                    <div class="absolute -right-20 -top-20 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
+                    <div class="relative z-10 flex flex-col md:flex-row justify-between items-center gap-6">
+                        <div>
+                            <h2 class="text-3xl font-extrabold mb-2 text-white">Dashboard Overview</h2>
+                            <p class="text-blue-100 font-medium text-sm">Here's a quick summary of your school's data and recent activities.</p>
+                        </div>
+                        <div class="flex gap-3">
+                             <button onclick="openAddStudentModal()" class="bg-white text-primary px-6 py-3 rounded-xl font-bold hover:bg-gray-50 transition shadow-lg flex items-center gap-2 hover:-translate-y-1">
+                                <ion-icon name="person-add" class="text-xl"></ion-icon> Register Student
                             </button>
-                         </div>
-                     </div>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Stats Grid -->
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
-                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4 hover:shadow-md transition">
-                        <div class="w-16 h-16 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-3xl">
-                            <ion-icon name="people"></ion-icon>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <!-- Students -->
+                    <div class="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 relative group overflow-hidden">
+                        <div class="absolute inset-x-0 top-0 h-1.5 bg-blue-500"></div>
+                        <div class="flex items-center justify-between mb-2 mt-1">
+                            <div class="w-14 h-14 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center text-3xl group-hover:scale-110 transition-transform duration-300 border border-blue-100">
+                                <ion-icon name="people"></ion-icon>
+                            </div>
+                            <span class="px-3 py-1 bg-blue-50 text-blue-600 rounded-xl text-[10px] font-black tracking-wider uppercase">Active</span>
                         </div>
-                        <div>
-                            <p class="text-gray-400 text-sm font-bold uppercase tracking-wider">Total Students</p>
-                            <h3 class="text-3xl font-bold text-gray-900" id="count-students">0</h3>
-                        </div>
-                    </div>
-                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4 hover:shadow-md transition">
-                        <div class="w-16 h-16 rounded-xl bg-green-50 text-green-600 flex items-center justify-center text-3xl">
-                            <ion-icon name="briefcase"></ion-icon>
-                        </div>
-                        <div>
-                            <p class="text-gray-400 text-sm font-bold uppercase tracking-wider">Teachers</p>
-                            <h3 class="text-3xl font-bold text-gray-900" id="count-teachers">0</h3>
+                        <div class="mt-4">
+                            <h3 class="text-4xl font-black text-gray-900 mb-1" id="count-students">0</h3>
+                            <p class="text-gray-400 text-xs font-bold uppercase tracking-wider">Total Enrolled</p>
                         </div>
                     </div>
-                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4 hover:shadow-md transition">
-                        <div class="w-16 h-16 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center text-3xl">
-                            <ion-icon name="library"></ion-icon>
+                    
+                    <!-- Teachers -->
+                    <div class="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 relative group overflow-hidden">
+                        <div class="absolute inset-x-0 top-0 h-1.5 bg-purple-500"></div>
+                        <div class="flex items-center justify-between mb-2 mt-1">
+                            <div class="w-14 h-14 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center text-3xl group-hover:scale-110 transition-transform duration-300 border border-purple-100">
+                                <ion-icon name="library"></ion-icon>
+                            </div>
+                            <span class="px-3 py-1 bg-purple-50 text-purple-600 rounded-xl text-[10px] font-black tracking-wider uppercase">Staff</span>
                         </div>
-                        <div>
-                            <p class="text-gray-400 text-sm font-bold uppercase tracking-wider">Classes</p>
-                            <h3 class="text-3xl font-bold text-gray-900" id="count-classes">0</h3>
+                        <div class="mt-4">
+                            <h3 class="text-4xl font-black text-gray-900 mb-1" id="count-teachers">0</h3>
+                            <p class="text-gray-400 text-xs font-bold uppercase tracking-wider">Teachers</p>
                         </div>
                     </div>
-                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4 hover:shadow-md transition">
-                        <div class="w-16 h-16 rounded-xl bg-orange-50 text-orange-600 flex items-center justify-center text-3xl">
-                            <ion-icon name="book"></ion-icon>
+                    
+                    <!-- Classes -->
+                    <div class="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 relative group overflow-hidden">
+                        <div class="absolute inset-x-0 top-0 h-1.5 bg-orange-500"></div>
+                        <div class="flex items-center justify-between mb-2 mt-1">
+                            <div class="w-14 h-14 rounded-2xl bg-orange-50 text-orange-600 flex items-center justify-center text-3xl group-hover:scale-110 transition-transform duration-300 border border-orange-100">
+                                <ion-icon name="easel"></ion-icon>
+                            </div>
+                            <span class="px-3 py-1 bg-orange-50 text-orange-600 rounded-xl text-[10px] font-black tracking-wider uppercase">Rooms</span>
                         </div>
-                        <div>
-                            <p class="text-gray-400 text-sm font-bold uppercase tracking-wider">Subjects</p>
-                            <h3 class="text-3xl font-bold text-gray-900" id="count-subjects">0</h3>
+                        <div class="mt-4">
+                            <h3 class="text-4xl font-black text-gray-900 mb-1" id="count-classes">0</h3>
+                            <p class="text-gray-400 text-xs font-bold uppercase tracking-wider">Classes</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Subjects -->
+                    <div class="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 relative group overflow-hidden">
+                        <div class="absolute inset-x-0 top-0 h-1.5 bg-emerald-500"></div>
+                        <div class="flex items-center justify-between mb-2 mt-1">
+                            <div class="w-14 h-14 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-3xl group-hover:scale-110 transition-transform duration-300 border border-emerald-100">
+                                <ion-icon name="book"></ion-icon>
+                            </div>
+                            <span class="px-3 py-1 bg-emerald-50 text-emerald-600 rounded-xl text-[10px] font-black tracking-wider uppercase">Curriculum</span>
+                        </div>
+                        <div class="mt-4">
+                            <h3 class="text-4xl font-black text-gray-900 mb-1" id="count-subjects">0</h3>
+                            <p class="text-gray-400 text-xs font-bold uppercase tracking-wider">Subjects</p>
                         </div>
                     </div>
                 </div>
@@ -166,56 +181,74 @@
                 <!-- Chart & Student Management Section -->
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     <!-- Student Table -->
-                    <div class="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-                        <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
-                            <h3 class="font-bold text-lg text-gray-800">Student Directory</h3>
-                             <button onclick="handleGenerateIndexes()" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg text-sm font-bold transition flex items-center gap-2">
-                                <ion-icon name="list-outline"></ion-icon> Auto-Index
-                            </button>
-                             <button onclick="openAddStudentModal()" class="bg-gray-900 hover:bg-black text-white px-4 py-2 rounded-lg text-sm font-bold transition flex items-center gap-2">
-                                <ion-icon name="add"></ion-icon> Add Student
-                            </button>
+                    <div class="lg:col-span-2 bg-white rounded-3xl shadow-sm border border-gray-100 p-8">
+                        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+                            <div>
+                                <h3 class="font-extrabold text-2xl text-gray-900">Student Directory</h3>
+                                <p class="text-gray-500 text-sm font-medium">Manage all enrolled students</p>
+                            </div>
+                            <div class="flex gap-3">
+                                <button onclick="handleGenerateIndexes()" class="bg-purple-50 text-purple-600 hover:bg-purple-100 px-5 py-2.5 rounded-xl text-sm font-bold transition-all flex items-center gap-2 border border-purple-100">
+                                    <ion-icon name="list"></ion-icon> Auto-Index
+                                </button>
+                                <button onclick="openAddStudentModal()" class="bg-primary hover:bg-gray-800 text-white px-5 py-2.5 rounded-xl text-sm font-bold transition-all flex items-center gap-2 shadow-lg shadow-primary/20 hover:-translate-y-0.5">
+                                    <ion-icon name="add-circle"></ion-icon> Add Student
+                                </button>
+                            </div>
                         </div>
                         
                         <!-- Filter Bar -->
-                        <div class="flex gap-4 mb-4">
+                        <div class="flex flex-col md:flex-row gap-4 mb-6">
                             <div class="relative flex-1">
-                                <ion-icon name="search-outline" class="absolute left-3 top-3 text-gray-400"></ion-icon>
-                                <input type="text" id="search-input" onkeyup="renderStudents()" placeholder="Search Name or ID..." class="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-accent">
+                                <ion-icon name="search-outline" class="absolute left-4 top-3.5 text-gray-400 text-lg"></ion-icon>
+                                <input type="text" id="search-input" onkeyup="renderStudents()" placeholder="Search Name or ID..." class="w-full pl-12 pr-4 py-3 bg-gray-50/50 border border-gray-200 rounded-xl outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all font-medium text-gray-700">
                             </div>
-                            <select id="filter-class" onchange="renderStudents()" class="px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-accent w-1/3">
+                            <select id="filter-class" onchange="renderStudents()" class="px-5 py-3 bg-gray-50/50 border border-gray-200 rounded-xl outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all font-medium text-gray-700 cursor-pointer appearance-none md:w-48">
                                 <option value="">All Classes</option>
                             </select>
                         </div>
 
-                        <div class="overflow-x-auto">
+                        <div class="overflow-x-auto rounded-2xl border border-gray-100">
                             <table class="w-full text-left text-sm">
-                                <thead class="bg-gray-50 text-gray-400 font-bold uppercase text-xs">
+                                <thead class="bg-gray-50/80 text-gray-500 font-bold uppercase text-xs tracking-wider">
                                     <tr>
-                                        <th class="px-4 py-3">ID</th>
-                                        <th class="px-4 py-3">Name</th>
-                                        <th class="px-4 py-3">Class</th>
-                                        <th class="px-4 py-3">Status</th>
-                                        <th class="px-4 py-3 text-right">Actions</th>
+                                        <th class="px-6 py-4">ID</th>
+                                        <th class="px-6 py-4">Student Info</th>
+                                        <th class="px-6 py-4">Class</th>
+                                        <th class="px-6 py-4">Status</th>
+                                        <th class="px-6 py-4 text-right">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-gray-100" id="student-table-body">
+                                    <!-- Injected JS -->
                                 </tbody>
                             </table>
                         </div>
-                        <div class="mt-4 flex justify-between items-center text-xs text-gray-400">
-                            <span id="showing-count">Showing 0 students</span>
+                        
+                        <!-- Pagination -->
+                        <div class="mt-6 flex justify-between items-center text-sm font-medium text-gray-500">
+                            <span id="showing-count" class="bg-gray-50 px-3 py-1 rounded-lg border border-gray-100">Showing 0 students</span>
                             <div class="flex gap-2">
-                                <button class="p-2 bg-gray-100 rounded hover:bg-gray-200 disabled:opacity-50"><ion-icon name="chevron-back"></ion-icon></button>
-                                <button class="p-2 bg-gray-100 rounded hover:bg-gray-200 disabled:opacity-50"><ion-icon name="chevron-forward"></ion-icon></button>
+                                <button class="w-10 h-10 flex border border-gray-200 items-center justify-center bg-white rounded-xl hover:bg-gray-50 hover:text-primary transition-colors disabled:opacity-50"><ion-icon name="chevron-back"></ion-icon></button>
+                                <button class="w-10 h-10 flex border border-gray-200 items-center justify-center bg-white rounded-xl hover:bg-gray-50 hover:text-primary transition-colors disabled:opacity-50"><ion-icon name="chevron-forward"></ion-icon></button>
                             </div>
                         </div>
                     </div>
 
                     <!-- Simple Chart -->
-                    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 h-fit">
-                        <h3 class="font-bold text-lg text-gray-800 mb-6">Enrollment Overview</h3>
-                        <canvas id="enrollmentChart"></canvas>
+                    <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-8 h-fit flex flex-col items-center">
+                        <div class="w-full flex justify-between items-center mb-8">
+                            <div>
+                                <h3 class="font-extrabold text-xl text-gray-900">Enrollment Overview</h3>
+                                <p class="text-xs font-medium text-gray-400 uppercase tracking-wider mt-1">Global Data</p>
+                            </div>
+                            <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-xl">
+                                <ion-icon name="pie-chart"></ion-icon>
+                            </div>
+                        </div>
+                        <div class="w-full aspect-square relative flex items-center justify-center">
+                            <canvas id="enrollmentChart"></canvas>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1120,28 +1153,33 @@
             document.getElementById('showing-count').innerText = `Showing ${filtered.length} students`;
             
             if(filtered.length === 0) {
-                 tbody.innerHTML = `<tr><td colspan="5" class="py-10 text-center text-gray-400">No students found.</td></tr>`;
+                 tbody.innerHTML = `<tr><td colspan="5" class="py-12 text-center text-gray-400"><ion-icon name="school" class="text-4xl mb-3 opacity-50 block mx-auto"></ion-icon>No students found in this search.</td></tr>`;
                  return;
             }
 
             filtered.forEach(student => {
                 const tr = document.createElement('tr');
-                tr.className = "border-b border-gray-100 hover:bg-gray-50 transition";
+                tr.className = "border-b border-gray-100/60 hover:bg-indigo-50/30 transition-colors group";
                 tr.innerHTML = `
-                    <td class="px-4 py-3 font-mono text-gray-500">${student.id}</td>
-                    <td class="px-4 py-3 font-medium text-gray-900 flex items-center gap-3">
-                        <div class="w-8 h-8 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center text-xs font-bold">
-                            ${student.name.charAt(0)}
+                    <td class="px-6 py-4 font-mono text-gray-400 font-medium text-xs">#${student.id}</td>
+                    <td class="px-6 py-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-blue-50 to-indigo-50 text-indigo-600 flex items-center justify-center font-bold shadow-inner border border-white/60 group-hover:scale-110 transition-transform">
+                                ${student.name.charAt(0)}
+                            </div>
+                            <div>
+                                <p class="font-bold text-gray-900 group-hover:text-indigo-600 transition-colors">${student.name}</p>
+                                <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider mt-0.5">${student.gender || 'Unknown'} &bull; ${student.dob || 'No DOB'}</p>
+                            </div>
                         </div>
-                        ${student.name}
                     </td>
-                    <td class="px-4 py-3"><span class="px-2 py-1 bg-blue-50 text-blue-600 rounded text-[10px] font-bold">${student.class || 'Unassigned'}</span></td>
-                    <td class="px-4 py-3"><span class="px-2 py-1 bg-green-50 text-green-600 rounded text-[10px] font-bold uppercase">Active</span></td>
-                    <td class="px-4 py-3 text-right">
-                         <div class="flex justify-end gap-2 group-hover:opacity-100 transition">
-                            <a href="student-report.html?student_id=${student.id}" target="_blank" class="p-1.5 hover:bg-white text-gray-400 hover:text-blue-500 rounded shadow-sm" title="View/Print Report"><ion-icon name="print"></ion-icon></a>
-                            <button onclick="openAddStudentModal('${student.id}')" class="p-1.5 hover:bg-white text-gray-400 hover:text-accent rounded shadow-sm" title="Edit"><ion-icon name="create"></ion-icon></button>
-                            <button onclick="openDeleteStudentModal('${student.id}')" class="p-1.5 hover:bg-white text-gray-400 hover:text-red-500 rounded shadow-sm" title="Delete"><ion-icon name="trash"></ion-icon></button>
+                    <td class="px-6 py-4"><span class="px-3 py-1 bg-purple-50 text-purple-600 border border-purple-100/50 rounded-lg text-[11px] font-bold shadow-sm inline-flex items-center gap-1.5"><ion-icon name="easel-outline" class="text-sm"></ion-icon>${student.class || 'Unassigned'}</span></td>
+                    <td class="px-6 py-4"><span class="px-3 py-1.5 bg-emerald-50 text-emerald-600 border border-emerald-100/50 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-sm inline-flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Active</span></td>
+                    <td class="px-6 py-4 text-right">
+                         <div class="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                             <a href="student-report.html?student_id=${student.id}" target="_blank" class="w-9 h-9 flex items-center justify-center bg-white border border-gray-200 text-gray-400 hover:text-indigo-600 hover:border-indigo-200 hover:bg-indigo-50 rounded-xl transition-all shadow-sm group/btn" title="View/Print Report"><ion-icon name="document-text-outline" class="group-hover/btn:scale-110 transition-transform"></ion-icon></a>
+                             <button onclick="openAddStudentModal('${student.id}')" class="w-9 h-9 flex items-center justify-center bg-white border border-gray-200 text-gray-400 hover:text-blue-600 hover:border-blue-200 hover:bg-blue-50 rounded-xl transition-all shadow-sm group/btn" title="Edit"><ion-icon name="create-outline" class="group-hover/btn:scale-110 transition-transform"></ion-icon></button>
+                             <button onclick="openDeleteStudentModal('${student.id}')" class="w-9 h-9 flex items-center justify-center bg-white border border-gray-200 text-gray-400 hover:text-red-600 hover:border-red-200 hover:bg-red-50 rounded-xl transition-all shadow-sm group/btn" title="Delete"><ion-icon name="trash-outline" class="group-hover/btn:scale-110 transition-transform"></ion-icon></button>
                         </div>
                     </td>
                 `;
