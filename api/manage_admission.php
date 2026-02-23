@@ -26,18 +26,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if ($stmt->execute()) {
             // Get application details to send email
-            $app_stmt = $conn->prepare("
-                SELECT a.*, s.name as school_name, s.contact_email 
-                FROM admission_applications a 
-                LEFT JOIN schools s ON a.school_id = s.id 
-                WHERE a.id = ?
-            ");
+            $app_stmt = $conn->prepare("SELECT * FROM admission_applications WHERE id = ?");
             $app_stmt->bind_param("i", $id);
             $app_stmt->execute();
             $res = $app_stmt->get_result();
             if ($row = $res->fetch_assoc()) {
-                $school_name = $row['school_name'] ?? 'General School';
-                $school_email = $row['contact_email'] ?? 'admissions@generalschool.com';
+                // Manually fetch school to avoid collation join issues
+                $school_name = 'General School';
+                $school_email = 'admissions@generalschool.com';
+
+                $s_stmt = $conn->prepare("SELECT name, contact_email FROM schools WHERE id = ?");
+                $s_stmt->bind_param("s", $row['school_id']);
+                $s_stmt->execute();
+                $s_res = $s_stmt->get_result();
+                if ($s_row = $s_res->fetch_assoc()) {
+                    $school_name = $s_row['name'];
+                    $school_email = $s_row['contact_email'];
+                }
+                $s_stmt->close();
+
                 $applicant_email = $row['email'];
                 $parent_name = $row['parent_name'];
                 $student_name = $row['first_name'] . ' ' . $row['last_name'];
