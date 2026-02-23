@@ -47,6 +47,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         );
 
         if ($stmt->execute()) {
+            // Get school details for email notifications
+            $school_stmt = $conn->prepare("SELECT name, contact_email FROM schools WHERE id = ?");
+            $school_stmt->bind_param("s", $data['school_id']);
+            $school_stmt->execute();
+            $school_res = $school_stmt->get_result();
+            $school_data = $school_res->fetch_assoc();
+            $school_stmt->close();
+
+            $school_name = $school_data['name'] ?? 'General School';
+            $admin_email = $school_data['contact_email'] ?? 'owusuansahnathaniel21@gmail.com';
+
+            // 1. Send Email to Applicant (if email provided)
+            if (!empty($data['email'])) {
+                $to_applicant = $data['email'];
+                $subject_applicant = "Application Received - $school_name";
+                $message_applicant = "Dear {$data['parent_name']},\n\nWe have successfully received the admission application for {$data['first_name']} {$data['last_name']} to $school_name. Our admissions office will review your application and contact you shortly regarding the next steps.\n\nThank you for choosing $school_name.\n\nBest Regards,\nAdmissions Team";
+                $headers_applicant = "From: admissions@generalschool.com\r\nReply-To: $admin_email\r\n";
+                @mail($to_applicant, $subject_applicant, $message_applicant, $headers_applicant);
+            }
+
+            // 2. Send Email to School Admin & CC Super Admin
+            if (!empty($admin_email)) {
+                $to_admin = $admin_email;
+                $subject_admin = "New Admission Application: {$data['first_name']} {$data['last_name']}";
+                $message_admin = "Hello Admin,\n\nA new admission application has been submitted for $school_name.\n\nStudent: {$data['first_name']} {$data['last_name']}\nDOB: {$data['dob']} ({$data['gender']})\nParent/Guardian: {$data['parent_name']}\nPhone: {$data['contact_phone']}\nEmail: {$data['email']}\n\nPlease log in to your admin dashboard to review this application.\n\nBest Regards,\nGeneral School System";
+
+                // Copy super admin on all admissions
+                $headers_admin = "From: system@generalschool.com\r\nCC: owusuansahnathaniel21@gmail.com\r\n";
+                @mail($to_admin, $subject_admin, $message_admin, $headers_admin);
+            }
+
             echo json_encode(["success" => true, "message" => "Application submitted successfully!"]);
         } else {
             echo json_encode(["success" => false, "message" => "Failed to save application."]);
