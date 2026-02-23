@@ -231,6 +231,99 @@
                 </div>
 
             </div>
+
+            <!-- Online Application Form Section -->
+            <div class="mt-32 max-w-4xl mx-auto reveal" id="application-section">
+                <div class="text-center mb-12">
+                    <span class="text-accent font-bold tracking-wider uppercase text-sm">Apply Online</span>
+                    <h2 class="text-3xl font-bold text-gray-900 mt-2 mb-4">Start Your Application</h2>
+                    <div class="w-16 h-1 bg-accent mx-auto rounded-full"></div>
+                </div>
+
+                <div class="bg-white rounded-3xl shadow-xl border border-gray-100 p-8 md:p-12 relative overflow-hidden">
+                    <!-- Step 1: Select School -->
+                    <div id="step-1-school" class="transition-all duration-500">
+                        <label class="block text-sm font-bold text-gray-700 uppercase mb-4">1. Select Your Preferred School *</label>
+                        <div class="relative mb-8">
+                            <ion-icon name="business-outline" class="absolute left-5 top-1/2 transform -translate-y-1/2 text-gray-400 text-xl"></ion-icon>
+                            <select id="school-select" class="w-full pl-14 pr-5 py-4 bg-gray-50 border border-gray-200 rounded-2xl outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all font-medium text-gray-700 cursor-pointer appearance-none text-lg">
+                                <option value="">-- Loading available schools... --</option>
+                            </select>
+                            <ion-icon name="chevron-down" class="absolute right-5 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"></ion-icon>
+                        </div>
+                        <button id="btn-continue-form" disabled class="w-full bg-gray-200 text-gray-400 py-4 rounded-2xl font-bold transition-all flex items-center justify-center gap-2 cursor-not-allowed">
+                            Continue to Application Form <ion-icon name="arrow-forward"></ion-icon>
+                        </button>
+                    </div>
+
+                    <!-- Step 2: Fill Form -->
+                    <form id="admission-form" class="hidden space-y-6">
+                        <div class="flex flex-col md:flex-row md:items-center justify-between mb-8 pb-6 border-b border-gray-100 gap-4">
+                            <div>
+                                <span class="bg-blue-100 text-blue-700 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider inline-block mb-2">Selected School</span>
+                                <h3 class="text-xl font-bold text-gray-900" id="selected-school-name">School Name</h3>
+                            </div>
+                            <button type="button" id="btn-change-school" class="text-sm font-bold text-gray-500 hover:text-accent transition-colors flex items-center gap-1 border border-gray-200 px-4 py-2 rounded-xl hover:border-accent/30 bg-gray-50 hover:bg-blue-50">
+                                <ion-icon name="create-outline"></ion-icon> Change School
+                            </button>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Student First Name *</label>
+                                <input type="text" required class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all font-medium text-gray-800">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Student Last Name *</label>
+                                <input type="text" required class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all font-medium text-gray-800">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Date of Birth *</label>
+                                <input type="date" required class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all font-medium text-gray-700">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Gender *</label>
+                                <div class="relative">
+                                    <select required class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all font-medium text-gray-700 appearance-none">
+                                        <option value="">Select Gender</option>
+                                        <option value="Male">Male</option>
+                                        <option value="Female">Female</option>
+                                    </select>
+                                    <ion-icon name="chevron-down" class="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"></ion-icon>
+                                </div>
+                            </div>
+                            <div class="md:col-span-2">
+                                <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Parent / Guardian Name *</label>
+                                <input type="text" required class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all font-medium text-gray-800">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Contact Phone *</label>
+                                <input type="tel" required class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all font-medium text-gray-800">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Email Address</label>
+                                <input type="email" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all font-medium text-gray-800">
+                            </div>
+                        </div>
+                        
+                        <div class="pt-8">
+                            <button type="submit" id="submit-btn" class="w-full bg-gradient-to-r from-primary to-accent text-white py-4 rounded-xl font-bold hover:shadow-lg hover:shadow-primary/30 transition-all transform hover:-translate-y-0.5 flex items-center justify-center gap-2 text-lg">
+                                Submit Application <ion-icon name="paper-plane-outline"></ion-icon>
+                            </button>
+                        </div>
+                    </form>
+                    
+                    <!-- Success Message -->
+                    <div id="form-success" class="hidden text-center py-10">
+                        <div class="w-24 h-24 bg-green-100 text-green-500 rounded-full flex items-center justify-center text-5xl mx-auto mb-6 shadow-xl shadow-green-100/50">
+                            <ion-icon name="checkmark-done"></ion-icon>
+                        </div>
+                        <h3 class="text-3xl font-black text-gray-900 mb-3">Application Received!</h3>
+                        <p class="text-gray-600 mb-10 text-lg leading-relaxed max-w-lg mx-auto">We have successfully received your admission form. Our admissions office will review it and contact you shortly regarding the next steps.</p>
+                        <button type="button" onclick="location.reload()" class="px-8 py-3.5 bg-gray-100 text-gray-700 rounded-xl font-bold hover:bg-gray-200 transition-colors shadow-sm border border-gray-200">Start New Application</button>
+                    </div>
+                </div>
+            </div>
         </div>
     </main>
 
@@ -339,6 +432,80 @@
         window.addEventListener("scroll", reveal);
         // Trigger once on load
         reveal();
+
+        // ADMISSIONS FORM LOGIC
+        document.addEventListener("DOMContentLoaded", async () => {
+            const schoolSelect = document.getElementById('school-select');
+            const btnContinue = document.getElementById('btn-continue-form');
+            const step1 = document.getElementById('step-1-school');
+            const step2 = document.getElementById('admission-form');
+            const schoolNameDisplay = document.getElementById('selected-school-name');
+            const btnChangeSchool = document.getElementById('btn-change-school');
+            const formSuccess = document.getElementById('form-success');
+            const admissionForm = document.getElementById('admission-form');
+
+            // Fetch Schools from Database API
+            try {
+                const res = await fetch('api/public_schools.php');
+                const result = await res.json();
+                
+                if(result.success && result.data.length > 0) {
+                    schoolSelect.innerHTML = '<option value="">-- Choose a School to Apply To --</option>';
+                    result.data.forEach(school => {
+                        const option = document.createElement('option');
+                        option.value = school.id;
+                        option.textContent = school.name;
+                        schoolSelect.appendChild(option);
+                    });
+                } else {
+                    schoolSelect.innerHTML = '<option value="">No active schools available right now</option>';
+                }
+            } catch(e) {
+                schoolSelect.innerHTML = '<option value="">Failed to load schools. Please refresh.</option>';
+            }
+
+            // Enable Continue button only when school is picked
+            schoolSelect.addEventListener('change', () => {
+                if(schoolSelect.value) {
+                    btnContinue.disabled = false;
+                    btnContinue.className = "w-full bg-accent hover:bg-blue-700 text-white py-4 rounded-2xl font-bold transition-all flex items-center justify-center gap-2 transform hover:-translate-y-0.5 shadow-lg shadow-accent/30";
+                } else {
+                    btnContinue.disabled = true;
+                    btnContinue.className = "w-full bg-gray-200 text-gray-400 py-4 rounded-2xl font-bold transition-all flex items-center justify-center gap-2 cursor-not-allowed";
+                }
+            });
+
+            // Transition from Step 1 to Step 2
+            btnContinue.addEventListener('click', () => {
+                const selectedText = schoolSelect.options[schoolSelect.selectedIndex].text;
+                schoolNameDisplay.textContent = selectedText;
+                
+                step1.classList.add('hidden');
+                step2.classList.remove('hidden');
+                step2.classList.add('animate-fade-in');
+            });
+
+            // Transition back to Step 1
+            btnChangeSchool.addEventListener('click', () => {
+                step2.classList.add('hidden');
+                step1.classList.remove('hidden');
+            });
+
+            // Form Submit Simulation
+            admissionForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const btn = document.getElementById('submit-btn');
+                btn.innerHTML = 'Submitting... <ion-icon class="animate-spin" name="sync-outline"></ion-icon>';
+                btn.disabled = true;
+
+                // Simulate network request
+                setTimeout(() => {
+                    step2.classList.add('hidden');
+                    formSuccess.classList.remove('hidden');
+                    formSuccess.classList.add('animate-fade-in');
+                }, 1500);
+            });
+        });
     </script>
     <!-- WhatsApp Floating Button -->
     <a href="https://wa.me/233595027787" target="_blank" rel="noopener noreferrer" class="fixed bottom-6 right-6 z-50 bg-green-500 hover:bg-green-600 text-white w-14 h-14 rounded-full shadow-lg flex items-center justify-center transition-all duration-300 transform hover:scale-110 group animate-bounce cursor-pointer">
