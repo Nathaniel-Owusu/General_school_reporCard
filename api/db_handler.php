@@ -105,11 +105,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
         // Clear existing data (Full Refresh Strategy)
         $conn->query("SET FOREIGN_KEY_CHECKS = 0");
-        $conn->query("TRUNCATE TABLE schools");
-        $conn->query("TRUNCATE TABLE users");
-        $conn->query("TRUNCATE TABLE classes");
-        $conn->query("TRUNCATE TABLE subjects");
-        $conn->query("TRUNCATE TABLE students");
+        $conn->query("DELETE FROM students");
+        $conn->query("DELETE FROM subjects");
+        $conn->query("DELETE FROM classes");
+        $conn->query("DELETE FROM users");
+        $conn->query("DELETE FROM schools");
         $conn->query("SET FOREIGN_KEY_CHECKS = 1");
 
         // Helper
