@@ -787,12 +787,16 @@ async function fetchSuperAdminData(action, params = {}) {
     }
     
     else if (action === 'delete_school') {
-        const school = db.schools.find(s => s.id === params.school_id);
-        if (school) {
-            // Soft delete: Mark as deleted instead of removing from database
-            school.deleted = true;
-            school.active = false;
-            school.deleted_at = Date.now();
+        const schoolIndex = db.schools.findIndex(s => s.id === params.school_id);
+        if (schoolIndex !== -1) {
+            // Hard delete: Remove from database entirely
+            db.schools.splice(schoolIndex, 1);
+            
+            // Also cascade delete all related data to prevent orphans
+            db.users = db.users.filter(u => u.school_id !== params.school_id);
+            db.students = db.students.filter(s => s.school_id !== params.school_id);
+            db.classes = db.classes.filter(c => c.school_id !== params.school_id);
+            db.subjects = db.subjects.filter(s => s.school_id !== params.school_id);
             
             didUpdate = true;
             result = { success: true };
