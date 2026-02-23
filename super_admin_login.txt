@@ -1,0 +1,6 @@
+Super Admin Login Credentials:
+
+Email: superadmin@system.com
+Password: superadmin123
+
+Login URL: /super-admin.html (or /login.html depending on routing)
