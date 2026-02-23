@@ -189,7 +189,14 @@ async function fetchAdminData(action, params = {}) {
     
     else if (action === 'get_settings') {
          const school = db.schools.find(s => s.id === schoolId);
-         result = school ? { ...school.settings, schoolName: school.name, schoolLogo: school.logo, schoolAddress: school.address, contactPhone: school.contact_phone, contactEmail: school.contact_email } : {};
+         result = school ? { 
+             ...school.settings, 
+             schoolName: school.name || (school.settings ? school.settings.schoolName : ''), 
+             schoolLogo: school.logo || (school.settings ? school.settings.schoolLogo : ''), 
+             schoolAddress: school.address || (school.settings ? school.settings.schoolAddress : ''), 
+             contactPhone: school.contact_phone || (school.settings ? school.settings.contactPhone : ''), 
+             contactEmail: school.contact_email || (school.settings ? school.settings.contactEmail : '') 
+         } : {};
     }
 
     else if (action === 'save_settings') {
@@ -200,7 +207,11 @@ async function fetchAdminData(action, params = {}) {
             if(params.schoolAddress) school.address = params.schoolAddress;
             if(params.contactPhone) school.contact_phone = params.contactPhone;
             if(params.contactEmail) school.contact_email = params.contactEmail;
-            if(params.schoolLogo) school.logo = params.schoolLogo;
+            if(params.schoolLogo) {
+                school.logo = params.schoolLogo;
+                if(!school.settings) school.settings = {};
+                school.settings.schoolLogo = params.schoolLogo; // Dual save for compatibility
+            }
             
             // Update Settings Object
             // We merge carefully
@@ -714,11 +725,11 @@ async function fetchStudentReport(studentId) {
             },
             settings: {
                 ...school.settings,
-                schoolName: school.name,
-                schoolLogo: school.logo,
-                schoolAddress: school.address,
-                contactPhone: school.contact_phone,
-                contactEmail: school.contact_email
+                schoolName: school.name || (school.settings ? school.settings.schoolName : ''),
+                schoolLogo: school.logo || (school.settings ? school.settings.schoolLogo : ''),
+                schoolAddress: school.address || (school.settings ? school.settings.schoolAddress : ''),
+                contactPhone: school.contact_phone || (school.settings ? school.settings.contactPhone : ''),
+                contactEmail: school.contact_email || (school.settings ? school.settings.contactEmail : '')
             }
         };
     }
