@@ -244,12 +244,15 @@
                     <!-- Step 1: Select School -->
                     <div id="step-1-school" class="transition-all duration-500">
                         <label class="block text-sm font-bold text-gray-700 uppercase mb-4">1. Select Your Preferred School *</label>
-                        <div class="relative mb-8">
-                            <ion-icon name="business-outline" class="absolute left-5 top-1/2 transform -translate-y-1/2 text-gray-400 text-xl"></ion-icon>
-                            <select id="school-select" class="w-full pl-14 pr-5 py-4 bg-gray-50 border border-gray-200 rounded-2xl outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all font-medium text-gray-700 cursor-pointer appearance-none text-lg">
-                                <option value="">-- Loading available schools... --</option>
-                            </select>
-                            <ion-icon name="chevron-down" class="absolute right-5 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"></ion-icon>
+                        <div class="relative mb-8" id="school-search-container">
+                            <ion-icon name="search-outline" class="absolute left-5 top-1/2 transform -translate-y-1/2 text-gray-400 text-xl"></ion-icon>
+                            <input type="text" id="school-search-input" placeholder="Type to search for a school..." class="w-full pl-14 pr-5 py-4 bg-gray-50 border border-gray-200 rounded-2xl outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all font-medium text-gray-700 text-lg">
+                            <input type="hidden" id="school-select" value="">
+                            
+                            <!-- Dropdown Results -->
+                            <div id="school-search-results" class="hidden absolute top-full left-0 w-full mt-2 bg-white border border-gray-100 rounded-2xl shadow-2xl max-h-64 overflow-y-auto z-50 py-2">
+                                <div class="px-5 py-3 text-gray-500 font-medium animate-pulse">Loading schools...</div>
+                            </div>
                         </div>
                         <button id="btn-continue-form" disabled class="w-full bg-gray-200 text-gray-400 py-4 rounded-2xl font-bold transition-all flex items-center justify-center gap-2 cursor-not-allowed">
                             Continue to Application Form <ion-icon name="arrow-forward"></ion-icon>
@@ -435,7 +438,9 @@
 
         // ADMISSIONS FORM LOGIC
         document.addEventListener("DOMContentLoaded", async () => {
-            const schoolSelect = document.getElementById('school-select');
+            const schoolSearchInput = document.getElementById('school-search-input');
+            const schoolSelectHidden = document.getElementById('school-select');
+            const searchResults = document.getElementById('school-search-results');
             const btnContinue = document.getElementById('btn-continue-form');
             const step1 = document.getElementById('step-1-school');
             const step2 = document.getElementById('admission-form');
@@ -444,41 +449,86 @@
             const formSuccess = document.getElementById('form-success');
             const admissionForm = document.getElementById('admission-form');
 
+            let allSchools = [];
+
             // Fetch Schools from Database API
             try {
                 const res = await fetch('api/public_schools.php');
                 const result = await res.json();
                 
                 if(result.success && result.data.length > 0) {
-                    schoolSelect.innerHTML = '<option value="">-- Choose a School to Apply To --</option>';
-                    result.data.forEach(school => {
-                        const option = document.createElement('option');
-                        option.value = school.id;
-                        option.textContent = school.name;
-                        schoolSelect.appendChild(option);
-                    });
+                    allSchools = result.data;
+                    renderSearchResults(allSchools); 
                 } else {
-                    schoolSelect.innerHTML = '<option value="">No active schools available right now</option>';
+                    searchResults.innerHTML = '<div class="px-5 py-3 text-gray-400 font-medium">No active schools available right now</div>';
                 }
             } catch(e) {
-                schoolSelect.innerHTML = '<option value="">Failed to load schools. Please refresh.</option>';
+                searchResults.innerHTML = '<div class="px-5 py-3 text-red-400 font-medium">Failed to load schools. Please refresh the page.</div>';
             }
 
-            // Enable Continue button only when school is picked
-            schoolSelect.addEventListener('change', () => {
-                if(schoolSelect.value) {
-                    btnContinue.disabled = false;
-                    btnContinue.className = "w-full bg-accent hover:bg-blue-700 text-white py-4 rounded-2xl font-bold transition-all flex items-center justify-center gap-2 transform hover:-translate-y-0.5 shadow-lg shadow-accent/30";
+            // Function to render items
+            function renderSearchResults(schools) {
+                searchResults.innerHTML = '';
+                if(schools.length === 0) {
+                    searchResults.innerHTML = '<div class="px-5 py-3 text-gray-400 font-medium">No schools found matching that name.</div>';
+                    return;
+                }
+                
+                schools.forEach(school => {
+                    const item = document.createElement('div');
+                    item.className = 'px-5 py-3 hover:bg-blue-50 cursor-pointer text-gray-800 font-medium flex items-center gap-3 transition-colors border-b border-gray-50 last:border-0';
+                    item.innerHTML = `<ion-icon name="business-outline" class="text-accent"></ion-icon> ${school.name}`;
+                    
+                    item.addEventListener('click', () => {
+                        // User selected a school
+                        schoolSearchInput.value = school.name;
+                        schoolSelectHidden.value = school.id;
+                        searchResults.classList.add('hidden');
+                        
+                        // Enable button
+                        btnContinue.disabled = false;
+                        btnContinue.className = "w-full bg-accent hover:bg-blue-700 text-white py-4 rounded-2xl font-bold transition-all flex items-center justify-center gap-2 transform hover:-translate-y-0.5 shadow-lg shadow-accent/30";
+                    });
+                    
+                    searchResults.appendChild(item);
+                });
+            }
+
+            // Live Search Filter Logic
+            schoolSearchInput.addEventListener('input', (e) => {
+                const term = e.target.value.toLowerCase();
+                
+                // Clear hidden selected input if user starts typing something else
+                schoolSelectHidden.value = '';
+                btnContinue.disabled = true;
+                btnContinue.className = "w-full bg-gray-200 text-gray-400 py-4 rounded-2xl font-bold transition-all flex items-center justify-center gap-2 cursor-not-allowed";
+
+                if (term === '') {
+                    renderSearchResults(allSchools);
                 } else {
-                    btnContinue.disabled = true;
-                    btnContinue.className = "w-full bg-gray-200 text-gray-400 py-4 rounded-2xl font-bold transition-all flex items-center justify-center gap-2 cursor-not-allowed";
+                    const filtered = allSchools.filter(s => s.name.toLowerCase().includes(term));
+                    renderSearchResults(filtered);
+                }
+            });
+
+            // Show results on focus
+            schoolSearchInput.addEventListener('focus', () => {
+                if(allSchools.length > 0) {
+                    searchResults.classList.remove('hidden');
+                }
+            });
+
+            // Hide results when clicking outside
+            document.addEventListener('click', (e) => {
+                if(!document.getElementById('school-search-container').contains(e.target)) {
+                    searchResults.classList.add('hidden');
                 }
             });
 
             // Transition from Step 1 to Step 2
             btnContinue.addEventListener('click', () => {
-                const selectedText = schoolSelect.options[schoolSelect.selectedIndex].text;
-                schoolNameDisplay.textContent = selectedText;
+                if (!schoolSelectHidden.value) return; 
+                schoolNameDisplay.textContent = schoolSearchInput.value;
                 
                 step1.classList.add('hidden');
                 step2.classList.remove('hidden');
