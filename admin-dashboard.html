@@ -258,64 +258,73 @@
 
             <!-- VIEW: SUBJECTS -->
              <div id="view-subjects" class="space-y-8 hidden animate-fade-in">
+                <!-- Header / Greeting area, similar to dashboard but smaller? No, they are separated. Let's modernize the panels -->
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
                     
                     <!-- Subject Master List -->
-                    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-                        <div class="flex justify-between items-center mb-6">
+                    <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-8 flex flex-col h-[750px]">
+                        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4 shrink-0">
                              <div>
-                                <h3 class="font-bold text-xl text-gray-800">All Subjects</h3>
-                                <p class="text-gray-400 text-sm">Manage the school's curriculum.</p>
+                                <h3 class="font-extrabold text-2xl text-gray-900">Curriculum</h3>
+                                <p class="text-gray-500 text-sm font-medium">Manage all available subjects</p>
                             </div>
-                            <button onclick="openAddSubjectModal()" class="bg-primary hover:bg-gray-800 text-white px-4 py-2 rounded-lg text-sm font-bold shadow-lg transition flex items-center gap-2">
-                                <ion-icon name="add"></ion-icon> New Subject
+                            <button onclick="openAddSubjectModal()" class="bg-emerald-50 text-emerald-600 hover:bg-emerald-500 hover:text-white border border-emerald-100 px-5 py-2.5 rounded-xl text-sm font-bold shadow-sm transition-all flex items-center gap-2 hover:-translate-y-0.5">
+                                <ion-icon name="add-circle"></ion-icon> New Subject
                             </button>
                         </div>
-                        <div class="overflow-y-auto max-h-[500px]">
-                            <table class="w-full text-left">
-                                <thead class="bg-gray-50 text-gray-500 font-bold uppercase text-xs sticky top-0">
+                        <div class="overflow-y-auto flex-1 rounded-2xl border border-gray-100 bg-gray-50/30">
+                            <table class="w-full text-left text-sm whitespace-nowrap">
+                                <thead class="bg-gray-50/80 text-gray-500 font-bold uppercase text-xs tracking-wider sticky top-0 backdrop-blur-md z-10">
                                     <tr>
-                                        <th class="px-4 py-3">Code</th>
-                                        <th class="px-4 py-3">Subject</th>
-                                        <th class="px-4 py-3">Status</th>
-                                        <th class="px-4 py-3 text-right">Actions</th>
+                                        <th class="px-6 py-4">Subject Info</th>
+                                        <th class="px-6 py-4">Status</th>
+                                        <th class="px-6 py-4 text-right">Actions</th>
                                     </tr>
                                 </thead>
-                                <tbody class="divide-y divide-gray-50" id="subject-table-body"></tbody>
+                                <tbody class="divide-y divide-gray-100" id="subject-table-body"></tbody>
                             </table>
                         </div>
                     </div>
 
                     <!-- Class Assignment -->
-                    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex flex-col">
-                        <div class="mb-6 border-b border-gray-100 pb-4">
-                            <h3 class="font-bold text-xl text-gray-800">Class Assignments</h3>
-                            <p class="text-gray-400 text-sm">Control which subjects are taught in each class.</p>
+                    <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-8 flex flex-col h-[750px] relative overflow-hidden">
+                        <!-- BG Decoration -->
+                        <div class="absolute -right-20 -top-20 w-64 h-64 bg-accent/5 rounded-full blur-3xl pointer-events-none"></div>
+
+                        <div class="mb-8 shrink-0 relative z-10">
+                            <h3 class="font-extrabold text-2xl text-gray-900">Class Assignments</h3>
+                            <p class="text-gray-500 text-sm font-medium">Map subjects to specific classes.</p>
                         </div>
                         
-                        <div class="space-y-4 flex-1">
-                            <div class="space-y-2">
-                                <label class="text-xs font-bold text-gray-500 uppercase">Select Class</label>
-                                <select id="assign-class-select" onchange="loadClassSubjects()" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-accent"></select>
+                        <div class="space-y-6 flex-1 flex flex-col relative z-10">
+                            <div class="space-y-2 shrink-0">
+                                <label class="text-xs font-bold text-gray-400 uppercase tracking-widest pl-1">Select A Class</label>
+                                <div class="relative">
+                                    <ion-icon name="easel-outline" class="absolute left-4 top-3.5 text-gray-400 text-lg"></ion-icon>
+                                    <select id="assign-class-select" onchange="loadClassSubjects()" class="w-full pl-12 pr-4 py-3 bg-gray-50/50 border border-gray-200 rounded-xl outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all font-bold text-gray-700 cursor-pointer appearance-none"></select>
+                                </div>
                             </div>
 
-                            <div class="relative bg-gray-50 rounded-xl border border-gray-200 p-4 flex-1 overflow-hidden flex flex-col">
-                                <div class="flex justify-between items-center mb-3">
-                                    <label class="text-xs font-bold text-gray-500 uppercase">Available Subjects</label>
-                                    <div class="space-x-2">
-                                         <button type="button" onclick="toggleAllSubjects(true)" class="text-xs font-bold text-accent hover:underline">Select All</button>
+                            <div class="bg-indigo-50/30 rounded-2xl border border-indigo-100/50 p-5 flex-1 overflow-hidden flex flex-col shadow-inner">
+                                <div class="flex justify-between items-center mb-4 shrink-0">
+                                    <label class="text-xs font-bold text-indigo-400 uppercase tracking-widest flex items-center gap-1.5"><ion-icon name="book"></ion-icon> Subject Checklist</label>
+                                    <div class="space-x-3 bg-white px-3 py-1.5 rounded-lg shadow-sm border border-gray-100">
+                                         <button type="button" onclick="toggleAllSubjects(true)" class="text-xs font-bold text-indigo-600 hover:text-indigo-800 transition-colors uppercase">All</button>
                                          <span class="text-gray-300">|</span>
-                                         <button type="button" onclick="toggleAllSubjects(false)" class="text-xs font-bold text-gray-400 hover:underline">Clear</button>
+                                         <button type="button" onclick="toggleAllSubjects(false)" class="text-xs font-bold text-red-400 hover:text-red-600 transition-colors uppercase">Clear</button>
                                     </div>
                                 </div>
-                                <div id="assignment-checkboxes" class="space-y-2 overflow-y-auto max-h-[350px] pr-2">
+                                <div id="assignment-checkboxes" class="space-y-2 overflow-y-auto flex-1 pr-2 custom-scrollbar">
                                     <!-- Checkboxes -->
-                                    <p class="text-gray-400 text-sm italic text-center py-10">Select a class to configure subjects.</p>
+                                    <div class="h-full flex flex-col items-center justify-center opacity-50">
+                                        <ion-icon name="options-outline" class="text-5xl text-gray-300 mb-3"></ion-icon>
+                                        <p class="text-gray-400 text-sm font-medium text-center">Select a class to configure subjects.</p>
+                                    </div>
                                 </div>
                             </div>
                             
-                            <button onclick="saveClassSubjects()" class="w-full py-3 bg-secondary text-white rounded-xl font-bold hover:bg-amber-600 shadow-lg transition">
-                                <ion-icon name="save"></ion-icon> Save Assignments
+                            <button onclick="saveClassSubjects()" class="w-full py-3.5 bg-gradient-to-r from-secondary to-amber-500 text-white rounded-xl font-bold border-none shadow-lg shadow-amber-500/30 hover:shadow-xl hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2 shrink-0">
+                                <ion-icon name="save" class="text-lg"></ion-icon> Save Subject Mapping
                             </button>
                         </div>
                     </div>
@@ -1914,7 +1923,11 @@
             const container = document.getElementById('assignment-checkboxes');
             
             if(!classId) {
-                container.innerHTML = '<p class="text-gray-400 text-sm italic text-center py-10">Select a class to configure subjects.</p>';
+                container.innerHTML = `
+                    <div class="h-full flex flex-col items-center justify-center opacity-50">
+                        <ion-icon name="options-outline" class="text-5xl text-gray-300 mb-3"></ion-icon>
+                        <p class="text-gray-400 text-sm font-medium text-center">Select a class to configure subjects.</p>
+                    </div>`;
                 return;
             }
 
@@ -1928,18 +1941,24 @@
             const assigned = cls.subjects || [];
 
             if(levelSubjects.length === 0) {
-                 container.innerHTML = '<div class="text-center py-10 text-gray-400 italic">No subjects defined for this level yet.</div>';
+                 container.innerHTML = `
+                    <div class="h-full flex flex-col items-center justify-center opacity-50">
+                        <ion-icon name="alert-circle-outline" class="text-5xl text-gray-300 mb-3"></ion-icon>
+                        <p class="text-gray-400 text-sm font-medium text-center">No subjects defined in the system yet.</p>
+                    </div>`;
             } else {
                  container.innerHTML = levelSubjects.map(s => {
                      const isChecked = assigned.includes(s.id);
+                     const statusColor = s.status === 'Active' ? 'emerald' : 'red';
+                     
                      return `
-                        <label class="flex items-center gap-3 p-3 rounded-xl border border-gray-100 bg-white hover:border-gray-300 hover:bg-gray-50 cursor-pointer transition">
-                            <input type="checkbox" name="assign_subject_ids" value="${s.id}" ${isChecked ? 'checked' : ''} class="w-5 h-5 rounded border-gray-300 text-secondary focus:ring-secondary">
-                            <div>
-                                <span class="block text-gray-800 font-bold text-sm">${s.name}</span>
-                                <span class="block text-xs text-gray-400 font-mono">${s.code}</span>
+                        <label class="flex items-center gap-4 p-3.5 rounded-2xl border border-white/60 bg-white/40 hover:bg-white/80 cursor-pointer transition-all shadow-sm group">
+                            <input type="checkbox" name="assign_subject_ids" value="${s.id}" ${isChecked ? 'checked' : ''} class="w-5 h-5 rounded-md border-gray-300 text-indigo-600 focus:ring-indigo-500 shadow-inner">
+                            <div class="flex-1">
+                                <span class="block text-gray-900 font-bold text-sm group-hover:text-indigo-700 transition-colors">${s.name}</span>
+                                <span class="block text-[10px] text-gray-500 font-bold uppercase tracking-wider mt-0.5">${s.code}</span>
                             </div>
-                            <span class="ml-auto text-xs font-bold px-2 py-1 rounded bg-${s.active ? 'green' : 'red'}-100 text-${s.active ? 'green' : 'red'}-600">${s.active ? 'Active' : 'Inactive'}</span>
+                            <span class="ml-auto text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-lg bg-${statusColor}-50 text-${statusColor}-600 border border-${statusColor}-100">${s.status || 'Active'}</span>
                         </label>
                      `;
                  }).join('');
@@ -2221,16 +2240,25 @@
                  const levelSubjects = allSubjects.filter(s => s.level === level);
                  if(levelSubjects.length > 0) {
                      html += `
-                        <tr class="bg-gray-50/50"><td colspan="4" class="px-4 py-2 font-bold text-xs uppercase text-gray-400 tracking-wider sticky top-0 bg-gray-50">${level} Subjects</td></tr>
+                        <tr class="bg-gray-100/80 backdrop-blur-sm"><td colspan="3" class="px-6 py-2.5 font-black text-[10px] uppercase text-gray-500 tracking-widest sticky top-0">${level} Level</td></tr>
                      ` + levelSubjects.map(s => `
-                        <tr class="hover:bg-gray-50/50 transition group border-b border-gray-50">
-                            <td class="px-4 py-3 font-mono font-bold text-gray-600">${s.code}</td>
-                            <td class="px-4 py-3 font-medium text-gray-800">${s.name}</td>
-                            <td class="px-4 py-3"><span class="px-2 py-1 ${s.status === 'Active' ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'} text-[10px] rounded font-bold uppercase">${s.status}</span></td>
-                            <td class="px-4 py-3 text-right">
-                                <div class="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition">
-                                    <button onclick="openEditSubjectModal('${s.id}')" class="text-gray-400 hover:text-accent transition"><ion-icon name="create-outline"></ion-icon></button>
-                                    <button onclick="deleteSubject('${s.id}')" class="text-gray-400 hover:text-red-500 transition"><ion-icon name="trash-outline"></ion-icon></button>
+                        <tr class="hover:bg-indigo-50/30 transition-colors group border-b border-gray-100/60">
+                            <td class="px-6 py-4">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-gray-50 to-gray-100 text-gray-500 flex items-center justify-center font-bold shadow-inner border border-gray-200 group-hover:scale-110 group-hover:from-emerald-50 group-hover:to-emerald-100 group-hover:text-emerald-600 group-hover:border-emerald-200 transition-all">
+                                        ${s.code.substring(0, 2)}
+                                    </div>
+                                    <div>
+                                        <p class="font-bold text-gray-900 group-hover:text-emerald-700 transition-colors">${s.name}</p>
+                                        <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider mt-0.5">Code: ${s.code}</p>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4"><span class="px-3 py-1.5 ${s.status === 'Active' ? 'bg-emerald-50 text-emerald-600 border border-emerald-100/50' : 'bg-red-50 text-red-600 border border-red-100/50'} rounded-lg text-[10px] font-black uppercase tracking-widest shadow-sm inline-flex items-center gap-1.5">${s.status}</span></td>
+                            <td class="px-6 py-4 text-right">
+                                <div class="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <button onclick="openEditSubjectModal('${s.id}')" class="w-8 h-8 flex items-center justify-center bg-white border border-gray-200 text-gray-400 hover:text-blue-600 hover:border-blue-200 hover:bg-blue-50 rounded-lg transition-all shadow-sm"><ion-icon name="create-outline"></ion-icon></button>
+                                    <button onclick="deleteSubject('${s.id}')" class="w-8 h-8 flex items-center justify-center bg-white border border-gray-200 text-gray-400 hover:text-red-600 hover:border-red-200 hover:bg-red-50 rounded-lg transition-all shadow-sm"><ion-icon name="trash-outline"></ion-icon></button>
                                 </div>
                             </td>
                         </tr>
@@ -2242,16 +2270,25 @@
             const otherSubjects = allSubjects.filter(s => !levels.includes(s.level));
             if(otherSubjects.length > 0) {
                  html += `
-                    <tr class="bg-gray-50/50"><td colspan="4" class="px-4 py-2 font-bold text-xs uppercase text-gray-400 tracking-wider">Other / Uncategorized</td></tr>
+                    <tr class="bg-gray-100/80 backdrop-blur-sm"><td colspan="3" class="px-6 py-2.5 font-black text-[10px] uppercase text-gray-500 tracking-widest">Other / Uncategorized</td></tr>
                  ` + otherSubjects.map(s => `
-                    <tr class="hover:bg-gray-50/50 transition group border-b border-gray-50">
-                        <td class="px-4 py-3 font-mono font-bold text-gray-600">${s.code}</td>
-                        <td class="px-4 py-3 font-medium text-gray-800">${s.name}</td>
-                        <td class="px-4 py-3"><span class="px-2 py-1 ${s.status === 'Active' ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'} text-[10px] rounded font-bold uppercase">${s.status}</span></td>
-                        <td class="px-4 py-3 text-right">
-                            <div class="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition">
-                                <button onclick="openEditSubjectModal('${s.id}')" class="text-gray-400 hover:text-accent transition"><ion-icon name="create-outline"></ion-icon></button>
-                                <button onclick="deleteSubject('${s.id}')" class="text-gray-400 hover:text-red-500 transition"><ion-icon name="trash-outline"></ion-icon></button>
+                    <tr class="hover:bg-indigo-50/30 transition-colors group border-b border-gray-100/60">
+                         <td class="px-6 py-4">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-gray-50 to-gray-100 text-gray-500 flex items-center justify-center font-bold shadow-inner border border-gray-200 group-hover:scale-110 group-hover:from-emerald-50 group-hover:to-emerald-100 group-hover:text-emerald-600 group-hover:border-emerald-200 transition-all">
+                                    ${s.code.substring(0, 2)}
+                                </div>
+                                <div>
+                                    <p class="font-bold text-gray-900 group-hover:text-emerald-700 transition-colors">${s.name}</p>
+                                    <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider mt-0.5">Code: ${s.code}</p>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4"><span class="px-3 py-1.5 ${s.status === 'Active' ? 'bg-emerald-50 text-emerald-600 border border-emerald-100/50' : 'bg-red-50 text-red-600 border border-red-100/50'} rounded-lg text-[10px] font-black uppercase tracking-widest shadow-sm inline-flex items-center gap-1.5">${s.status}</span></td>
+                        <td class="px-6 py-4 text-right">
+                             <div class="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <button onclick="openEditSubjectModal('${s.id}')" class="w-8 h-8 flex items-center justify-center bg-white border border-gray-200 text-gray-400 hover:text-blue-600 hover:border-blue-200 hover:bg-blue-50 rounded-lg transition-all shadow-sm"><ion-icon name="create-outline"></ion-icon></button>
+                                <button onclick="deleteSubject('${s.id}')" class="w-8 h-8 flex items-center justify-center bg-white border border-gray-200 text-gray-400 hover:text-red-600 hover:border-red-200 hover:bg-red-50 rounded-lg transition-all shadow-sm"><ion-icon name="trash-outline"></ion-icon></button>
                             </div>
                         </td>
                     </tr>
