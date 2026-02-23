@@ -16,8 +16,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         }
     }
 
-    $result = $conn->query("SELECT * FROM admission_applications ORDER BY created_at DESC");
+    $school_id = $_GET['school_id'] ?? null;
+    $query = "SELECT * FROM admission_applications";
 
+    if ($school_id) {
+        $stmt = $conn->prepare("SELECT * FROM admission_applications WHERE school_id = ? ORDER BY created_at DESC");
+        $stmt->bind_param("s", $school_id);
+        $stmt->execute();
+        $result = $stmt->get_result();
+    } else {
+        $result = $conn->query("SELECT * FROM admission_applications ORDER BY created_at DESC");
+    }
     $applications = [];
     if ($result) {
         while ($row = $result->fetch_assoc()) {
