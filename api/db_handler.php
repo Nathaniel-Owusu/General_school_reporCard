@@ -42,6 +42,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     $result = $conn->query("SELECT * FROM schools");
     while ($row = $result->fetch_assoc()) {
         $row['settings'] = json_decode($row['settings']);
+        if (isset($row['active'])) $row['active'] = (bool)$row['active'];
         unset($row['created_at']);
         $response['schools'][] = $row;
     }
@@ -120,10 +121,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // Insert Schools
         if (!empty($data['schools'])) {
-            $stmt = $conn->prepare("INSERT INTO schools (id, name, address, logo, contact_email, contact_phone, settings) VALUES (?, ?, ?, ?, ?, ?, ?)");
+            $stmt = $conn->prepare("INSERT INTO schools (id, name, address, logo, contact_email, contact_phone, settings, active) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
             foreach ($data['schools'] as $s) {
                 $ref_settings = safe_json($s['settings'] ?? []);
-                $stmt->bind_param("sssssss", $s['id'], $s['name'], $s['address'], $s['logo'], $s['contact_email'], $s['contact_phone'], $ref_settings);
+                $isActive = isset($s['active']) ? ($s['active'] ? 1 : 0) : 1;
+                $stmt->bind_param("sssssssi", $s['id'], $s['name'], $s['address'], $s['logo'], $s['contact_email'], $s['contact_phone'], $ref_settings, $isActive);
                 $stmt->execute();
             }
             $stmt->close();

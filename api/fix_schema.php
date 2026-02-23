@@ -12,7 +12,8 @@ $queries = [
     "ALTER TABLE users MODIFY assigned_subjects LONGTEXT",
     "ALTER TABLE students MODIFY scores LONGTEXT",
     "ALTER TABLE students MODIFY attendance LONGTEXT",
-    "ALTER TABLE schools MODIFY settings LONGTEXT"
+    "ALTER TABLE schools MODIFY settings LONGTEXT",
+    "ALTER TABLE schools ADD COLUMN active TINYINT(1) DEFAULT 1"
 ];
 
 foreach ($queries as $sql) {
