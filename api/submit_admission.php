@@ -64,7 +64,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $subject_applicant = "Application Received - $school_name";
                 $message_applicant = "Dear {$data['parent_name']},\n\nWe have successfully received the admission application for {$data['first_name']} {$data['last_name']} to $school_name. Our admissions office will review your application and contact you shortly regarding the next steps.\n\nThank you for choosing $school_name.\n\nBest Regards,\nAdmissions Team";
                 $headers_applicant = "From: admissions@generalschool.com\r\nReply-To: $admin_email\r\n";
-                @mail($to_applicant, $subject_applicant, $message_applicant, $headers_applicant);
+                if (!isset($_SERVER['HTTP_HOST']) || (strpos($_SERVER['HTTP_HOST'], 'localhost') === false && strpos($_SERVER['HTTP_HOST'], '127.0.0.1') === false)) {
+                    @mail($to_applicant, $subject_applicant, $message_applicant, $headers_applicant);
+                }
             }
 
             // 2. Send Email to School Admin & CC Super Admin
@@ -75,7 +77,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 // Copy super admin on all admissions
                 $headers_admin = "From: system@generalschool.com\r\nCC: owusuansahnathaniel21@gmail.com\r\n";
-                @mail($to_admin, $subject_admin, $message_admin, $headers_admin);
+                if (!isset($_SERVER['HTTP_HOST']) || (strpos($_SERVER['HTTP_HOST'], 'localhost') === false && strpos($_SERVER['HTTP_HOST'], '127.0.0.1') === false)) {
+                    @mail($to_admin, $subject_admin, $message_admin, $headers_admin);
+                }
             }
 
             echo json_encode(["success" => true, "message" => "Application submitted successfully!"]);

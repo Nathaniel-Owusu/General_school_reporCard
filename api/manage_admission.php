@@ -54,7 +54,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     }
 
                     $headers = "From: no-reply@generalschool.com\r\nReply-To: $school_email\r\nCC: owusuansahnathaniel21@gmail.com\r\n";
-                    @mail($to, $subject, $message, $headers);
+                    if (!isset($_SERVER['HTTP_HOST']) || (strpos($_SERVER['HTTP_HOST'], 'localhost') === false && strpos($_SERVER['HTTP_HOST'], '127.0.0.1') === false)) {
+                        @mail($to, $subject, $message, $headers);
+                    }
                 }
             }
             $app_stmt->close();
