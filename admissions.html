@@ -21,7 +21,10 @@
     </script>
     <style>
         .hero-bg {
-            background: linear-gradient(135deg, #eff6ff 0%, #e0e7ff 100%);
+            background-color: #0f172a; /* Slate 900 base */
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(37, 99, 235, 0.5) 0px, transparent 50%), /* primary blue */
+                radial-gradient(at 100% 100%, rgba(79, 70, 229, 0.5) 0px, transparent 50%); /* accent indigo */
             position: relative;
         }
         .reveal {
@@ -72,18 +75,19 @@
     </nav>
 
     <!-- Header Section -->
-    <header class="pt-32 pb-20 bg-gradient-to-br from-indigo-900 via-blue-900 to-indigo-800 text-white relative overflow-hidden">
+    <header class="pt-36 pb-32 hero-bg text-white relative overflow-hidden">
         <div class="absolute inset-0 z-0">
-            <div class="absolute inset-0 bg-black/30"></div>
-            <!-- Abstract background pattern -->
-            <svg class="absolute bottom-0 w-full h-auto text-white" viewBox="0 0 1440 320" preserveAspectRatio="none">
-                <path fill="currentColor" fill-opacity="1" d="M0,192L48,197.3C96,203,192,213,288,229.3C384,245,480,267,576,250.7C672,235,768,181,864,181.3C960,181,1056,235,1152,234.7C1248,235,1344,181,1392,154.7L1440,128L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path>
+            <!-- Subtle overlay for extreme readability -->
+            <div class="absolute inset-0 bg-slate-900/40"></div>
+            <!-- Abstract background wave at bottom -->
+            <svg class="absolute bottom-0 w-full h-auto text-white" viewBox="0 0 1440 120" preserveAspectRatio="none">
+                <path fill="currentColor" fill-opacity="1" d="M0,64L80,58.7C160,53,320,43,480,48C640,53,800,75,960,74.7C1120,75,1280,53,1360,42.7L1440,32L1440,120L1360,120C1280,120,1120,120,960,120C800,120,640,120,480,120C320,120,160,120,80,120L0,120Z"></path>
             </svg>
         </div>
         <div class="container mx-auto px-6 relative z-10 text-center">
-            <span class="px-4 py-1.5 bg-white/10 rounded-full text-blue-100 font-bold text-xs border border-white/20 mb-6 inline-block tracking-widest uppercase shadow-sm">Join Us</span>
-            <h1 class="text-5xl md:text-7xl font-black mb-6 tracking-tight leading-tight">Admissions Process</h1>
-            <p class="text-xl md:text-2xl text-blue-100 max-w-2xl mx-auto font-medium leading-relaxed">Start your journey at General School. We make the enrollment process straightforward and welcoming.</p>
+            <span class="px-5 py-2 bg-white/10 backdrop-blur-md rounded-full text-blue-100 font-extrabold text-xs border border-white/20 mb-8 inline-block tracking-[0.2em] uppercase shadow-lg">Join Us</span>
+            <h1 class="text-5xl md:text-7xl font-black mb-8 tracking-tight leading-tight drop-shadow-lg text-white">Admissions Process</h1>
+            <p class="text-xl md:text-2xl text-blue-50 max-w-3xl mx-auto font-medium leading-relaxed drop-shadow-md">Start your journey at General School. We make the enrollment process straightforward and welcoming.</p>
         </div>
     </header>
 
