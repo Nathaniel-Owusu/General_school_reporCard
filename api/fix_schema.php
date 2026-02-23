@@ -1,6 +1,6 @@
 <?php
 header('Content-Type: text/plain');
-require_once '../config/db_connect.php';
+require_once __DIR__ . '/../config/db_connect.php';
 
 echo "Database Schema Update Tool\n";
 echo "---------------------------\n";

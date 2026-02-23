@@ -8,9 +8,14 @@ $db_user = 'root';
 $db_pass = '';
 $db_name = 'school_report_db';
 
-// Check for Production Credentials File
+// Check for Production Credentials File (only use if NOT on localhost)
+$is_localhost = false;
+if (php_sapi_name() === 'cli' || (isset($_SERVER['HTTP_HOST']) && ($_SERVER['HTTP_HOST'] === 'localhost' || strpos($_SERVER['HTTP_HOST'], '127.0.0.1') !== false))) {
+    $is_localhost = true;
+}
+
 $prod_file = __DIR__ . '/prod_config.php';
-if (file_exists($prod_file)) {
+if (!$is_localhost && file_exists($prod_file)) {
     include $prod_file;
     // Production config loaded successfully
 }
