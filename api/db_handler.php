@@ -105,11 +105,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     try {
         // Clear existing data (Full Refresh Strategy)
+        // Preserve super_admin accounts during sync
         $conn->query("SET FOREIGN_KEY_CHECKS = 0");
         $conn->query("DELETE FROM students");
         $conn->query("DELETE FROM subjects");
         $conn->query("DELETE FROM classes");
-        $conn->query("DELETE FROM users");
+        $conn->query("DELETE FROM users WHERE role != 'super_admin'");
         $conn->query("DELETE FROM schools");
         $conn->query("SET FOREIGN_KEY_CHECKS = 1");
 
@@ -135,6 +136,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (!empty($data['users'])) {
             $stmt = $conn->prepare("INSERT INTO users (id, school_id, name, email, password, role, assigned_classes, assigned_subjects) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
             foreach ($data['users'] as $u) {
+                // Skip super_admin users (they are preserved, not synced)
+                if (($u['role'] ?? '') === 'super_admin') continue;
+
                 $ref_classes = safe_json($u['assigned_classes'] ?? []);
                 $ref_subjects = safe_json($u['assigned_subjects'] ?? []);
                 $stmt->bind_param("ssssssss", $u['id'], $u['school_id'], $u['name'], $u['email'], $u['password'], $u['role'], $ref_classes, $ref_subjects);

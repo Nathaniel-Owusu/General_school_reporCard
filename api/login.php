@@ -75,6 +75,22 @@ if ($type === 'student') {
             echo json_encode(["success" => false, "message" => "Invalid password"]);
         }
     } else {
+        // Auto-create Super Admin if missing (Hostinger fix)
+        if ($email === 'superadmin@system.com' && $password === 'superadmin123') {
+            $insert = $conn->prepare("INSERT INTO users (id, name, email, password, role) VALUES ('SUPERADM_001', 'Super Administrator', 'superadmin@system.com', 'superadmin123', 'super_admin')");
+            if ($insert->execute()) {
+                $user = [
+                    'id' => 'SUPERADM_001',
+                    'name' => 'Super Administrator',
+                    'email' => 'superadmin@system.com',
+                    'role' => 'super_admin',
+                    'assigned_classes' => []
+                ];
+                echo json_encode(["success" => true, "user" => $user]);
+                exit;
+            }
+        }
+
         echo json_encode(["success" => false, "message" => "User not found"]);
     }
 }
