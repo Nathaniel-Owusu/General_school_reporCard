@@ -22,9 +22,84 @@
     <style>
         .fade-in { animation: fadeIn 0.5s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .login-slide-up { animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(40px) scale(0.96); } to { opacity: 1; transform: translateY(0) scale(1); } }
+        .pulse-glow { animation: pulseGlow 2s ease-in-out infinite alternate; }
+        @keyframes pulseGlow { from { box-shadow: 0 0 20px rgba(99,102,241,0.2); } to { box-shadow: 0 0 40px rgba(99,102,241,0.4); } }
+        .float-animation { animation: float 6s ease-in-out infinite; }
+        @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        #dashboard-content { display: none; }
     </style>
 </head>
 <body class="bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 min-h-screen font-sans">
+    
+    <!-- ============ SUPER ADMIN LOGIN SCREEN ============ -->
+    <div id="login-screen" class="fixed inset-0 z-[100] flex items-center justify-center p-4" style="background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);">
+        <!-- Animated Background Orbs -->
+        <div class="absolute inset-0 overflow-hidden pointer-events-none">
+            <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl float-animation"></div>
+            <div class="absolute bottom-1/4 right-1/4 w-80 h-80 bg-purple-500/10 rounded-full blur-3xl float-animation" style="animation-delay: -3s;"></div>
+            <div class="absolute top-1/2 left-1/2 w-64 h-64 bg-blue-500/5 rounded-full blur-3xl float-animation" style="animation-delay: -1.5s;"></div>
+        </div>
+
+        <div class="relative z-10 w-full max-w-md login-slide-up">
+            <!-- Logo & Title -->
+            <div class="text-center mb-8">
+                <div class="w-20 h-20 mx-auto mb-6 rounded-3xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white text-4xl shadow-2xl shadow-indigo-500/40 pulse-glow">
+                    <ion-icon name="shield-checkmark"></ion-icon>
+                </div>
+                <h1 class="text-3xl font-extrabold text-white tracking-tight mb-2">Super Admin</h1>
+                <p class="text-indigo-300/70 text-sm font-medium">Multi-School Management System</p>
+            </div>
+
+            <!-- Login Card -->
+            <div class="bg-white/10 backdrop-blur-xl border border-white/10 rounded-3xl p-8 shadow-2xl">
+                <form id="super-admin-login-form" onsubmit="handleSuperAdminLogin(event)" class="space-y-5">
+                    <div>
+                        <label class="block text-xs font-bold text-indigo-200/80 uppercase tracking-wider mb-2">Email Address</label>
+                        <div class="relative">
+                            <ion-icon name="mail-outline" class="absolute left-4 top-3.5 text-indigo-300/50 text-lg"></ion-icon>
+                            <input type="email" id="sa-email" required 
+                                class="w-full pl-12 pr-4 py-3.5 bg-white/5 border border-white/10 rounded-2xl outline-none text-white focus:border-indigo-400/50 focus:ring-2 focus:ring-indigo-500/20 transition-all font-medium">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-indigo-200/80 uppercase tracking-wider mb-2">Password</label>
+                        <div class="relative">
+                            <ion-icon name="lock-closed-outline" class="absolute left-4 top-3.5 text-indigo-300/50 text-lg"></ion-icon>
+                            <input type="text" id="sa-password" required 
+                                class="w-full pl-12 pr-12 py-3.5 bg-white/5 border border-white/10 rounded-2xl outline-none text-white focus:border-indigo-400/50 focus:ring-2 focus:ring-indigo-500/20 transition-all font-medium">
+                            <button type="button" onclick="toggleSAPass()" class="absolute right-4 top-3.5 text-indigo-300/50 hover:text-indigo-200 transition">
+                                <ion-icon name="eye-off-outline" id="sa-eye-icon" class="text-lg"></ion-icon>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="sa-login-error" class="hidden bg-red-500/10 border border-red-400/20 text-red-300 text-sm font-medium rounded-xl px-4 py-3 text-center"></div>
+
+                    <button type="submit" id="sa-login-btn" class="w-full py-3.5 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-2xl font-bold text-sm uppercase tracking-wider shadow-lg shadow-indigo-500/30 hover:shadow-xl hover:shadow-indigo-500/40 hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2">
+                        <ion-icon name="log-in-outline" class="text-lg"></ion-icon>
+                        Access Dashboard
+                    </button>
+                </form>
+
+                <div class="mt-6 pt-5 border-t border-white/5 text-center">
+                    <a href="login.html" class="text-xs font-medium text-indigo-300/40 hover:text-indigo-200 transition flex items-center justify-center gap-1.5">
+                        <ion-icon name="arrow-back-outline"></ion-icon>
+                        Back to School Portal
+                    </a>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="mt-6 text-center">
+                <p class="text-[11px] text-indigo-300/20 font-medium">Secured System Access • Authorized Personnel Only</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============ DASHBOARD CONTENT (hidden until login) ============ -->
+    <div id="dashboard-content">
     
     <!-- Header -->
     <header class="bg-white/90 backdrop-blur-md border-b border-gray-100 shadow-sm sticky top-0 z-40">
@@ -48,7 +123,7 @@
                         <p class="text-xs font-semibold text-primary">System Administrator</p>
                     </div>
                 </div>
-                <button onclick="logout()" class="p-3 hover:bg-red-50 hover:text-red-600 rounded-xl text-gray-400 transition-all font-bold flex items-center gap-2">
+                <button onclick="saLogout()" class="p-3 hover:bg-red-50 hover:text-red-600 rounded-xl text-gray-400 transition-all font-bold flex items-center gap-2">
                     <span class="hidden md:inline text-sm">Logout</span>
                     <ion-icon name="log-out-outline" class="text-xl"></ion-icon>
                 </button>
@@ -271,7 +346,6 @@
         </div>
 
     </main>
-
 
     <!-- Add School Modal -->
     <div id="add-school-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden flex items-center justify-center z-50 p-4">
@@ -607,13 +681,128 @@
         </div>
     </div>
 
+    </div> <!-- end #dashboard-content -->
+
     <script src="js/storage.js?v=5"></script>
     <script src="js/app.js?v=5"></script>
     <script>
-        // Check Super Admin Auth
-        const user = checkAuth(['super_admin']);
-        if(user) {
-            document.getElementById('super-admin-name').textContent = user.name || 'Super Admin';
+        // ===== SUPER ADMIN LOGIN HANDLER =====
+
+        function toggleSAPass() {
+            const input = document.getElementById('sa-password');
+            const icon = document.getElementById('sa-eye-icon');
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.setAttribute('name', 'eye-off-outline');
+            } else {
+                input.type = 'password';
+                icon.setAttribute('name', 'eye-outline');
+            }
+        }
+
+        async function handleSuperAdminLogin(e) {
+            e.preventDefault();
+            const btn = document.getElementById('sa-login-btn');
+            const errorDiv = document.getElementById('sa-login-error');
+            const email = document.getElementById('sa-email').value.trim();
+            const password = document.getElementById('sa-password').value;
+
+            // Loading state
+            btn.innerHTML = '<ion-icon name="sync-outline" class="text-lg animate-spin"></ion-icon> Verifying...';
+            btn.disabled = true;
+            btn.classList.add('opacity-70', 'cursor-not-allowed');
+            errorDiv.classList.add('hidden');
+
+            try {
+                const response = await fetch('api/login.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password, type: 'staff' })
+                });
+
+                const data = await response.json();
+
+                if (data.success && data.user && data.user.role === 'super_admin') {
+                    sessionStorage.setItem('currentUser', JSON.stringify(data.user));
+                    btn.innerHTML = '<ion-icon name="checkmark-circle-outline" class="text-lg"></ion-icon> Access Granted';
+                    btn.classList.remove('opacity-70');
+                    btn.classList.add('from-green-500', 'to-emerald-600');
+
+                    setTimeout(() => {
+                        showDashboard(data.user);
+                    }, 600);
+                } else if (data.success && data.user && data.user.role !== 'super_admin') {
+                    showLoginError('This login is for Super Admins only.');
+                    resetLoginBtn();
+                } else {
+                    showLoginError(data.message || 'Invalid credentials.');
+                    resetLoginBtn();
+                }
+            } catch (err) {
+                console.warn('API unavailable, trying offline...', err);
+                // Offline fallback
+                const result = await login('staff', { email, password });
+                if (result.success) {
+                    const user = JSON.parse(sessionStorage.getItem('currentUser'));
+                    if (user && user.role === 'super_admin') {
+                        btn.innerHTML = '<ion-icon name="checkmark-circle-outline" class="text-lg"></ion-icon> Access Granted';
+                        setTimeout(() => showDashboard(user), 600);
+                    } else {
+                        sessionStorage.removeItem('currentUser');
+                        showLoginError('This login is for Super Admins only.');
+                        resetLoginBtn();
+                    }
+                } else {
+                    showLoginError(result.message || 'Invalid credentials.');
+                    resetLoginBtn();
+                }
+            }
+        }
+
+        function showLoginError(msg) {
+            const errorDiv = document.getElementById('sa-login-error');
+            errorDiv.textContent = msg;
+            errorDiv.classList.remove('hidden');
+            errorDiv.classList.add('fade-in');
+        }
+
+        function resetLoginBtn() {
+            const btn = document.getElementById('sa-login-btn');
+            btn.innerHTML = '<ion-icon name="log-in-outline" class="text-lg"></ion-icon> Access Dashboard';
+            btn.disabled = false;
+            btn.classList.remove('opacity-70', 'cursor-not-allowed', 'from-green-500', 'to-emerald-600');
+        }
+
+        function showDashboard(user) {
+            const loginScreen = document.getElementById('login-screen');
+            loginScreen.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
+            loginScreen.style.opacity = '0';
+            loginScreen.style.transform = 'scale(1.02)';
+
+            setTimeout(() => {
+                loginScreen.style.display = 'none';
+                document.getElementById('dashboard-content').style.display = 'block';
+                document.getElementById('super-admin-name').textContent = user.name || 'Super Admin';
+                initSuperAdmin();
+            }, 400);
+        }
+
+        // ===== CHECK EXISTING SESSION ON LOAD =====
+        (function() {
+            const user = JSON.parse(sessionStorage.getItem('currentUser'));
+            if (user && user.role === 'super_admin') {
+                // Already logged in - skip login screen
+                document.getElementById('login-screen').style.display = 'none';
+                document.getElementById('dashboard-content').style.display = 'block';
+                document.getElementById('super-admin-name').textContent = user.name || 'Super Admin';
+                initSuperAdmin();
+            }
+            // Otherwise login screen stays visible
+        })();
+
+        function saLogout() {
+            sessionStorage.removeItem('currentUser');
+            window.location.reload();
         }
 
         // Initialize Dashboard
