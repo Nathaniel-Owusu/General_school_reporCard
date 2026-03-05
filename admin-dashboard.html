@@ -1928,9 +1928,9 @@
                  classSubjects.forEach(s => {
                      const checked = sel.subjectIds.has(s.id);
                      subjectChips += `
-                     <label class="atm-subject-chip flex items-center gap-3 p-3 rounded-xl border-2 cursor-pointer transition-all select-none
+                     <div class="atm-subject-chip flex items-center gap-3 p-3 rounded-xl border-2 cursor-pointer transition-all select-none
                          ${checked ? 'border-indigo-400 bg-indigo-50 shadow-sm shadow-indigo-100' : 'border-gray-100 bg-gray-50/50 hover:border-gray-200 hover:bg-gray-50'}"
-                         onclick="_atmToggleSubject('${classId}', '${s.id}', this)">
+                         onclick="_atmToggleSubject('${classId}', '${s.id}')">
                          <div class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 font-bold text-xs transition-all
                              ${checked ? 'bg-indigo-500 text-white shadow-md shadow-indigo-300' : 'bg-white text-gray-400 border border-gray-200'}">
                              ${s.code ? s.code.substring(0, 2) : s.name.substring(0, 2)}
@@ -1943,8 +1943,7 @@
                              ${checked ? 'border-indigo-500 bg-indigo-500' : 'border-gray-200 bg-white'}">
                              ${checked ? '<ion-icon name="checkmark" class="text-white text-xs"></ion-icon>' : ''}
                          </div>
-                         <input type="checkbox" class="subject-cb sr-only" data-class-id="${classId}" value="${s.id}" ${checked ? 'checked' : ''}>
-                     </label>`;
+                     </div>`;
                  });
              }
 
@@ -1985,20 +1984,14 @@
                  </div>`;
          }
 
-         window._atmToggleSubject = function(classId, subjectId, labelEl) {
+         window._atmToggleSubject = function(classId, subjectId) {
              const sel = _atmSelections[classId];
              if (!sel) return;
-             const cb = labelEl ? labelEl.querySelector('.subject-cb') : null;
 
              if (sel.subjectIds.has(subjectId)) {
                  sel.subjectIds.delete(subjectId);
-                 if (cb) cb.checked = false;
-                 // Uncheck "all subjects" toggle
-                 const allToggle = document.querySelector(`.class-teacher-toggle`);
-                 if (allToggle) allToggle.checked = false;
              } else {
                  sel.subjectIds.add(subjectId);
-                 if (cb) cb.checked = true;
              }
              // Re-render panel to refresh chip styles + counters
              _atmSelectTab(classId);
