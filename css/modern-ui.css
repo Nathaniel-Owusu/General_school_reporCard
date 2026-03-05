@@ -1,535 +1,583 @@
-/* 
- * Modern UI Enhancement Stylesheet
- * Adds contemporary design elements to the School Report Card System
+/*
+ * ═══════════════════════════════════════════════════════
+ *   PREMIUM ADMIN UI — General School Report Card
+ *   Full Design System v3.0
+ * ═══════════════════════════════════════════════════════
  */
 
-/* ========================================
-   MODERN COLOR PALETTE
-   ======================================== */
+/* ── Google Font Import ── */
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap');
+
+/* ── CSS Custom Properties ── */
 :root {
-    --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-    --success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-    --info-gradient: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
-    --warning-gradient: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
-    
-    --glass-bg: rgba(255, 255, 255, 0.1);
-    --glass-border: rgba(255, 255, 255, 0.2);
-    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
-    --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.12);
-    --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.16);
-    --shadow-xl: 0 12px 48px rgba(0, 0, 0, 0.20);
+    --sidebar-width: 260px;
+    --sidebar-bg: #0d1117;
+    --sidebar-border: rgba(255,255,255,0.06);
+    --sidebar-active: rgba(99,102,241,0.15);
+    --sidebar-active-border: #6366f1;
+    --sidebar-text: #8b949e;
+    --sidebar-text-active: #f0f6ff;
+
+    --header-bg: rgba(255,255,255,0.97);
+    --header-border: #f0f0f0;
+
+    --page-bg: #f6f7fb;
+    --card-bg: #ffffff;
+    --card-border: rgba(0,0,0,0.05);
+    --card-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.06);
+    --card-shadow-hover: 0 4px 12px rgba(0,0,0,0.08), 0 16px 40px rgba(0,0,0,0.1);
+
+    --accent-blue:   #6366f1;
+    --accent-purple: #8b5cf6;
+    --accent-teal:   #14b8a6;
+    --accent-amber:  #f59e0b;
+    --accent-rose:   #f43f5e;
+    --accent-emerald:#10b981;
+
+    --text-primary:  #111827;
+    --text-secondary:#6b7280;
+    --text-muted:    #9ca3af;
+
+    --radius-sm:  8px;
+    --radius-md:  12px;
+    --radius-lg:  16px;
+    --radius-xl:  20px;
+    --radius-2xl: 24px;
+
+    --transition: all 0.22s cubic-bezier(0.4,0,0.2,1);
 }
 
-/* ========================================
-   GLASSMORPHISM CARDS
-   ======================================== */
-.glass-card {
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    box-shadow: 0 8px 32px rgba(31, 38, 135, 0.15);
-    border-radius: 20px;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+/* ── Base Reset ── */
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+    font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--page-bg);
+    color: var(--text-primary);
+    -webkit-font-smoothing: antialiased;
 }
 
-.glass-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 12px 40px rgba(31, 38, 135, 0.25);
+/* ═══════════════════════════════════════
+   SCROLLBAR
+═══════════════════════════════════════ */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: #9ca3af; }
+
+/* ═══════════════════════════════════════
+   SIDEBAR — PREMIUM DARK
+═══════════════════════════════════════ */
+aside#mobile-sidebar {
+    background: var(--sidebar-bg) !important;
+    width: var(--sidebar-width) !important;
+    border-right: 1px solid var(--sidebar-border) !important;
+    box-shadow: 4px 0 24px rgba(0,0,0,0.18) !important;
 }
 
-/* ========================================
-   MODERN GRADIENT BUTTONS
-   ======================================== */
-.btn-gradient-primary {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    border: none;
-    color: white;
-    padding: 12px 28px;
-    border-radius: 12px;
-    font-weight: 600;
-    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
-    transition: all 0.3s ease;
-    position: relative;
-    overflow: hidden;
+/* Sidebar brand area */
+aside#mobile-sidebar > div:first-child {
+    background: rgba(255,255,255,0.03) !important;
+    border-bottom: 1px solid var(--sidebar-border) !important;
+    padding: 0 24px !important;
+    height: 70px !important;
 }
 
-.btn-gradient-primary::before {
+/* Nav items */
+aside#mobile-sidebar nav button,
+aside#mobile-sidebar nav a {
+    border-radius: var(--radius-md) !important;
+    color: var(--sidebar-text) !important;
+    font-size: 14px !important;
+    font-weight: 500 !important;
+    letter-spacing: 0.01em !important;
+    padding: 11px 14px !important;
+    transition: var(--transition) !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+    text-decoration: none !important;
+    position: relative !important;
+    background: transparent !important;
+    border: none !important;
+    width: 100% !important;
+}
+
+aside#mobile-sidebar nav button:hover,
+aside#mobile-sidebar nav a:hover {
+    background: rgba(255,255,255,0.05) !important;
+    color: #e2e8f0 !important;
+    transform: translateX(2px) !important;
+}
+
+/* Active nav item */
+aside#mobile-sidebar nav button.bg-accent {
+    background: var(--sidebar-active) !important;
+    color: #a5b4fc !important;
+    border: 1px solid rgba(99,102,241,0.25) !important;
+    font-weight: 600 !important;
+    box-shadow: none !important;
+}
+
+aside#mobile-sidebar nav button.bg-accent::before {
     content: '';
     position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-    transition: left 0.5s;
-}
-
-.btn-gradient-primary:hover::before {
-    left: 100%;
-}
-
-.btn-gradient-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
-}
-
-.btn-gradient-success {
-    background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
-    box-shadow: 0 4px 15px rgba(17, 153, 142, 0.4);
-}
-
-.btn-gradient-danger {
-    background: linear-gradient(135deg, #ee0979 0%, #ff6a00 100%);
-    box-shadow: 0 4px 15px rgba(238, 9, 121, 0.4);
-}
-
-/* ========================================
-   MODERN STAT CARDS
-   ======================================== */
-.stat-card-modern {
-    background: white;
-    border-radius: 20px;
-    padding: 24px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    border: 1px solid rgba(0, 0, 0, 0.05);
-    position: relative;
-    overflow: hidden;
-}
-
-.stat-card-modern::before {
-    content: '';
-    position: absolute;
-    top: 0;
     left: 0;
-    right: 0;
-    height: 4px;
-    background: linear-gradient(90deg, #667eea, #764ba2);
+    top: 20%;
+    bottom: 20%;
+    width: 3px;
+    background: var(--accent-blue);
+    border-radius: 0 4px 4px 0;
 }
 
-.stat-card-modern:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
-}
-
-.stat-icon-modern {
-    width: 56px;
-    height: 56px;
-    border-radius: 16px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 28px;
-    margin-bottom: 16px;
-}
-
-.stat-icon-primary {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
-}
-
-.stat-icon-success {
-    background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
-    color: white;
-    box-shadow: 0 4px 15px rgba(17, 153, 142, 0.3);
-}
-
-.stat-icon-warning {
-    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-    color: white;
-    box-shadow: 0 4px 15px rgba(240, 147, 251, 0.3);
-}
-
-.stat-icon-info {
-    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-    color: white;
-    box-shadow: 0 4px 15px rgba(79, 172, 254, 0.3);
-}
-
-/* ========================================
-   MODERN TABLE STYLING
-   ======================================== */
-.table-modern {
-    background: white;
-    border-radius: 16px;
-    overflow: hidden;
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
-}
-
-.table-modern thead {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-}
-
-.table-modern thead th {
-    padding: 16px 20px;
-    font-weight: 600;
-    text-transform: uppercase;
-    font-size: 12px;
-    letter-spacing: 0.5px;
-}
-
-.table-modern tbody tr {
-    transition: all 0.2s ease;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-}
-
-.table-modern tbody tr:hover {
-    background: linear-gradient(90deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
-    transform: scale(1.01);
-}
-
-.table-modern tbody td {
-    padding: 16px 20px;
-    vertical-align: middle;
-}
-
-/* ========================================
-   MODERN BADGES
-   ======================================== */
-.badge-modern {
-    padding: 6px 14px;
-    border-radius: 20px;
-    font-size: 11px;
+/* Nav section label */
+.nav-section-label {
+    font-size: 10px;
     font-weight: 700;
+    letter-spacing: 0.12em;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    color: rgba(255,255,255,0.2);
+    padding: 16px 14px 6px;
+}
+
+/* Sidebar icon */
+aside#mobile-sidebar nav button ion-icon,
+aside#mobile-sidebar nav a ion-icon {
+    font-size: 18px !important;
+    flex-shrink: 0 !important;
+    opacity: 0.8 !important;
+}
+
+/* Sidebar logout area */
+aside#mobile-sidebar > div:last-child {
+    border-top: 1px solid var(--sidebar-border) !important;
+    padding: 16px !important;
+}
+
+/* ═══════════════════════════════════════
+   HEADER — CLEAN GLASS
+═══════════════════════════════════════ */
+header {
+    background: var(--header-bg) !important;
+    border-bottom: 1px solid var(--header-border) !important;
+    height: 64px !important;
+    backdrop-filter: blur(12px) !important;
+    box-shadow: 0 1px 0 rgba(0,0,0,0.05), 0 2px 12px rgba(0,0,0,0.03) !important;
+}
+
+header h2 {
+    font-size: 20px !important;
+    font-weight: 700 !important;
+    letter-spacing: -0.01em !important;
+    color: var(--text-primary) !important;
+}
+
+header p {
+    font-size: 13px !important;
+    color: var(--text-muted) !important;
+}
+
+/* Admin avatar */
+header .w-10.h-10.rounded-full {
+    background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple)) !important;
+    box-shadow: 0 4px 12px rgba(99,102,241,0.35) !important;
+    font-size: 15px !important;
+    font-weight: 700 !important;
+}
+
+/* ═══════════════════════════════════════
+   PAGE BACKGROUND
+═══════════════════════════════════════ */
+.flex-1.overflow-y-auto {
+    background: var(--page-bg) !important;
+}
+
+/* ═══════════════════════════════════════
+   WELCOME BANNER — PREMIUM GRADIENT
+═══════════════════════════════════════ */
+.bg-gradient-to-r.from-primary.to-accent {
+    background: linear-gradient(135deg, #1e1b4b 0%, #312e81 40%, #4338ca 70%, #6366f1 100%) !important;
+    border-radius: var(--radius-2xl) !important;
+    padding: 32px 40px !important;
+    position: relative !important;
+    overflow: hidden !important;
+    box-shadow: 0 8px 32px rgba(99,102,241,0.3), 0 0 0 1px rgba(255,255,255,0.05) inset !important;
+}
+
+.bg-gradient-to-r.from-primary.to-accent::after {
+    content: '';
+    position: absolute;
+    bottom: -40px;
+    right: -40px;
+    width: 200px;
+    height: 200px;
+    background: radial-gradient(circle, rgba(139,92,246,0.4), transparent 70%);
+    pointer-events: none;
+}
+
+/* ═══════════════════════════════════════
+   STAT CARDS — ELEVATED GLASS
+═══════════════════════════════════════ */
+.grid .bg-white.rounded-3xl {
+    background: var(--card-bg) !important;
+    border: 1px solid var(--card-border) !important;
+    border-radius: var(--radius-xl) !important;
+    box-shadow: var(--card-shadow) !important;
+    transition: var(--transition) !important;
+}
+
+.grid .bg-white.rounded-3xl:hover {
+    box-shadow: var(--card-shadow-hover) !important;
+    transform: translateY(-3px) !important;
+}
+
+/* Colored top bar on stat cards — thinner, sharper */
+.grid .bg-white.rounded-3xl > .absolute.inset-x-0.top-0 {
+    height: 3px !important;
+    border-radius: var(--radius-xl) var(--radius-xl) 0 0 !important;
+}
+
+/* Stat number */
+.grid .bg-white.rounded-3xl h3.text-4xl {
+    font-size: 36px !important;
+    font-weight: 800 !important;
+    letter-spacing: -0.03em !important;
+    color: var(--text-primary) !important;
+}
+
+/* ═══════════════════════════════════════
+   CONTENT CARDS — UNIFIED STYLE
+═══════════════════════════════════════ */
+.bg-white.rounded-3xl,
+.bg-white.rounded-2xl {
+    background: var(--card-bg) !important;
+    border-radius: var(--radius-xl) !important;
+    border: 1px solid rgba(0,0,0,0.045) !important;
+    box-shadow: var(--card-shadow) !important;
+}
+
+/* ═══════════════════════════════════════
+   TABLES — CLEAN MODERN
+═══════════════════════════════════════ */
+table.w-full thead {
+    background: #fafafa !important;
+}
+
+table.w-full thead th {
+    font-size: 11px !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.08em !important;
+    text-transform: uppercase !important;
+    color: #9ca3af !important;
+    padding: 14px 20px !important;
+    border-bottom: 1px solid #f0f0f0 !important;
+}
+
+table.w-full tbody td {
+    padding: 14px 20px !important;
+    font-size: 14px !important;
+    color: var(--text-primary) !important;
+    border-bottom: 1px solid #f8f8f8 !important;
+    vertical-align: middle !important;
+}
+
+table.w-full tbody tr:last-child td {
+    border-bottom: none !important;
+}
+
+table.w-full tbody tr:hover td {
+    background: #fafbff !important;
+}
+
+/* ═══════════════════════════════════════
+   BUTTONS — PREMIUM SYSTEM
+═══════════════════════════════════════ */
+
+/* Primary (dark) */
+.bg-primary, button.bg-primary {
+    background: #111827 !important;
+    border-radius: var(--radius-md) !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.01em !important;
+    transition: var(--transition) !important;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.1), 0 4px 12px rgba(0,0,0,0.15) !important;
+}
+.bg-primary:hover, button.bg-primary:hover {
+    background: #1f2937 !important;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2) !important;
+    transform: translateY(-1px) !important;
+}
+
+/* Accent (blue/indigo) */
+.bg-accent, button.bg-accent {
+    background: linear-gradient(135deg, #6366f1, #4f46e5) !important;
+    border-radius: var(--radius-md) !important;
+    font-weight: 600 !important;
+    transition: var(--transition) !important;
+    box-shadow: 0 4px 14px rgba(99,102,241,0.35) !important;
+}
+.bg-accent:hover, button.bg-accent:hover {
+    background: linear-gradient(135deg, #4f46e5, #4338ca) !important;
+    box-shadow: 0 6px 20px rgba(99,102,241,0.45) !important;
+    transform: translateY(-1px) !important;
+}
+
+/* Secondary (amber) */
+.bg-secondary, button.bg-secondary,
+.bg-gradient-to-r.from-secondary {
+    background: linear-gradient(135deg, #f59e0b, #d97706) !important;
+    border-radius: var(--radius-md) !important;
+    box-shadow: 0 4px 14px rgba(245,158,11,0.3) !important;
+    font-weight: 600 !important;
+    transition: var(--transition) !important;
+}
+
+/* Purple assign button */
+button.bg-purple-600 {
+    background: linear-gradient(135deg, #8b5cf6, #7c3aed) !important;
+    border-radius: var(--radius-md) !important;
+    box-shadow: 0 4px 14px rgba(139,92,246,0.35) !important;
+    font-weight: 600 !important;
+}
+
+/* Danger (red) */
+button.bg-red-600, button.text-red-500 {
+    border-radius: var(--radius-md) !important;
+}
+
+/* Emerald */
+.bg-emerald-50.text-emerald-600 {
+    border-radius: var(--radius-md) !important;
+    transition: var(--transition) !important;
+}
+
+/* Ghost / outline buttons */
+.border.border-gray-200.bg-white,
+button.border.bg-white {
+    border-radius: var(--radius-md) !important;
+    transition: var(--transition) !important;
+}
+
+/* ═══════════════════════════════════════
+   INPUTS & SELECTS
+═══════════════════════════════════════ */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+select,
+textarea {
+    font-family: 'Outfit', sans-serif !important;
+    font-size: 14px !important;
+    color: var(--text-primary) !important;
+    border-radius: var(--radius-md) !important;
+    border: 1.5px solid #e5e7eb !important;
+    background: #fafafa !important;
+    transition: var(--transition) !important;
+    outline: none !important;
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus,
+input[type="number"]:focus,
+select:focus,
+textarea:focus {
+    border-color: #6366f1 !important;
+    background: white !important;
+    box-shadow: 0 0 0 3px rgba(99,102,241,0.1) !important;
+}
+
+/* ═══════════════════════════════════════
+   MODALS — PREMIUM OVERLAY
+═══════════════════════════════════════ */
+.fixed.inset-0[id] {
+    backdrop-filter: blur(6px) !important;
+    background: rgba(10,10,20,0.65) !important;
+}
+
+/* Modal container */
+.fixed.inset-0[id] > div > div,
+.modal-content {
+    border-radius: var(--radius-2xl) !important;
+    box-shadow: 0 24px 80px rgba(0,0,0,0.35), 0 0 0 1px rgba(255,255,255,0.08) inset !important;
+    overflow: hidden !important;
+    animation: modal-enter 0.28s cubic-bezier(0.34,1.56,0.64,1) !important;
+}
+
+@keyframes modal-enter {
+    from { opacity: 0; transform: scale(0.92) translateY(16px); }
+    to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+/* ═══════════════════════════════════════
+   BADGES / TAGS
+═══════════════════════════════════════ */
+.badge-modern {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
+    gap: 4px;
+    padding: 4px 10px;
+    border-radius: 99px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
 }
 
-.badge-gradient-primary {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+/* Status badges — re-style Tailwind classes to look premium */
+span.bg-green-100 { background: #ecfdf5 !important; color: #059669 !important; border: 1px solid #d1fae5 !important; border-radius: 99px !important; }
+span.bg-red-100   { background: #fff1f2 !important; color: #e11d48 !important; border: 1px solid #ffe4e6 !important; border-radius: 99px !important; }
+span.bg-blue-100  { background: #eff6ff !important; color: #2563eb !important; border: 1px solid #dbeafe !important; border-radius: 99px !important; }
+span.bg-purple-100{ background: #f5f3ff !important; color: #7c3aed !important; border: 1px solid #ede9fe !important; border-radius: 99px !important; }
+span.bg-yellow-100{ background: #fffbeb !important; color: #d97706 !important; border: 1px solid #fef3c7 !important; border-radius: 99px !important; }
+span.bg-gray-100  { background: #f9fafb !important; color: #6b7280 !important; border: 1px solid #e5e7eb !important; border-radius: 99px !important; }
+
+/* ═══════════════════════════════════════
+   CLASS CARDS (Manage Classes grid)
+═══════════════════════════════════════ */
+#class-grid > div {
+    background: white !important;
+    border-radius: var(--radius-xl) !important;
+    border: 1px solid rgba(0,0,0,0.05) !important;
+    box-shadow: var(--card-shadow) !important;
+    transition: var(--transition) !important;
+    overflow: hidden !important;
 }
 
-.badge-gradient-success {
-    background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
-    color: white;
-    box-shadow: 0 2px 8px rgba(17, 153, 142, 0.3);
+#class-grid > div:hover {
+    box-shadow: var(--card-shadow-hover) !important;
+    transform: translateY(-4px) !important;
 }
 
-.badge-gradient-warning {
-    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-    color: white;
-    box-shadow: 0 2px 8px rgba(240, 147, 251, 0.3);
+/* ═══════════════════════════════════════
+   ANIMATIONS
+═══════════════════════════════════════ */
+@keyframes fade-in-up {
+    from { opacity: 0; transform: translateY(18px); }
+    to   { opacity: 1; transform: translateY(0); }
 }
 
-/* ========================================
-   MODERN INPUT FIELDS
-   ======================================== */
-.input-modern {
-    width: 100%;
-    padding: 14px 18px;
-    border: 2px solid #e2e8f0;
-    border-radius: 12px;
-    font-size: 15px;
-    transition: all 0.3s ease;
+.animate-fade-in {
+    animation: fade-in-up 0.35s ease-out both !important;
+}
+
+@keyframes shimmer-slide {
+    0%   { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+}
+
+/* Skeleton loader shimmer */
+.skeleton {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e8e8e8 50%, #f0f0f0 75%) !important;
+    background-size: 200% 100% !important;
+    animation: shimmer-slide 1.4s infinite !important;
+    border-radius: var(--radius-sm) !important;
+}
+
+/* ═══════════════════════════════════════
+   TEACHER ASSIGNMENT MODAL
+═══════════════════════════════════════ */
+#assign-teacher-classes-modal .atm-subject-chip {
+    transition: var(--transition) !important;
+    cursor: pointer !important;
+}
+
+#assign-teacher-classes-modal .atm-subject-chip:hover {
+    transform: scale(1.02) !important;
+}
+
+/* Tab active styling */
+.atm-tab-btn.active-tab {
+    color: #6366f1 !important;
+    border-bottom-color: #6366f1 !important;
+}
+
+/* ═══════════════════════════════════════
+   TOAST NOTIFICATION
+═══════════════════════════════════════ */
+.toast-notification {
+    position: fixed !important;
+    bottom: 28px !important;
+    right: 28px !important;
+    background: #111827 !important;
+    color: white !important;
+    padding: 14px 20px !important;
+    border-radius: var(--radius-lg) !important;
+    font-size: 14px !important;
+    font-weight: 500 !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.25) !important;
+    z-index: 99999 !important;
+    animation: toast-in 0.4s cubic-bezier(0.34,1.56,0.64,1) !important;
+    border: 1px solid rgba(255,255,255,0.08) !important;
+}
+
+@keyframes toast-in {
+    from { opacity: 0; transform: translateY(20px) scale(0.9); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* ═══════════════════════════════════════
+   QUICK ACTION CARDS (Dashboard)
+═══════════════════════════════════════ */
+.quick-action-card {
     background: white;
-}
-
-.input-modern:focus {
-    outline: none;
-    border-color: #667eea;
-    box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
-    transform: translateY(-1px);
-}
-
-.input-modern::placeholder {
-    color: #a0aec0;
-}
-
-/* ========================================
-   MODERN MODALS
-   ======================================== */
-.modal-modern {
-    border-radius: 24px;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-    border: none;
-    overflow: hidden;
-}
-
-.modal-header-modern {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    padding: 24px 32px;
-    border-bottom: none;
-}
-
-.modal-body-modern {
-    padding: 32px;
-}
-
-/* ========================================
-   FLOATING ACTION BUTTON
-   ======================================== */
-.fab {
-    position: fixed;
-    bottom: 32px;
-    right: 32px;
-    width: 64px;
-    height: 64px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
+    border-radius: var(--radius-lg);
+    padding: 20px;
+    border: 1px solid rgba(0,0,0,0.05);
+    box-shadow: var(--card-shadow);
+    cursor: pointer;
+    transition: var(--transition);
     display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 28px;
-    box-shadow: 0 8px 24px rgba(102, 126, 234, 0.4);
-    cursor: pointer;
-    transition: all 0.3s ease;
-    z-index: 999;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
 }
 
-.fab:hover {
-    transform: scale(1.1) rotate(90deg);
-    box-shadow: 0 12px 32px rgba(102, 126, 234, 0.5);
+.quick-action-card:hover {
+    box-shadow: var(--card-shadow-hover);
+    transform: translateY(-2px);
 }
 
-/* ========================================
-   LOADING SPINNER
-   ======================================== */
-.spinner-modern {
-    width: 48px;
-    height: 48px;
-    border: 4px solid rgba(102, 126, 234, 0.2);
-    border-top-color: #667eea;
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
+/* ═══════════════════════════════════════
+   TABS (Section tabs inside views)
+═══════════════════════════════════════ */
+.flex.border-b button {
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.04em !important;
+    padding: 12px 20px !important;
+    transition: var(--transition) !important;
 }
 
-@keyframes spin {
-    to { transform: rotate(360deg); }
+/* ═══════════════════════════════════════
+   RESULTS / REVIEW TABLE
+═══════════════════════════════════════ */
+#results-table tbody tr.bg-yellow-50 {
+    background: #fffbeb !important;
 }
 
-/* ========================================
-   MODERN ALERTS
-   ======================================== */
-.alert-modern {
-    border-radius: 16px;
-    padding: 18px 24px;
-    border: none;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-    display: flex;
-    align-items: center;
-    gap: 16px;
+/* ═══════════════════════════════════════
+   PRINT HIDDEN
+═══════════════════════════════════════ */
+@media print {
+    aside, header, .print-hidden { display: none !important; }
 }
 
-.alert-modern-success {
-    background: linear-gradient(135deg, rgba(17, 153, 142, 0.1) 0%, rgba(56, 239, 125, 0.1) 100%);
-    border-left: 4px solid #11998e;
-    color: #047857;
-}
-
-.alert-modern-danger {
-    background: linear-gradient(135deg, rgba(238, 9, 121, 0.1) 0%, rgba(255, 106, 0, 0.1) 100%);
-    border-left: 4px solid #ee0979;
-    color: #b91c1c;
-}
-
-.alert-modern-info {
-    background: linear-gradient(135deg, rgba(79, 172, 254, 0.1) 0%, rgba(0, 242, 254, 0.1) 100%);
-    border-left: 4px solid #4facfe;
-    color: #0369a1;
-}
-
-/* ========================================
-   PROGRESS BARS
-   ======================================== */
-.progress-modern {
-    height: 8px;
-    border-radius: 12px;
-    background: #e2e8f0;
-    overflow: hidden;
-    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
-}
-
-.progress-bar-modern {
-    height: 100%;
-    background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
-    border-radius: 12px;
-    transition: width 0.6s ease;
-    position: relative;
-    overflow: hidden;
-}
-
-.progress-bar-modern::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
-    animation: shimmer 2s infinite;
-}
-
-@keyframes shimmer {
-    0% { left: -100%; }
-    100% { left: 100%; }
-}
-
-/* ========================================
-   MODERN NAVIGATION
-   ======================================== */
-.nav-modern {
-    display: flex;
-    gap: 8px;
-    background: white;
-    padding: 8px;
-    border-radius: 16px;
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
-}
-
-.nav-item-modern {
-    padding: 12px 24px;
-    border-radius: 12px;
-    font-weight: 600;
-    transition: all 0.3s ease;
-    cursor: pointer;
-    color: #64748b;
-}
-
-.nav-item-modern.active {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
-}
-
-.nav-item-modern:hover:not(.active) {
-    background: rgba(102, 126, 234, 0.1);
-    color: #667eea;
-}
-
-/* ========================================
-   MODERN TOOLTIPS
-   ======================================== */
-[data-tooltip] {
-    position: relative;
-    cursor: pointer;
-}
-
-[data-tooltip]::before {
-    content: attr(data-tooltip);
-    position: absolute;
-    bottom: 100%;
-    left: 50%;
-    transform: translateX(-50%) translateY(-8px);
-    padding: 8px 14px;
-    background: #1e293b;
-    color: white;
-    border-radius: 8px;
-    font-size: 13px;
-    white-space: nowrap;
-    opacity: 0;
-    pointer-events: none;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-
-[data-tooltip]:hover::before {
-    opacity: 1;
-    transform: translateX(-50%) translateY(-12px);
-}
-
-/* ========================================
-   SMOOTH TRANSITIONS
-   ======================================== */
-.fade-in {
-    animation: fadeIn 0.5s ease-in;
-}
-
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.slide-in-right {
-    animation: slideInRight 0.4s ease-out;
-}
-
-@keyframes slideInRight {
-    from {
-        opacity: 0;
-        transform: translateX(30px);
-    }
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
-}
-
-/* ========================================
-   MODERN CHECKBOX/RADIO
-   ======================================== */
-.checkbox-modern {
-    width: 22px;
-    height: 22px;
-    border: 2px solid #cbd5e1;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.checkbox-modern:checked {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    border-color: #667eea;
-}
-
-/* ========================================
-   RESPONSIVE IMPROVEMENTS
-   ======================================== */
+/* ═══════════════════════════════════════
+   RESPONSIVE MOBILE
+═══════════════════════════════════════ */
 @media (max-width: 768px) {
-    .stat-card-modern {
-        padding: 20px;
+    .bg-gradient-to-r.from-primary.to-accent {
+        padding: 24px 20px !important;
+        border-radius: var(--radius-lg) !important;
     }
-    
-    .fab {
-        width: 56px;
-        height: 56px;
-        bottom: 24px;
-        right: 24px;
+
+    table.w-full thead th,
+    table.w-full tbody td {
+        padding: 12px 12px !important;
     }
-    
-    .modal-modern {
-        border-radius: 16px;
-    }
-    
-    .btn-gradient-primary {
-        padding: 10px 20px;
-        font-size: 14px;
-    }
-}
-
-/* ========================================
-   SCROLL IMPROVEMENTS
-   ======================================== */
-::-webkit-scrollbar {
-    width: 10px;
-    height: 10px;
-}
-
-::-webkit-scrollbar-track {
-    background: #f1f5f9;
-    border-radius: 10px;
-}
-
-::-webkit-scrollbar-thumb {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    border-radius: 10px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-    background: linear-gradient(135deg, #5568d3 0%, #6a3f8f 100%);
 }
