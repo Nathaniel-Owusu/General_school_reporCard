@@ -715,13 +715,39 @@ async function fetchStudentReport(studentId) {
     
     if (student) {
         const school = db.schools.find(s => s.id === student.school_id);
+
+        // ── Compute live class position from total scores ──
+        const classmates = db.students.filter(s => s.class === student.class && s.school_id === student.school_id && s.status !== 'Inactive');
+        
+        const getTotal = (st) => (st.scores || []).reduce((sum, sc) => {
+            const cs = Number(sc.class_score) || 0;
+            const es = Number(sc.exam_score)  || 0;
+            return sum + cs + es;
+        }, 0);
+
+        const myTotal = getTotal(student);
+
+        // Sort descending by total score
+        const sorted = [...classmates].sort((a, b) => getTotal(b) - getTotal(a));
+        const computedPosition = sorted.findIndex(s => s.id === student.id) + 1;
+
+        // ── Look up class teacher name ──
+        const cls = db.classes.find(c => c.name === student.class && c.school_id === student.school_id);
+        let classTeacherName = '';
+        if (cls && cls.class_teacher_id) {
+            const teacher = db.users.find(u => u.id === cls.class_teacher_id);
+            if (teacher) classTeacherName = teacher.name;
+        }
+
         return {
             student: {
                 ...student,
-                term: school.settings.currentTerm,
-                year: school.settings.academicYear,
-                position: student.position || 'N/A', // Assuming position is calc somewhere or static
-                total_students: db.students.filter(s => s.class === student.class && s.school_id === student.school_id).length
+                term: school?.settings?.currentTerm || '',
+                year: school?.settings?.academicYear || '',
+                position: computedPosition || student.position || '',
+                total_students: classmates.length,
+                class_teacher: classTeacherName || student.class_teacher || '',
+                reopening_date: school?.settings?.reopeningDate || ''
             },
             settings: {
                 ...school.settings,
@@ -729,12 +755,14 @@ async function fetchStudentReport(studentId) {
                 schoolLogo: school.logo || (school.settings ? school.settings.schoolLogo : ''),
                 schoolAddress: school.address || (school.settings ? school.settings.schoolAddress : ''),
                 contactPhone: school.contact_phone || (school.settings ? school.settings.contactPhone : ''),
-                contactEmail: school.contact_email || (school.settings ? school.settings.contactEmail : '')
+                contactEmail: school.contact_email || (school.settings ? school.settings.contactEmail : ''),
+                reopeningDate: school?.settings?.reopeningDate || ''
             }
         };
     }
     return null;
 }
+
 
 // --- Super Admin Controller ---
 

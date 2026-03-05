@@ -437,19 +437,22 @@
             const gs = settings || {};
             const gradingSystem = gs.gradingSystem || null;
 
-            /* collect approved scores */
-            const approvedScores = (user.scores || []).filter(s => s.status === 'Approved');
+            /* collect scores — show Approved and Pending (Pending = entered by teacher but not yet formally reviewed) */
+            const approvedScores = (user.scores || []).filter(s => s.status === 'Approved' || s.status === 'Pending');
 
             /* build table rows */
             const subjectRows = approvedScores.map((s, idx) => {
-                const total = (Number(s.class) || 0) + (Number(s.exam) || 0);
+                // Use class_score / exam_score (actual field names from teacher portal)
+                const classScore = (s.class_score !== undefined && s.class_score !== null && s.class_score !== '') ? Number(s.class_score) : null;
+                const examScore  = (s.exam_score  !== undefined && s.exam_score  !== null && s.exam_score  !== '') ? Number(s.exam_score)  : null;
+                const total = (classScore !== null ? classScore : 0) + (examScore !== null ? examScore : 0);
                 const gi = calculateGrade(total, gradingSystem);
                 return `
                 <tr>
                     <td class="subject-name">${escapeHtml(s.subject)}</td>
-                    <td>${s.class !== undefined && s.class !== null && s.class !== '' ? s.class : ''}</td>
-                    <td>${s.exam  !== undefined && s.exam  !== null && s.exam  !== '' ? s.exam  : ''}</td>
-                    <td>${s.class !== '' && s.exam !== '' ? total : ''}</td>
+                    <td>${classScore !== null ? classScore : ''}</td>
+                    <td>${examScore  !== null ? examScore  : ''}</td>
+                    <td>${(classScore !== null || examScore !== null) ? total : ''}</td>
                     <td>${s.position || ''}</td>
                     <td>${gi.remark}</td>
                 </tr>`;
