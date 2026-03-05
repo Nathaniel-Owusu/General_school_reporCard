@@ -68,6 +68,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     // Fetch Subjects
     $result = $conn->query("SELECT * FROM subjects");
     while ($row = $result->fetch_assoc()) {
+        // Ensure level and active are properly typed
+        if (!isset($row['level'])) $row['level'] = null;
+        $row['active'] = isset($row['active']) ? (bool)$row['active'] : true;
         unset($row['created_at']);
         $response['subjects'][] = $row;
     }
@@ -163,9 +166,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // Insert Subjects
         if (!empty($data['subjects'])) {
-            $stmt = $conn->prepare("INSERT INTO subjects (id, school_id, name, code, status) VALUES (?, ?, ?, ?, ?)");
+            // Auto-add missing columns if they don't exist (migration)
+            $conn->query("ALTER TABLE subjects ADD COLUMN IF NOT EXISTS level VARCHAR(20) DEFAULT NULL");
+            $conn->query("ALTER TABLE subjects ADD COLUMN IF NOT EXISTS active TINYINT(1) DEFAULT 1");
+
+            $stmt = $conn->prepare("INSERT INTO subjects (id, school_id, name, code, status, level, active) VALUES (?, ?, ?, ?, ?, ?, ?)");
             foreach ($data['subjects'] as $s) {
-                $stmt->bind_param("sssss", $s['id'], $s['school_id'], $s['name'], $s['code'], $s['status']);
+                $level = $s['level'] ?? null;
+                $isActive = isset($s['active']) ? ($s['active'] ? 1 : 0) : 1;
+                $stmt->bind_param("ssssssi", $s['id'], $s['school_id'], $s['name'], $s['code'], $s['status'], $level, $isActive);
                 $stmt->execute();
             }
             $stmt->close();

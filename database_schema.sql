@@ -60,6 +60,8 @@ CREATE TABLE IF NOT EXISTS `subjects` (
   `name` varchar(100) DEFAULT NULL,
   `code` varchar(20) DEFAULT NULL,
   `status` varchar(20) DEFAULT NULL,
+  `level` varchar(20) DEFAULT NULL,
+  `active` tinyint(1) DEFAULT 1,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

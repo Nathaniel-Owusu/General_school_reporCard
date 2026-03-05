@@ -1897,7 +1897,23 @@
              const sel = _atmSelections[classId] || { isClassTeacher: false, subjectIds: new Set() };
              _atmSelections[classId] = sel;
 
-             const classSubjects = _atmAllSubjects.filter(s => s.level === cls.level && s.active !== false);
+             // Smart subject lookup — handles cases where subject.level is missing in DB
+             // Strategy 1: Match by level (ideal)
+             let classSubjects = _atmAllSubjects.filter(s => s.level === cls.level && s.active !== false);
+
+             // Strategy 2: Fall back to subject IDs stored on the class object (from Manage Subjects → Class Assignments)
+             if (classSubjects.length === 0 && cls.subjects && cls.subjects.length > 0) {
+                 const clsSubjectIds = cls.subjects.map(s => (typeof s === 'object' ? s.id : s));
+                 classSubjects = _atmAllSubjects.filter(s => clsSubjectIds.includes(s.id) && s.active !== false);
+             }
+
+             // Strategy 3: Last resort — show all active subjects (level data is completely missing)
+             if (classSubjects.length === 0 && _atmAllSubjects.filter(s => s.active !== false).length > 0) {
+                 const hasNoLevelData = _atmAllSubjects.every(s => !s.level);
+                 if (hasNoLevelData) {
+                     classSubjects = _atmAllSubjects.filter(s => s.active !== false);
+                 }
+             }
              const assignedCount = sel.subjectIds.size;
              const allChecked = classSubjects.length > 0 && classSubjects.every(s => sel.subjectIds.has(s.id));
 
@@ -1995,7 +2011,15 @@
              if (!sel) return;
              const cls = _atmClasses.find(c => c.id === classId);
              if (!cls) return;
-             const classSubjects = _atmAllSubjects.filter(s => s.level === cls.level && s.active !== false);
+             // Same 3-tier lookup as _atmRenderPanel
+             let classSubjects = _atmAllSubjects.filter(s => s.level === cls.level && s.active !== false);
+             if (classSubjects.length === 0 && cls.subjects && cls.subjects.length > 0) {
+                 const clsSubjectIds = cls.subjects.map(s => (typeof s === 'object' ? s.id : s));
+                 classSubjects = _atmAllSubjects.filter(s => clsSubjectIds.includes(s.id) && s.active !== false);
+             }
+             if (classSubjects.length === 0 && _atmAllSubjects.every(s => !s.level)) {
+                 classSubjects = _atmAllSubjects.filter(s => s.active !== false);
+             }
              sel.isClassTeacher = checked;
              sel.subjectIds = checked ? new Set(classSubjects.map(s => s.id)) : new Set();
              _atmSelectTab(classId);
