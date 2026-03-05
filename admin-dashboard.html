@@ -1011,28 +1011,50 @@
         </div>
     </div>
     <!-- Assign Teacher Classes Modal -->
-    <div id="assign-teacher-classes-modal" class="fixed inset-0 bg-gray-900/50 backdrop-blur-sm hidden flex items-center justify-center z-50">
-        <div class="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
-            <h2 class="text-2xl font-bold mb-2 text-gray-800">Assign Classes to Teacher</h2>
-            <p class="text-gray-500 text-sm mb-6" id="assign-teacher-name">Select which classes this teacher can access</p>
-            
-            <form onsubmit="handleAssignTeacherClasses(event)" class="space-y-6">
-                <input type="hidden" name="teacher_id" id="assign-teacher-id">
-                
-                <div class="bg-gray-50 rounded-xl p-5 border border-gray-200">
-                    <h3 class="font-bold text-gray-700 mb-4 flex items-center gap-2">
-                        <ion-icon name="school" class="text-lg"></ion-icon>
-                        Available Classes
-                    </h3>
-                    
-                    <div id="assign-teacher-classes-list" class="space-y-2 max-h-96 overflow-y-auto">
-                        <!-- Classes will be populated here -->
+    <!-- Assign Teacher Subjects Modal (Redesigned) -->
+    <div id="assign-teacher-classes-modal" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm hidden flex items-start justify-center z-50 p-4 pt-8 overflow-y-auto">
+        <div class="bg-white rounded-3xl shadow-2xl w-full max-w-2xl mx-auto flex flex-col" style="max-height: 88vh;">
+
+            <!-- Modal Header -->
+            <div class="bg-gradient-to-r from-primary to-indigo-800 rounded-t-3xl p-6 text-white relative overflow-hidden shrink-0">
+                <div class="absolute -right-10 -top-10 w-40 h-40 bg-white/10 rounded-full blur-2xl"></div>
+                <div class="absolute -left-10 bottom-0 w-32 h-32 bg-white/5 rounded-full blur-xl"></div>
+                <div class="relative z-10 flex items-center gap-4">
+                    <div id="atm-avatar" class="w-14 h-14 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center text-2xl font-black text-white border border-white/30 shadow-lg shrink-0">T</div>
+                    <div class="flex-1 min-w-0">
+                        <p class="text-white/60 text-xs font-bold uppercase tracking-widest mb-0.5">Assigning Subjects To</p>
+                        <h2 class="text-xl font-extrabold text-white truncate" id="assign-teacher-name">Teacher Name</h2>
+                        <p class="text-white/60 text-xs mt-0.5" id="atm-teacher-email">email@school.com</p>
+                    </div>
+                    <div class="text-right shrink-0">
+                        <div class="bg-white/20 backdrop-blur-sm rounded-xl px-3 py-1.5 border border-white/20 inline-block">
+                            <span class="text-xl font-black text-white" id="atm-total-count">0</span>
+                            <p class="text-white/60 text-[9px] font-bold uppercase tracking-wider">Subjects</p>
+                        </div>
                     </div>
                 </div>
-                
-                <div class="pt-2 flex gap-3">
-                    <button type="button" onclick="closeModal('assign-teacher-classes-modal')" class="flex-1 py-3 border border-gray-200 rounded-xl font-bold hover:bg-gray-50 transition">Cancel</button>
-                    <button type="submit" class="flex-1 py-3 bg-green-600 text-white rounded-xl font-bold hover:bg-green-700 shadow-lg shadow-green-500/30 transition flex items-center justify-center gap-2">
+            </div>
+
+            <form onsubmit="handleAssignTeacherClasses(event)" class="flex flex-col flex-1 overflow-hidden">
+                <input type="hidden" name="teacher_id" id="assign-teacher-id">
+
+                <!-- Class Tab Bar -->
+                <div class="border-b border-gray-100 bg-gray-50/50 px-4 pt-4 pb-0 shrink-0">
+                    <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3 px-1">Select a Class to Configure</p>
+                    <div id="atm-class-tabs" class="flex gap-2 overflow-x-auto pb-3 custom-scrollbar">
+                        <!-- Tabs injected by JS -->
+                    </div>
+                </div>
+
+                <!-- Panel Area -->
+                <div id="assign-teacher-classes-list" class="flex-1 overflow-y-auto p-6 space-y-4">
+                    <!-- Content injected per tab -->
+                </div>
+
+                <!-- Footer -->
+                <div class="p-5 border-t border-gray-100 flex gap-3 shrink-0 bg-gray-50/50 rounded-b-3xl">
+                    <button type="button" onclick="closeModal('assign-teacher-classes-modal')" class="flex-1 py-3 border border-gray-200 rounded-xl font-bold text-gray-600 hover:bg-gray-100 transition text-sm">Cancel</button>
+                    <button type="submit" id="atm-save-btn" class="flex-1 py-3 bg-gradient-to-r from-indigo-600 to-primary text-white rounded-xl font-bold shadow-lg shadow-indigo-500/30 hover:shadow-xl hover:-translate-y-0.5 transition-all text-sm flex items-center justify-center gap-2">
                         <ion-icon name="checkmark-circle"></ion-icon>
                         Save Assignments
                     </button>
@@ -1771,135 +1793,246 @@
              }
          }
          
-         // --- ASSIGN TEACHER TO CLASSES ---
-         // --- ASSIGN TEACHER TO CLASSES ---
+         // --- ASSIGN TEACHER TO CLASSES & SUBJECTS (Redesigned) ---
+         let _atmClasses = [];
+         let _atmAllSubjects = [];
+         let _atmCurrentClassId = null;
+         let _atmSelections = {}; // { class_id: { isClassTeacher: bool, subjectIds: Set } }
+
          async function openAssignTeacherClassesModal(teacherId) {
              const teacher = allTeachers.find(t => t.id === teacherId);
              if (!teacher) return;
-             
-             // Fetch all necessary data
-             const classes = await fetchAdminData('classes') || [];
-             const allSubjects = await fetchAdminData('subjects') || [];
-             
-             // Get current assignments
-             const assignedClassNames = teacher.assigned_classes || []; // Legacy/Class Teacher Mode
-             const assignedSubjects = teacher.assigned_subjects || []; // struct: [{ class_id, subject_ids: [] }]
-             
-             // Update modal title
-             document.getElementById('assign-teacher-name').innerText = `Assign: ${teacher.name}`;
+
+             // Update header
+             document.getElementById('assign-teacher-name').innerText = teacher.name;
+             document.getElementById('atm-teacher-email').innerText = teacher.email || '';
+             const initial = (teacher.name || 'T').charAt(0).toUpperCase();
+             document.getElementById('atm-avatar').innerText = initial;
              document.getElementById('assign-teacher-id').value = teacherId;
-             
-             // Populate classes list
-             const container = document.getElementById('assign-teacher-classes-list');
-             
-             if (classes.length === 0) {
-                 container.innerHTML = '<p class="text-gray-400 text-sm italic text-center py-8">No classes available.</p>';
-             } else {
-                 const levels = ['KG', 'Primary', 'JHS'];
-                 let html = '';
-                 
-                 levels.forEach(level => {
-                     const levelClasses = classes.filter(c => c.level === level && c.active !== false);
-                     if (levelClasses.length > 0) {
-                         html += `<div class="mb-6"><h4 class="text-xs font-bold text-gray-400 uppercase mb-3 border-b pb-1">${level}</h4>`;
-                         
-                         levelClasses.forEach(c => {
-                             // Determine current state
-                             const isClassTeacher = assignedClassNames.includes(c.name) || assignedClassNames.includes(c.id);
-                             const mySubjAssignment = assignedSubjects.find(as => as.class_id === c.id);
-                             const mySubjectIds = mySubjAssignment ? mySubjAssignment.subject_ids : [];
-                             
-                             // Filter subjects for this class/level
-                             // Subjects are defined globally but linked to class via level or direct assignment? 
-                             // Usually subjects have a 'level'.
-                             const classSubjects = allSubjects.filter(s => s.level === level && s.active !== false);
-                             
-                             html += `
-                                 <div class="bg-gray-50 rounded-lg p-3 mb-3 border border-gray-200 class-assignment-row" data-class-id="${c.id}" data-class-name="${c.name}">
-                                     <div class="flex items-center justify-between mb-2">
-                                         <div>
-                                             <span class="font-bold text-gray-800">${c.name}</span>
-                                             <span class="text-xs text-gray-500 ml-2">(${classSubjects.length} subjects)</span>
-                                         </div>
-                                         <label class="flex items-center gap-2 text-sm text-blue-800 font-semibold cursor-pointer">
-                                             <input type="checkbox" class="class-teacher-toggle w-4 h-4 text-blue-600 rounded" 
-                                                 ${isClassTeacher ? 'checked' : ''} 
-                                                 onchange="toggleSubjectSection(this)">
-                                             Class Teacher (All)
-                                         </label>
-                                     </div>
-                                     
-                                     <!-- Subject List (Hidden if Class Teacher is checked? No, maybe disabled or explicitly shown as 'All') -->
-                                     <div class="subject-selection-list pl-2 mt-2 border-l-2 border-gray-300 ${isClassTeacher ? 'opacity-50 pointer-events-none' : ''}">
-                                         <div class="grid grid-cols-2 gap-2">
-                                             ${classSubjects.map(s => `
-                                                 <label class="flex items-center gap-2 text-xs text-gray-700 cursor-pointer hover:bg-white p-1 rounded">
-                                                     <input type="checkbox" value="${s.id}" class="subject-cb w-3 h-3 text-gray-600 rounded"
-                                                         ${(isClassTeacher || mySubjectIds.includes(s.id)) ? 'checked' : ''}>
-                                                     ${s.name}
-                                                 </label>
-                                             `).join('')}
-                                         </div>
-                                         ${classSubjects.length === 0 ? '<p class="text-xs text-red-400 italic">No subjects found for this level</p>' : ''}
-                                     </div>
-                                 </div>
-                             `;
-                         });
-                         
-                         html += `</div>`;
-                     }
-                 });
-                 
-                 container.innerHTML = html || '<p class="text-gray-400 text-sm italic py-4">No active classes found.</p>';
-             }
-             
+
+             // Show modal immediately, show loading state
              document.getElementById('assign-teacher-classes-modal').classList.remove('hidden');
+             document.getElementById('atm-class-tabs').innerHTML = '<div class="text-xs text-gray-400 italic pb-2 flex items-center gap-2"><ion-icon name="sync" class="animate-spin"></ion-icon> Loading...</div>';
+             document.getElementById('assign-teacher-classes-list').innerHTML = '';
+
+             // Fetch data
+             _atmClasses = await fetchAdminData('classes') || [];
+             _atmAllSubjects = await fetchAdminData('subjects') || [];
+             _atmCurrentClassId = null;
+             _atmSelections = {};
+
+             // Build initial selections from saved data
+             const savedClassNames = teacher.assigned_classes || [];
+             const savedSubjects  = teacher.assigned_subjects  || [];
+
+             _atmClasses.filter(c => c.active !== false).forEach(c => {
+                 const isClassTeacher = savedClassNames.includes(c.name) || savedClassNames.includes(c.id);
+                 const saved = savedSubjects.find(as => as.class_id === c.id);
+                 const ids = new Set(saved ? saved.subject_ids : []);
+                 if (isClassTeacher) {
+                     // Mark all subjects in class
+                     _atmAllSubjects.filter(s => s.level === c.level && s.active !== false).forEach(s => ids.add(s.id));
+                 }
+                 _atmSelections[c.id] = { isClassTeacher, subjectIds: ids };
+             });
+
+             _atmRenderTabs();
+             _atmUpdateTotalCount();
+
+             // Auto-select first tab
+             const firstActive = _atmClasses.find(c => c.active !== false);
+             if (firstActive) _atmSelectTab(firstActive.id);
+         }
+
+         function _atmRenderTabs() {
+             const levels = ['KG', 'Primary', 'JHS'];
+             const tabContainer = document.getElementById('atm-class-tabs');
+             const activeCls = _atmClasses.filter(c => c.active !== false);
+
+             if (activeCls.length === 0) {
+                 tabContainer.innerHTML = '<p class="text-gray-400 text-xs italic pb-2">No active classes found.</p>';
+                 return;
+             }
+
+             let html = '';
+             levels.forEach(level => {
+                 const lc = activeCls.filter(c => c.level === level);
+                 if (lc.length > 0) {
+                     if (html) html += '<div class="w-px bg-gray-200 self-stretch mx-1 shrink-0"></div>';
+                     lc.forEach(c => {
+                         const sel = _atmSelections[c.id];
+                         const count = sel ? sel.subjectIds.size : 0;
+                         const badge = count > 0 ? `<span class="ml-1.5 bg-indigo-500 text-white text-[9px] font-black px-1.5 py-0.5 rounded-full leading-none">${count}</span>` : '';
+                         html += `<button type="button" id="atm-tab-${c.id}" onclick="_atmSelectTab('${c.id}')" 
+                             class="atm-tab shrink-0 flex items-center gap-1.5 px-4 py-2 rounded-t-lg text-sm font-bold transition-all border-b-2 border-transparent text-gray-500 hover:text-gray-800 whitespace-nowrap">
+                             <ion-icon name="easel-outline" class="text-base"></ion-icon>
+                             ${c.name}${badge}
+                         </button>`;
+                     });
+                 }
+             });
+             tabContainer.innerHTML = html;
+         }
+
+         function _atmSelectTab(classId) {
+             _atmCurrentClassId = classId;
+             // Update tab styles
+             document.querySelectorAll('.atm-tab').forEach(btn => {
+                 btn.classList.remove('border-indigo-500', 'text-indigo-700', 'bg-indigo-50/50');
+                 btn.classList.add('border-transparent', 'text-gray-500');
+             });
+             const activeTab = document.getElementById(`atm-tab-${classId}`);
+             if (activeTab) {
+                 activeTab.classList.remove('border-transparent', 'text-gray-500');
+                 activeTab.classList.add('border-indigo-500', 'text-indigo-700', 'bg-indigo-50/50');
+             }
+             _atmRenderPanel(classId);
+         }
+
+         function _atmRenderPanel(classId) {
+             const container = document.getElementById('assign-teacher-classes-list');
+             const cls = _atmClasses.find(c => c.id === classId);
+             if (!cls) return;
+
+             const sel = _atmSelections[classId] || { isClassTeacher: false, subjectIds: new Set() };
+             _atmSelections[classId] = sel;
+
+             const classSubjects = _atmAllSubjects.filter(s => s.level === cls.level && s.active !== false);
+             const assignedCount = sel.subjectIds.size;
+             const allChecked = classSubjects.length > 0 && classSubjects.every(s => sel.subjectIds.has(s.id));
+
+             let subjectChips = '';
+             if (classSubjects.length === 0) {
+                 subjectChips = `<div class="col-span-full py-8 text-center text-gray-400">
+                     <ion-icon name="book-outline" class="text-4xl mb-2 opacity-40 block mx-auto"></ion-icon>
+                     <p class="text-sm font-medium">No subjects defined for ${cls.level} level yet.</p>
+                     <p class="text-xs mt-1">Go to <strong>Manage Subjects</strong> to add subjects.</p>
+                 </div>`;
+             } else {
+                 classSubjects.forEach(s => {
+                     const checked = sel.subjectIds.has(s.id);
+                     subjectChips += `
+                     <label class="atm-subject-chip flex items-center gap-3 p-3 rounded-xl border-2 cursor-pointer transition-all select-none
+                         ${checked ? 'border-indigo-400 bg-indigo-50 shadow-sm shadow-indigo-100' : 'border-gray-100 bg-gray-50/50 hover:border-gray-200 hover:bg-gray-50'}"
+                         onclick="_atmToggleSubject('${classId}', '${s.id}', this)">
+                         <div class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 font-bold text-xs transition-all
+                             ${checked ? 'bg-indigo-500 text-white shadow-md shadow-indigo-300' : 'bg-white text-gray-400 border border-gray-200'}">
+                             ${s.code ? s.code.substring(0, 2) : s.name.substring(0, 2)}
+                         </div>
+                         <div class="flex-1 min-w-0">
+                             <p class="font-bold text-sm ${checked ? 'text-indigo-800' : 'text-gray-700'} truncate">${s.name}</p>
+                             <p class="text-[10px] ${checked ? 'text-indigo-500' : 'text-gray-400'} font-bold uppercase tracking-wider">${s.code || ''}</p>
+                         </div>
+                         <div class="w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 transition-all
+                             ${checked ? 'border-indigo-500 bg-indigo-500' : 'border-gray-200 bg-white'}">
+                             ${checked ? '<ion-icon name="checkmark" class="text-white text-xs"></ion-icon>' : ''}
+                         </div>
+                         <input type="checkbox" class="subject-cb sr-only" data-class-id="${classId}" value="${s.id}" ${checked ? 'checked' : ''}>
+                     </label>`;
+                 });
+             }
+
+             container.innerHTML = `
+                 <div class="class-assignment-row" data-class-id="${classId}" data-class-name="${cls.name}">
+                     <!-- Class Info Banner -->
+                     <div class="flex items-center justify-between mb-5">
+                         <div class="flex items-center gap-3">
+                             <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-primary text-white flex items-center justify-center shadow-md shadow-indigo-200">
+                                 <ion-icon name="easel" class="text-lg"></ion-icon>
+                             </div>
+                             <div>
+                                 <h3 class="font-extrabold text-gray-900">${cls.name}</h3>
+                                 <p class="text-xs text-gray-400">${cls.level || 'General'} Level &bull; ${classSubjects.length} available subjects</p>
+                             </div>
+                         </div>
+                         <div class="flex items-center gap-3">
+                             ${classSubjects.length > 0 ? `
+                             <!-- Class Teacher Toggle -->
+                             <label class="flex items-center gap-2 cursor-pointer bg-blue-50 border border-blue-100 px-3 py-1.5 rounded-lg" title="Assign all subjects at once">
+                                 <input type="checkbox" class="class-teacher-toggle sr-only" ${allChecked ? 'checked' : ''}
+                                     onchange="_atmToggleAllSubjects('${classId}', this.checked)">
+                                 <div class="w-9 h-5 rounded-full relative transition-all ${allChecked ? 'bg-blue-500' : 'bg-gray-200'}">
+                                     <div class="absolute top-0.5 w-4 h-4 bg-white rounded-full shadow transition-all ${allChecked ? 'left-4' : 'left-0.5'}"></div>
+                                 </div>
+                                 <span class="text-xs font-bold ${allChecked ? 'text-blue-700' : 'text-gray-500'}">All Subjects</span>
+                             </label>` : ''}
+                             <span class="text-sm font-black text-indigo-700 bg-indigo-50 border border-indigo-100 rounded-lg px-3 py-1.5" id="atm-panel-count-${classId}">
+                                 ${assignedCount} / ${classSubjects.length}
+                             </span>
+                         </div>
+                     </div>
+
+                     <!-- Subject Grid -->
+                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3" id="atm-subject-grid-${classId}">
+                         ${subjectChips}
+                     </div>
+                 </div>`;
+         }
+
+         window._atmToggleSubject = function(classId, subjectId, labelEl) {
+             const sel = _atmSelections[classId];
+             if (!sel) return;
+             const cb = labelEl ? labelEl.querySelector('.subject-cb') : null;
+
+             if (sel.subjectIds.has(subjectId)) {
+                 sel.subjectIds.delete(subjectId);
+                 if (cb) cb.checked = false;
+                 // Uncheck "all subjects" toggle
+                 const allToggle = document.querySelector(`.class-teacher-toggle`);
+                 if (allToggle) allToggle.checked = false;
+             } else {
+                 sel.subjectIds.add(subjectId);
+                 if (cb) cb.checked = true;
+             }
+             // Re-render panel to refresh chip styles + counters
+             _atmSelectTab(classId);
+             _atmUpdateTotalCount();
+             _atmRenderTabs();
+         };
+
+         window._atmToggleAllSubjects = function(classId, checked) {
+             const sel = _atmSelections[classId];
+             if (!sel) return;
+             const cls = _atmClasses.find(c => c.id === classId);
+             if (!cls) return;
+             const classSubjects = _atmAllSubjects.filter(s => s.level === cls.level && s.active !== false);
+             sel.isClassTeacher = checked;
+             sel.subjectIds = checked ? new Set(classSubjects.map(s => s.id)) : new Set();
+             _atmSelectTab(classId);
+             _atmUpdateTotalCount();
+             _atmRenderTabs();
+         };
+
+         function _atmUpdateTotalCount() {
+             let total = 0;
+             Object.values(_atmSelections).forEach(sel => total += sel.subjectIds.size);
+             document.getElementById('atm-total-count').innerText = total;
          }
          
-         // Helper for UI toggle
-         window.toggleSubjectSection = function(toggle) {
-             const row = toggle.closest('.class-assignment-row');
-             const subjectList = row.querySelector('.subject-selection-list');
-             const checkboxes = subjectList.querySelectorAll('.subject-cb');
-             
-             if(toggle.checked) {
-                 // If Class Teacher, look " All Checked" visually (or disable)
-                 subjectList.classList.add('opacity-50', 'pointer-events-none');
-                 checkboxes.forEach(cb => cb.checked = true);
-             } else {
-                 subjectList.classList.remove('opacity-50', 'pointer-events-none');
-                 checkboxes.forEach(cb => cb.checked = false); // Clear
-             }
-         };
+         // Legacy toggle stub (kept for compatibility, replaced by _atmToggleAllSubjects)
+         window.toggleSubjectSection = function(toggle) {};
          
          async function handleAssignTeacherClasses(e) {
              e.preventDefault();
              const teacherId = e.target.teacher_id.value;
              if(!teacherId) return alert("Error: Teacher ID missing");
-             
-             // Gather data
+
+             // Gather data from the _atmSelections state object
              const assignedClasses = [];
              const assignedSubjects = [];
-             
-             // Scope to the modal list to avoid conflicts
-             const rows = document.getElementById('assign-teacher-classes-list').querySelectorAll('.class-assignment-row');
-             rows.forEach(row => {
-                 const classId = row.dataset.classId;
-                 const className = row.dataset.className;
-                 
-                 const toggle = row.querySelector('.class-teacher-toggle');
-                 if(toggle && toggle.checked) {
-                     assignedClasses.push(className); 
+
+             Object.entries(_atmSelections).forEach(([classId, sel]) => {
+                 const cls = _atmClasses.find(c => c.id === classId);
+                 if (!cls) return;
+                 if (sel.isClassTeacher) {
+                     assignedClasses.push(cls.name);
                  }
-                 
-                 const subjectCbs = row.querySelectorAll('.subject-cb:checked');
-                 if(subjectCbs.length > 0) {
-                     const ids = Array.from(subjectCbs).map(cb => cb.value);
-                     assignedSubjects.push({ class_id: classId, subject_ids: ids });
+                 if (sel.subjectIds.size > 0) {
+                     assignedSubjects.push({ class_id: classId, subject_ids: Array.from(sel.subjectIds) });
                  }
              });
 
-             const btn = e.target.querySelector('button[type="submit"]');
+             const btn = document.getElementById('atm-save-btn');
              const originalText = btn.innerHTML;
              btn.innerHTML = '<ion-icon name="sync" class="animate-spin"></ion-icon> Saving...';
              btn.disabled = true;
@@ -1907,15 +2040,20 @@
              try {
                  const result = await fetchAdminData('assign_teacher_classes', {
                      teacher_id: teacherId,
-                     id: teacherId, // Fallback
+                     id: teacherId,
                      class_names: assignedClasses,
                      assigned_subjects: assignedSubjects
                  }, 'POST');
-                 
+
                  if(result && result.success) {
-                     alert(result.message || 'Assignments Saved!');
                      closeModal('assign-teacher-classes-modal');
                      renderTeachers();
+                     // Small toast-like feedback
+                     const toast = document.createElement('div');
+                     toast.className = 'fixed bottom-6 right-6 bg-green-600 text-white px-5 py-3 rounded-xl shadow-xl font-bold text-sm flex items-center gap-2 z-[100] animate-fade-in';
+                     toast.innerHTML = '<ion-icon name="checkmark-circle"></ion-icon> Assignments saved successfully!';
+                     document.body.appendChild(toast);
+                     setTimeout(() => toast.remove(), 3000);
                  } else {
                      alert('Failed: ' + (result ? result.message : 'Unknown error'));
                  }
