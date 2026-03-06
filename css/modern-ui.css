@@ -11,12 +11,12 @@
 /* ── CSS Custom Properties ── */
 :root {
     --sidebar-width: 260px;
-    --sidebar-bg: #0d1117;
-    --sidebar-border: rgba(255,255,255,0.06);
-    --sidebar-active: rgba(99,102,241,0.15);
-    --sidebar-active-border: #6366f1;
-    --sidebar-text: #8b949e;
-    --sidebar-text-active: #f0f6ff;
+    --sidebar-bg: #0f1623;
+    --sidebar-border: rgba(255,255,255,0.08);
+    --sidebar-active: rgba(99,102,241,0.18);
+    --sidebar-active-border: #818cf8;
+    --sidebar-text: #a8b3c8;        /* clearly readable on dark bg */
+    --sidebar-text-active: #ffffff;
 
     --header-bg: rgba(255,255,255,0.97);
     --header-border: #f0f0f0;
@@ -88,10 +88,10 @@ aside#mobile-sidebar nav button,
 aside#mobile-sidebar nav a {
     border-radius: var(--radius-md) !important;
     color: var(--sidebar-text) !important;
-    font-size: 14px !important;
+    font-size: 13.5px !important;
     font-weight: 500 !important;
     letter-spacing: 0.01em !important;
-    padding: 11px 14px !important;
+    padding: 10px 12px !important;
     transition: var(--transition) !important;
     display: flex !important;
     align-items: center !important;
@@ -101,57 +101,69 @@ aside#mobile-sidebar nav a {
     background: transparent !important;
     border: none !important;
     width: 100% !important;
+    margin-bottom: 2px !important;
 }
 
 aside#mobile-sidebar nav button:hover,
 aside#mobile-sidebar nav a:hover {
-    background: rgba(255,255,255,0.05) !important;
-    color: #e2e8f0 !important;
+    background: rgba(255,255,255,0.07) !important;
+    color: #ffffff !important;
     transform: translateX(2px) !important;
+}
+
+aside#mobile-sidebar nav button:hover ion-icon,
+aside#mobile-sidebar nav a:hover ion-icon {
+    opacity: 1 !important;
 }
 
 /* Active nav item */
 aside#mobile-sidebar nav button.bg-accent {
     background: var(--sidebar-active) !important;
-    color: #a5b4fc !important;
-    border: 1px solid rgba(99,102,241,0.25) !important;
+    color: #c7d2fe !important;       /* indigo-200 — bright enough */
+    border: 1px solid rgba(129,140,248,0.3) !important;
     font-weight: 600 !important;
-    box-shadow: none !important;
+    box-shadow: 0 2px 12px rgba(99,102,241,0.15) !important;
+}
+
+aside#mobile-sidebar nav button.bg-accent ion-icon {
+    opacity: 1 !important;
+    color: #818cf8 !important;
 }
 
 aside#mobile-sidebar nav button.bg-accent::before {
     content: '';
     position: absolute;
     left: 0;
-    top: 20%;
-    bottom: 20%;
+    top: 18%;
+    bottom: 18%;
     width: 3px;
-    background: var(--accent-blue);
-    border-radius: 0 4px 4px 0;
+    background: var(--sidebar-active-border);
+    border-radius: 0 3px 3px 0;
 }
 
 /* Nav section label */
 .nav-section-label {
     font-size: 10px;
     font-weight: 700;
-    letter-spacing: 0.12em;
+    letter-spacing: 0.14em;
     text-transform: uppercase;
-    color: rgba(255,255,255,0.2);
-    padding: 16px 14px 6px;
+    color: rgba(255,255,255,0.38);   /* was 0.2 — now clearly visible */
+    padding: 14px 12px 5px;
 }
 
 /* Sidebar icon */
 aside#mobile-sidebar nav button ion-icon,
 aside#mobile-sidebar nav a ion-icon {
-    font-size: 18px !important;
+    font-size: 17px !important;
     flex-shrink: 0 !important;
-    opacity: 0.8 !important;
+    opacity: 0.65 !important;
+    transition: opacity 0.2s !important;
 }
 
 /* Sidebar logout area */
 aside#mobile-sidebar > div:last-child {
     border-top: 1px solid var(--sidebar-border) !important;
-    padding: 16px !important;
+    padding: 12px !important;
 }
 
 /* ═══════════════════════════════════════

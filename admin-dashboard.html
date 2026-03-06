@@ -30,19 +30,19 @@
     <div id="mobile-overlay" class="hidden fixed inset-0 bg-black/50 z-30 transition-opacity backdrop-blur-sm" onclick="toggleMobileMenu()"></div>
 
     <!-- Sidebar -->
-    <aside id="mobile-sidebar" class="w-72 bg-primary text-white shadow-2xl z-50 h-full transition-transform duration-300 transform -translate-x-full lg:translate-x-0 fixed inset-y-0 left-0 lg:relative hidden lg:flex flex-col">
+    <aside id="mobile-sidebar" class="w-64 bg-primary text-white shadow-2xl z-50 h-full transition-transform duration-300 transform -translate-x-full lg:translate-x-0 fixed inset-y-0 left-0 lg:relative hidden lg:flex flex-col">
         <!-- Brand -->
-        <div class="h-20 flex items-center gap-3 px-6 border-b border-gray-800 bg-gray-900/50">
-            <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white shadow-lg shadow-indigo-900/50 flex-shrink-0">
-                <ion-icon name="school" class="text-lg"></ion-icon>
+        <div style="height:64px;display:flex;align-items:center;gap:12px;padding:0 16px;background:rgba(255,255,255,0.04);border-bottom:1px solid rgba(255,255,255,0.08);flex-shrink:0;">
+            <div style="width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,#6366f1,#8b5cf6);display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 4px 12px rgba(99,102,241,0.4);">
+                <ion-icon name="school" style="color:white;font-size:17px;"></ion-icon>
             </div>
-            <div>
-                <div class="font-bold text-white text-sm tracking-wide">Admin Panel</div>
-                <div class="text-xs" style="color:rgba(255,255,255,0.35);">School Management</div>
+            <div style="min-width:0;">
+                <div style="font-size:13px;font-weight:700;color:#ffffff;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" id="sidebar-school-name">General School</div>
+                <div style="font-size:10px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:rgba(255,255,255,0.35);">Admin Panel</div>
             </div>
         </div>
 
-        <nav class="flex-1 py-4 px-3 overflow-y-auto space-y-0.5">
+        <nav class="flex-1 py-3 px-2.5 overflow-y-auto space-y-0.5">
             <!-- Overview -->
             <div class="nav-section-label">Overview</div>
             <button onclick="switchView('dashboard')" id="nav-dashboard" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-accent text-white font-medium shadow-lg shadow-blue-900/20 transition-all">
@@ -81,10 +81,10 @@
             </button>
 
             <!-- Portal Links -->
-            <div class="nav-section-label mt-2">Portals</div>
+            <div class="nav-section-label mt-2">Quick Links</div>
             <a href="teacher-portal.html" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-400 hover:bg-gray-800 hover:text-white font-medium transition-all">
                 <ion-icon name="key-outline" class="text-xl"></ion-icon>
-                <span>Teacher View</span>
+                <span>Teacher Portal</span>
                 <ion-icon name="open-outline" class="text-sm ml-auto opacity-50"></ion-icon>
             </a>
             <a href="student-report.html" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-400 hover:bg-gray-800 hover:text-white font-medium transition-all">
@@ -100,9 +100,9 @@
         </nav>
 
         <!-- Sign Out -->
-        <div class="px-3 pb-4 border-t border-gray-800 pt-3">
-            <button onclick="logout()" class="flex items-center gap-3 w-full px-4 py-3 rounded-xl transition-all" style="color:#6b7280;" onmouseover="this.style.background='rgba(239,68,68,0.08)';this.style.color='#f87171'" onmouseout="this.style.background='';this.style.color='#6b7280'">
-                <ion-icon name="log-out-outline" class="text-xl"></ion-icon>
+        <div class="px-2.5 pb-3 border-t border-gray-800 pt-2.5">
+            <button onclick="logout()" class="flex items-center gap-3 w-full px-4 py-2.5 rounded-xl transition-all" style="color:rgba(168,179,200,0.7);" onmouseover="this.style.background='rgba(239,68,68,0.1)';this.style.color='#fca5a5';" onmouseout="this.style.background='';this.style.color='rgba(168,179,200,0.7)';">
+                <ion-icon name="log-out-outline" class="text-lg"></ion-icon>
                 <span class="font-medium text-sm">Sign Out</span>
             </button>
         </div>
@@ -1307,6 +1307,17 @@
                 document.getElementById('count-classes').innerText = stats.classes || 0;
                 document.getElementById('count-subjects').innerText = stats.subjects || 0;
             }
+
+            // Inject school name into sidebar brand
+            try {
+                const db = await Storage.get();
+                const school = (db.schools || [])[0];
+                const sName = school?.settings?.schoolName || school?.name || '';
+                if (sName) {
+                    const el = document.getElementById('sidebar-school-name');
+                    if (el) el.textContent = sName;
+                }
+            } catch(e) {}
 
             // Load Classes for Filters
             allClasses = await fetchAdminData('classes') || [];
