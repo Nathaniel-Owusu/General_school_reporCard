@@ -4,10 +4,38 @@
  * NO localStorage dependency
  */
 
-const API_URL = 'api/db_handler.php';
+// Auto-detect base URL so this works on localhost AND Hostinger/mobile
+const _base = (function() {
+    // Use the current page's origin + path up to the app root
+    const path = window.location.pathname.replace(/\/[^\/]*$/, ''); // strip filename
+    return window.location.origin + path;
+})();
+const API_URL = _base + '/api/db_handler.php';
 
-// In-memory cache (session only, not persisted)
-let _dbCache = null;
+// In-memory cache + sessionStorage persistence (survives page navigation)
+const SESSION_CACHE_KEY = 'grc_db_cache';
+const SESSION_TS_KEY    = 'grc_db_ts';
+let _dbCache        = null;
+let _cacheTimestamp = null;
+let _saveTimer      = null;
+let _initialized    = false;
+
+// Restore cache from sessionStorage on script load (instant — no network)
+(function _restoreCache() {
+    try {
+        const raw = sessionStorage.getItem(SESSION_CACHE_KEY);
+        const ts  = parseInt(sessionStorage.getItem(SESSION_TS_KEY) || '0', 10);
+        if (raw && ts) {
+            _dbCache        = JSON.parse(raw);
+            _cacheTimestamp = ts;
+            console.log('⚡ Storage: Restored DB from sessionStorage (instant load)');
+        }
+    } catch(e) {
+        // Corrupted cache — ignore, will refetch
+        sessionStorage.removeItem(SESSION_CACHE_KEY);
+        sessionStorage.removeItem(SESSION_TS_KEY);
+    }
+})();
 
 const Storage = {
     /**
@@ -15,6 +43,8 @@ const Storage = {
      * Fetches initial data from server and seeds if empty.
      */
     init: async () => {
+        if (_initialized) return; // Prevent double-init
+        _initialized = true;
         console.log("🌐 Storage: Initializing remote database connection...");
         
         try {
@@ -36,32 +66,47 @@ const Storage = {
             }
             
             // Auto-fix schema for large JSON fields (silently)
-            try { fetch('api/fix_schema.php'); } catch(e) {}
+            try { fetch(_base + '/api/fix_schema.php'); } catch(e) {}
         } catch (e) {
+            _initialized = false; // Allow retry
             console.error("❌ Storage: Failed to connect to database", e);
-            alert("⚠️ Database Connection Failed\n\nCannot connect to the remote database. Please ensure:\n1. XAMPP/MySQL is running\n2. Database 'school_report_db' exists\n3. API endpoint is accessible\n\nError: " + e.message);
-            throw e;
+            // Don't alert/throw here — let the login page handle errors gracefully
         }
     },
 
     /**
-     * Get the entire database from server.
-     * @returns {Promise<Object>} The database object.
+     * Get the entire database.
+     * CACHE-FIRST: Returns instantly from memory/sessionStorage if fresh (< 5 min).
+     * Only hits the network on first load or after cache expires / is invalidated.
      */
     get: async () => {
+        const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+        const now = Date.now();
+
+        // ✅ CACHE HIT — memory is always fastest
+        if (_dbCache && _cacheTimestamp && (now - _cacheTimestamp) < CACHE_TTL) {
+            return _dbCache;
+        }
+
+        // 🌐 CACHE MISS — fetch from server
         try {
             const response = await fetch(API_URL);
-            if (!response.ok) {
-                throw new Error(`HTTP ${response.status}`);
-            }
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
             const data = await response.json();
-            _dbCache = data; // Update cache
+            _dbCache        = data;
+            _cacheTimestamp = Date.now();
+
+            // Persist to sessionStorage so next page load is instant
+            try {
+                sessionStorage.setItem(SESSION_CACHE_KEY, JSON.stringify(data));
+                sessionStorage.setItem(SESSION_TS_KEY, String(_cacheTimestamp));
+            } catch(e) { /* sessionStorage full — ignore */ }
+
             return data;
         } catch (e) {
             console.error("❌ Storage.get() failed:", e);
-            // Return cache if available
             if (_dbCache) {
-                console.warn("⚠️ Using cached data due to network error");
+                console.warn("⚠️ Using stale cache due to network error");
                 return _dbCache;
             }
             throw new Error("Database unavailable and no cache available");
@@ -69,40 +114,64 @@ const Storage = {
     },
 
     /**
-     * Save the entire database to server.
-     * @param {Object} data 
-     * @returns {Promise<Object>} Result of save operation
+     * Force a fresh fetch, bypassing cache.
+     * Use after major operations that change data on the server.
+     */
+    refresh: async () => {
+        _cacheTimestamp = null;
+        return await Storage.get();
+    },
+
+    /**
+     * Save to server — DEBOUNCED.
+     * Rapid saves within 800ms are batched into ONE network call.
+     * UI updates instantly from cache; server write happens after the delay.
      */
     save: async (data) => {
         data.last_updated = Date.now();
-        
-        try {
-            console.log("💾 Storage: Saving to remote database...");
-            
-            const response = await fetch(API_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data)
-            });
-            
-            const result = await response.json();
-            
-            if (!result.success) {
-                throw new Error(result.message || "Save failed");
-            }
-            
-            console.log("✅ Storage: Data saved successfully");
-            _dbCache = data; // Update cache
-            
-            // Notify other tabs/components
-            window.dispatchEvent(new Event('db-updated'));
-            
-            return result;
-        } catch (e) {
-            console.error("❌ Storage.save() failed:", e);
-            throw e;
-        }
+
+        // Update memory cache immediately so the UI reflects changes right away
+        _dbCache        = data;
+        _cacheTimestamp = Date.now();
+
+        // Invalidate sessionStorage so the next page load fetches fresh data
+        sessionStorage.removeItem(SESSION_CACHE_KEY);
+        sessionStorage.removeItem(SESSION_TS_KEY);
+
+        // Cancel any pending save and schedule a fresh one
+        if (_saveTimer) clearTimeout(_saveTimer);
+
+        return new Promise((resolve, reject) => {
+            _saveTimer = setTimeout(async () => {
+                try {
+                    console.log("💾 Storage: Saving to remote database...");
+                    const response = await fetch(API_URL, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(_dbCache) // Always use latest cache
+                    });
+
+                    const result = await response.json();
+                    if (!result.success) throw new Error(result.message || "Save failed");
+
+                    console.log("✅ Storage: Saved successfully");
+
+                    // Re-persist the now-confirmed data to sessionStorage
+                    try {
+                        sessionStorage.setItem(SESSION_CACHE_KEY, JSON.stringify(_dbCache));
+                        sessionStorage.setItem(SESSION_TS_KEY, String(_cacheTimestamp));
+                    } catch(e) { /* sessionStorage full — ignore */ }
+
+                    window.dispatchEvent(new Event('db-updated'));
+                    resolve(result);
+                } catch (e) {
+                    console.error("❌ Storage.save() failed:", e);
+                    reject(e);
+                }
+            }, 800); // Batch saves within 800ms window
+        });
     },
+
 
     /**
      * Sync is now same as save (kept for compatibility)
@@ -275,5 +344,16 @@ const Storage = {
     }
 };
 
-// Initialize on load
-Storage.init();
+// NOTE: Storage.init() is NOT called automatically here.
+// Pages that need the database (dashboard, teacher-portal, etc.) call Storage.init() explicitly.
+// The login page does NOT need Storage.init() — it uses api/login.php directly.
+
+// Auto-init only on pages that actually need the full database
+// login.html and public pages are skipped for fast load on mobile
+(function() {
+    const page = window.location.pathname.split('/').pop() || 'index.html';
+    const skipPages = ['login.html', 'index.html', 'contact.html', 'admissions.html'];
+    if (!skipPages.includes(page)) {
+        Storage.init();
+    }
+})();

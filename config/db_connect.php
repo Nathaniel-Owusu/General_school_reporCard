@@ -10,7 +10,18 @@ $db_name = 'school_report_db';
 
 // Check for Production Credentials File (only use if NOT on localhost)
 $is_localhost = false;
-if (php_sapi_name() === 'cli' || (isset($_SERVER['HTTP_HOST']) && ($_SERVER['HTTP_HOST'] === 'localhost' || strpos($_SERVER['HTTP_HOST'], '127.0.0.1') !== false))) {
+$http_host = isset($_SERVER['HTTP_HOST']) ? strtolower($_SERVER['HTTP_HOST']) : '';
+$server_addr = isset($_SERVER['SERVER_ADDR']) ? $_SERVER['SERVER_ADDR'] : '';
+
+if (
+    php_sapi_name() === 'cli' ||
+    $http_host === 'localhost' ||
+    strpos($http_host, '127.0.0.1') !== false ||
+    strpos($http_host, '::1') !== false ||
+    strpos($http_host, 'localhost:') !== false ||
+    $server_addr === '127.0.0.1' ||
+    $server_addr === '::1'
+) {
     $is_localhost = true;
 }
 

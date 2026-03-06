@@ -16,6 +16,7 @@ CREATE TABLE IF NOT EXISTS `schools` (
   `contact_email` varchar(100) DEFAULT NULL,
   `contact_phone` varchar(50) DEFAULT NULL,
   `settings` json DEFAULT NULL,
+  `active` tinyint(1) DEFAULT 1,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

@@ -412,95 +412,142 @@
                         </button>
                     </div>
                     
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" id="class-grid">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 auto-rows-min" id="class-grid">
                         <!-- Classes Cards will go here -->
                         <div class="col-span-full py-20 text-center"><ion-icon name="sync-outline" class="animate-spin text-3xl text-gray-400"></ion-icon></div>
                     </div>
                 </div>
             </div>
 
-            <!-- VIEW: CLASS MANAGER (New) -->
-              <div id="view-class-details" class="space-y-6 hidden animate-fade-in">
-                <!-- Header -->
-                <div class="flex items-center gap-4 mb-2">
-                    <button onclick="closeClassManager()" class="bg-white p-2 border border-gray-100 rounded-lg hover:shadow-md transition text-gray-500 hover:text-primary">
-                        <ion-icon name="arrow-back" class="text-xl"></ion-icon>
-                    </button>
-                    <div>
-                         <h2 class="text-2xl font-bold text-gray-800" id="cd-title">Class Name</h2>
-                         <div class="flex gap-4 text-sm text-gray-400">
-                             <span id="cd-count">0 Students</span>
-                             <span>•</span>
-                             <span id="cd-level">General</span>
-                         </div>
+            <!-- VIEW: CLASS MANAGER (Premium) -->
+              <div id="view-class-details" class="space-y-8 hidden animate-fade-in relative z-10">
+                <!-- Hero Header -->
+                <div class="relative bg-gradient-to-br from-indigo-900 via-primary to-indigo-950 rounded-3xl p-8 overflow-hidden shadow-2xl shadow-indigo-900/20">
+                    <div class="absolute top-0 right-0 w-64 h-64 bg-accent/20 rounded-full blur-3xl -mr-20 -mt-20 pointer-events-none"></div>
+                    <div class="absolute bottom-0 left-0 w-40 h-40 bg-purple-500/20 rounded-full blur-3xl -ml-10 -mb-10 pointer-events-none"></div>
+                    <div class="relative z-10 flex flex-col md:flex-row gap-6 justify-between items-start md:items-center">
+                        <div class="flex items-center gap-5 relative">
+                            <button onclick="closeClassManager()" class="w-12 h-12 flex items-center justify-center bg-white/10 hover:bg-white/20 text-white rounded-2xl backdrop-blur-md transition-all border border-white/10 hover:-translate-x-1" title="Back to Classes">
+                                <ion-icon name="arrow-back" class="text-xl"></ion-icon>
+                            </button>
+                            <div class="w-[1px] h-10 bg-white/20 hidden md:block"></div>
+                            <div>
+                                <div class="inline-flex items-center gap-2 px-2.5 py-1 rounded-md bg-white/10 border border-white/10 text-[10px] font-bold text-indigo-200 uppercase tracking-widest mb-2" id="cd-level-badge">
+                                    <ion-icon name="school"></ion-icon>
+                                    <span id="cd-level">General</span>
+                                </div>
+                                <h2 class="text-3xl md:text-4xl font-black text-white tracking-tight drop-shadow-sm mb-1" id="cd-title">Class Name</h2>
+                                <p class="text-indigo-200 text-sm font-medium flex items-center gap-2">
+                                    <ion-icon name="people" class="opacity-80"></ion-icon>
+                                    <span id="cd-count">0 Students</span> Enrolled
+                                </p>
+                            </div>
+                        </div>
+                        <div class="flex gap-3">
+                            <button onclick="openAddStudentModal(null, currentManagerClassId)" class="bg-white text-indigo-950 px-6 py-3 rounded-xl text-sm font-bold shadow-xl shadow-white/10 hover:shadow-white/20 hover:-translate-y-0.5 transition-all flex items-center gap-2">
+                                <ion-icon name="person-add" class="text-lg"></ion-icon> Add Student
+                            </button>
+                        </div>
                     </div>
-                    <div class="ml-auto flex gap-2">
-                        <button onclick="openAddStudentModal(null, currentManagerClassId)" class="bg-primary text-white px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 hover:bg-blue-800 shadow-lg transition">
-                             <ion-icon name="person-add"></ion-icon> Add Student
+                </div>
+
+                <!-- Segmented Control Tabs -->
+                <div class="flex justify-center -mt-4 relative z-20">
+                    <div class="bg-white shadow-xl shadow-gray-200/50 p-1.5 rounded-2xl flex items-center border border-gray-100/80 backdrop-blur-md">
+                        <button onclick="switchManagerTab('students')" id="tab-mgr-students" class="flex items-center gap-2 px-8 py-2.5 rounded-xl font-bold text-sm bg-primary text-white shadow-md transition-all">
+                            <ion-icon name="people" class="text-lg"></ion-icon> Student Roster
+                        </button>
+                        <button onclick="switchManagerTab('grades')" id="tab-mgr-grades" class="flex items-center gap-2 px-8 py-2.5 rounded-xl font-bold text-sm text-gray-500 hover:text-gray-800 transition-all">
+                            <ion-icon name="school" class="text-lg"></ion-icon> Results Entry
                         </button>
                     </div>
                 </div>
 
-                <!-- Tabs -->
-                <div class="flex border-b border-gray-200">
-                    <button onclick="switchManagerTab('students')" id="tab-mgr-students" class="px-6 py-3 font-bold text-sm text-primary border-b-2 border-primary transition uppercase tracking-wider">Student List</button>
-                    <button onclick="switchManagerTab('grades')" id="tab-mgr-grades" class="px-6 py-3 font-bold text-sm text-gray-400 hover:text-gray-600 border-b-2 border-transparent transition uppercase tracking-wider">Results Entry</button>
-                </div>
-
                 <!-- Tab: Students -->
-                <div id="mgr-students" class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-                     <table class="w-full text-left text-sm">
-                         <thead class="bg-gray-50 text-gray-500 font-bold uppercase text-xs">
-                             <tr>
-                                 <th class="px-4 py-3 rounded-l-lg">ID</th>
-                                 <th class="px-4 py-3">Name</th>
-                                 <th class="px-4 py-3">Gender</th>
-                                 <th class="px-4 py-3">Status</th>
-                                 <th class="px-4 py-3 rounded-r-lg text-right">Actions</th>
-                             </tr>
-                         </thead>
-                         <tbody id="mgr-student-table" class="divide-y divide-gray-50">
-                             <tr><td colspan="5" class="py-10 text-center text-gray-400 italic">No students found.</td></tr>
-                         </tbody>
-                     </table>
+                <div id="mgr-students" class="bg-white rounded-3xl shadow-sm border border-gray-100 p-8 pt-6">
+                    <div class="flex justify-between items-end mb-6">
+                        <div>
+                            <h3 class="font-extrabold text-xl text-gray-900">Class Roster</h3>
+                            <p class="text-gray-400 text-sm font-medium">Manage students enrolled in this specific class.</p>
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto rounded-2xl border border-gray-100 bg-gray-50/30">
+                         <table class="w-full text-left text-sm whitespace-nowrap">
+                             <thead class="bg-gray-50/80 text-gray-500 font-bold uppercase text-xs tracking-wider">
+                                 <tr>
+                                     <th class="px-6 py-4">ID</th>
+                                     <th class="px-6 py-4">Name</th>
+                                     <th class="px-6 py-4">Gender</th>
+                                     <th class="px-6 py-4">Status</th>
+                                     <th class="px-6 py-4 text-right">Actions</th>
+                                 </tr>
+                             </thead>
+                             <tbody id="mgr-student-table" class="divide-y divide-gray-100">
+                                 <tr><td colspan="5" class="py-12 text-center text-gray-400 italic font-medium">No students found.</td></tr>
+                             </tbody>
+                         </table>
+                    </div>
                 </div>
 
                 <!-- Tab: Grades -->
                 <div id="mgr-grades" class="hidden space-y-6">
-                    <div class="bg-white p-4 rounded-xl border border-gray-200 flex items-center gap-4 shadow-sm">
-                        <div class="w-10 h-10 bg-purple-50 text-purple-600 rounded-lg flex items-center justify-center text-xl"><ion-icon name="book"></ion-icon></div>
-                        <div class="flex-1">
-                            <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Select Subject to Grade</label>
-                            <select id="mgr-subject-select" onchange="loadManagerGrades()" class="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-accent font-bold text-gray-700"></select>
+                    <!-- Premium Selector -->
+                    <div class="bg-gradient-to-r from-indigo-50/50 to-purple-50/50 p-6 flex flex-col md:flex-row items-start md:items-center gap-6 rounded-3xl border border-indigo-100 shadow-sm relative overflow-hidden">
+                        <div class="absolute -right-10 -bottom-10 w-32 h-32 bg-purple-500/10 rounded-full blur-3xl pointer-events-none"></div>
+                        <div class="w-14 h-14 bg-white shadow-sm border border-indigo-100 text-indigo-600 rounded-2xl flex items-center justify-center text-2xl shrink-0 z-10">
+                            <ion-icon name="book"></ion-icon>
+                        </div>
+                        <div class="flex-1 w-full relative z-10">
+                            <label class="block text-xs font-bold text-indigo-500 uppercase tracking-widest pl-1 mb-1.5">Target Subject for Grading</label>
+                            <div class="relative w-full max-w-lg">
+                                <ion-icon name="search-outline" class="absolute left-4 top-4 text-gray-400 text-lg"></ion-icon>
+                                <select id="mgr-subject-select" onchange="loadManagerGrades()" class="w-full pl-12 pr-10 py-3.5 bg-white border border-gray-200 shadow-sm rounded-xl outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 font-bold text-gray-800 appearance-none transition-all cursor-pointer">
+                                </select>
+                                <ion-icon name="chevron-down" class="absolute right-4 top-4 text-gray-400 pointer-events-none text-lg"></ion-icon>
+                            </div>
                         </div>
                     </div>
                     
-                    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 overflow-x-auto">
-                        <table class="w-full text-left text-sm">
-                             <thead class="bg-gray-50 text-gray-500 font-bold uppercase text-xs">
-                                 <tr>
-                                     <th class="px-4 py-3 rounded-l-lg">Student</th>
-                                     <th class="px-4 py-3 text-center w-32 border-l border-white">Class (30)</th>
-                                     <th class="px-4 py-3 text-center w-32 border-l border-white">Exam (70)</th>
-                                     <th class="px-4 py-3 text-center w-24 border-l border-white">Total</th>
-                                     <th class="px-4 py-3 text-center w-24 rounded-r-lg border-l border-white">Grade</th>
-                                 </tr>
-                             </thead>
-                             <tbody id="mgr-grade-table" class="divide-y divide-gray-50">
-                                 <tr><td colspan="5" class="py-10 text-center text-gray-400 italic">Select a subject to load gradebook.</td></tr>
-                             </tbody>
-                        </table>
+                    <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-8 overflow-x-auto relative min-h-[400px]">
+                        <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-accent to-purple-500 rounded-t-3xl"></div>
                         
-                        <div class="mt-6 flex justify-end pt-6 border-t border-gray-100">
-                            <label class="bg-green-50 text-green-600 px-6 py-3 rounded-xl font-bold hover:bg-green-100 cursor-pointer flex items-center gap-2 mr-auto transition border border-green-200">
-                                <input type="file" id="import_csv_file" accept=".csv" class="hidden" onchange="importGradesFromCSV(this)">
-                                <ion-icon name="cloud-upload"></ion-icon> Import CSV
-                            </label>
-                            
-                            <a href="#" onclick="downloadCSVTemplate()" class="text-xs text-blue-500 font-bold underline mr-4 self-center">Download Template</a>
+                        <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-6 gap-4">
+                            <div>
+                                <h3 class="font-extrabold text-2xl text-gray-900">Gradebook Entry</h3>
+                                <p class="text-gray-400 text-sm font-medium">Input scores out of 30 (Class) and 70 (Exam).</p>
+                            </div>
+                            <div class="flex gap-3 relative z-10">
+                                <label class="bg-white border border-gray-200 text-gray-700 px-4 py-2.5 rounded-xl text-sm font-bold hover:bg-gray-50 hover:text-indigo-600 shadow-sm cursor-pointer flex items-center gap-2 transition-all">
+                                    <input type="file" id="import_csv_file" accept=".csv" class="hidden" onchange="importGradesFromCSV(this)">
+                                    <ion-icon name="cloud-upload" class="text-lg"></ion-icon> Import CSV
+                                </label>
+                                <button onclick="downloadCSVTemplate()" class="bg-white border border-gray-200 text-gray-700 px-4 py-2.5 rounded-xl text-sm font-bold hover:bg-gray-50 hover:text-blue-600 shadow-sm flex items-center gap-2 transition-all">
+                                    <ion-icon name="download" class="text-lg"></ion-icon> Template
+                                </button>
+                            </div>
+                        </div>
 
-                            <button onclick="saveManagerGrades()" class="bg-secondary text-white px-8 py-3 rounded-xl font-bold hover:bg-amber-600 shadow-lg shadow-amber-500/30 transition flex items-center gap-2">
-                                <ion-icon name="save"></ion-icon> Save All Grades
+                        <div class="overflow-hidden rounded-2xl border border-gray-200 shadow-sm bg-gray-50/50">
+                            <table class="w-full text-left text-sm whitespace-nowrap" style="border-collapse: separate; border-spacing: 0;">
+                                 <thead class="bg-gray-100 text-gray-600 font-bold uppercase text-[11px] tracking-wider sticky top-0 z-10">
+                                     <tr>
+                                         <th class="px-6 py-4 border-b border-gray-200">Student Scholar</th>
+                                         <th class="px-3 py-4 text-center w-36 border-b border-gray-200 border-l border-gray-200">Class Score (30)</th>
+                                         <th class="px-3 py-4 text-center w-36 border-b border-gray-200 border-l border-gray-200">Exam Score (70)</th>
+                                         <th class="px-4 py-4 text-center w-32 border-b border-gray-200 border-l border-gray-200">Total Score</th>
+                                         <th class="px-4 py-4 text-center w-28 border-b border-gray-200 border-l border-gray-200 bg-gray-50">Final Grade</th>
+                                     </tr>
+                                 </thead>
+                                 <tbody id="mgr-grade-table" class="divide-y divide-gray-200 bg-white">
+                                     <tr><td colspan="5" class="py-16 text-center text-gray-400 italic font-medium"><ion-icon name="options-outline" class="text-2xl mb-2"></ion-icon><br>Select a subject above to load the gradebook.</td></tr>
+                                 </tbody>
+                            </table>
+                        </div>
+                        
+                        <!-- Save Button -->
+                        <div class="sticky bottom-0 right-0 left-0 pt-6 mt-6 flex justify-end bg-gradient-to-t from-white via-white to-transparent pb-2 z-20 pointer-events-none">
+                            <button onclick="saveManagerGrades()" class="pointer-events-auto bg-gradient-to-r from-accent to-blue-600 text-white px-8 py-3.5 rounded-xl font-bold hover:shadow-xl hover:shadow-blue-500/30 hover:-translate-y-0.5 transition-all text-sm flex items-center gap-2">
+                                <ion-icon name="save" class="text-lg"></ion-icon> Save Record
                             </button>
                         </div>
                     </div>
@@ -1182,9 +1229,9 @@
         </div>
     </div>
 
-    <script src="js/storage.js?v=4"></script>
-    <script src="js/app.js?v=4"></script>
-    <script src="js/settings.js?v=4"></script>
+    <script src="js/storage.js?v=10"></script>
+    <script src="js/app.js?v=10"></script>
+    <script src="js/settings.js?v=10"></script>
 
     <script>
         checkAuth(['admin']);
@@ -2329,144 +2376,185 @@
         // --- VIEW RENDERERS ---
         async function renderClasses() {
             const grid = document.getElementById('class-grid');
+            grid.innerHTML = '<div class="col-span-full py-10 text-center"><ion-icon name="sync-outline" class="animate-spin text-3xl text-gray-300"></ion-icon></div>';
+
             const classes = await fetchAdminData('classes');
             // Fetch teachers if not loaded
             if(allTeachers.length === 0) allTeachers = await fetchAdminData('teachers') || [];
             // Fetch students if not loaded (for counts)
             if(allStudents.length === 0) allStudents = await fetchAdminData('students') || [];
             allClasses = classes || [];
-            
+
             if(!classes || classes.length === 0) {
-                grid.innerHTML = '<div class="col-span-full text-center flex flex-col items-center justify-center p-12 bg-gray-50/50 rounded-3xl border border-dashed border-gray-200 opacity-60"><ion-icon name="business-outline" class="text-6xl text-gray-300 mb-4"></ion-icon><p class="text-gray-500 font-bold">No classes found.</p><p class="text-xs text-gray-400 mt-1">Add one to get started.</p></div>';
+                grid.innerHTML = '<div class="col-span-full text-center flex flex-col items-center justify-center p-16 bg-gray-50/50 rounded-3xl border border-dashed border-gray-200 opacity-60"><ion-icon name="business-outline" class="text-6xl text-gray-300 mb-4"></ion-icon><p class="text-gray-500 font-bold">No classes found.</p><p class="text-xs text-gray-400 mt-1">Click "Create Class" to get started.</p></div>';
                 return;
             }
 
-            // Group by Level
             const levels = ['KG', 'Primary', 'JHS'];
+            const levelMeta = {
+                KG:      { label: 'Kindergarten', color: '#ec4899', bg: '#fdf2f8', border: '#fbcfe8', icon: 'color-palette', textColor: '#9d174d' },
+                Primary: { label: 'Primary School', color: '#0ea5e9', bg: '#f0f9ff', border: '#bae6fd', icon: 'library',       textColor: '#0369a1' },
+                JHS:     { label: 'Junior High',   color: '#8b5cf6', bg: '#f5f3ff', border: '#ddd6fe', icon: 'school',         textColor: '#6d28d9' },
+            };
+
             let html = '';
 
             levels.forEach(level => {
-                 const levelClasses = classes.filter(c => c.level === level);
-                 if(levelClasses.length > 0) {
-                     const color = getLevelColorCSS(level);
-                     const icon = getLevelIcon(level);
-                     
-                     html += `
-                        <div class="col-span-full mt-6 mb-2 flex items-center gap-3">
-                            <div class="w-8 h-8 rounded-lg bg-${color}-50 flex items-center justify-center text-${color}-600 font-bold"><ion-icon name="${icon}"></ion-icon></div>
-                            <h3 class="font-black text-gray-800 uppercase tracking-widest text-sm flex-1 border-b border-gray-100/60 pb-1 relative top-1">${level} Level</h3>
+                const levelClasses = classes.filter(c => c.level === level);
+                if(levelClasses.length === 0) return;
+
+                const meta = levelMeta[level];
+
+                html += `
+                    <div class="col-span-full flex items-center gap-3 mt-4 mb-1">
+                        <div class="w-8 h-8 rounded-xl flex items-center justify-center shrink-0" style="background:${meta.bg};color:${meta.color};border:1px solid ${meta.border};">
+                            <ion-icon name="${meta.icon}"></ion-icon>
                         </div>
-                     ` + levelClasses.map(c => `
-                        <div class="group bg-white rounded-3xl p-6 shadow-sm border border-gray-100 hover:shadow-xl transition-all duration-300 relative hover:-translate-y-1 flex flex-col h-[260px] overflow-hidden">
-                            <!-- Background decoration -->
-                            <div class="absolute -top-12 -right-12 w-32 h-32 bg-${color}-50/50 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-500 pointer-events-none"></div>
+                        <h3 class="font-black uppercase tracking-widest text-xs flex-1" style="color:${meta.textColor};">${meta.label}</h3>
+                        <span class="text-[10px] font-bold text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">${levelClasses.length} ${levelClasses.length === 1 ? 'class' : 'classes'}</span>
+                        <div class="flex-1 border-b border-gray-100 ml-2"></div>
+                    </div>
+                `;
 
-                            <!-- Floating Action Menu -->
-                            <div class="absolute top-4 right-4 flex flex-col gap-1.5 opacity-0 group-hover:opacity-100 transition-all translate-x-2 group-hover:translate-x-0 z-10">
-                                <button onclick="openClassManager('${c.id}')" title="Class Dashboard" class="w-8 h-8 flex flex-col items-center justify-center bg-white border border-gray-200 rounded-lg text-gray-400 hover:text-indigo-600 hover:border-indigo-200 hover:bg-indigo-50 shadow-sm transition-colors"><ion-icon name="open-outline" class="text-sm"></ion-icon></button>
-                                <button onclick="openManageSubjectsModal('${c.id}')" title="Subject Quick-Map" class="w-8 h-8 flex flex-col items-center justify-center bg-white border border-gray-200 rounded-lg text-gray-400 hover:text-emerald-600 hover:border-emerald-200 hover:bg-emerald-50 shadow-sm transition-colors"><ion-icon name="book" class="text-sm"></ion-icon></button>
-                                <button onclick="openAddClassModal('${c.id}')" title="Edit Properties" class="w-8 h-8 flex flex-col items-center justify-center bg-white border border-gray-200 rounded-lg text-gray-400 hover:text-blue-500 hover:border-blue-200 hover:bg-blue-50 shadow-sm transition-colors"><ion-icon name="create-outline" class="text-sm"></ion-icon></button>
-                                <button onclick="confirmDeleteClass('${c.id}')" title="Delete Class" class="w-8 h-8 flex flex-col items-center justify-center bg-white border border-gray-200 rounded-lg text-gray-400 hover:text-red-500 hover:border-red-200 hover:bg-red-50 shadow-sm transition-colors"><ion-icon name="trash" class="text-sm"></ion-icon></button>
-                            </div>
+                levelClasses.forEach(c => {
+                    const studentCount = (allStudents || []).filter(s => s.class === c.name || s.class_id === c.id).length;
+                    const subjectCount = c.subjects ? c.subjects.length : 0;
+                    const isActive = c.active !== false;
 
-                            <div class="w-14 h-14 rounded-2xl bg-${color}-50 text-${color}-600 flex items-center justify-center text-2xl mb-5 relative shadow-inner shrink-0 group-hover:scale-110 transition-transform">
-                                <ion-icon name="${icon}"></ion-icon>
-                                ${c.active === false ? '<div class="absolute -top-1 -right-1 w-3.5 h-3.5 bg-gray-400 rounded-full border-2 border-white shadow-sm" title="Inactive"></div>' : '<div class="absolute -top-1 -right-1 w-3.5 h-3.5 bg-emerald-500 rounded-full border-2 border-white shadow-sm" title="Active"></div>'}
-                            </div>
+                    // Teacher label
+                    let teacherLabel = '';
+                    const assignedTeachers = allTeachers.filter(t => t.assigned_classes && t.assigned_classes.includes(c.name));
+                    if (assignedTeachers.length > 0) {
+                        teacherLabel = assignedTeachers[0].name;
+                    } else if (c.class_teacher_id) {
+                        const t = allTeachers.find(t => t.id === c.class_teacher_id);
+                        teacherLabel = t ? t.name : '';
+                    }
 
-                            <div class="flex-1 min-h-0 relative z-10">
-                                <h3 class="font-extrabold text-gray-900 text-xl truncate ${c.active === false ? 'opacity-50' : ''}">${c.name}</h3>
-                                <div class="flex items-center gap-2 mt-1.5 mb-3">
-                                    <span class="text-[10px] text-${color}-600 font-bold uppercase tracking-widest bg-${color}-50 px-2 py-0.5 rounded-md border border-${color}-100/50">${c.level || 'General'}</span>
-                                    ${c.active === false ? '<span class="text-[10px] text-gray-500 font-bold uppercase tracking-widest bg-gray-100 px-2 py-0.5 rounded-md">Disabled</span>' : ''}
+                    html += `
+                    <div class="bg-white rounded-2xl border shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5 overflow-hidden flex flex-col" style="border-color:${isActive ? meta.border : '#e5e7eb'};">
+                        <!-- Colored top stripe -->
+                        <div class="h-1 w-full" style="background:linear-gradient(90deg,${meta.color},${meta.color}88);"></div>
+
+                        <!-- Main Body -->
+                        <div class="p-5 flex-1">
+                            <div class="flex items-start justify-between gap-3 mb-4">
+                                <div class="flex items-center gap-3 min-w-0">
+                                    <!-- Icon -->
+                                    <div class="w-12 h-12 rounded-xl flex items-center justify-center shrink-0 text-xl" style="background:${meta.bg};color:${meta.color};border:1px solid ${meta.border};">
+                                        <ion-icon name="${meta.icon}"></ion-icon>
+                                    </div>
+                                    <!-- Name + status -->
+                                    <div class="min-w-0">
+                                        <h3 class="font-extrabold text-gray-900 text-lg leading-tight truncate ${!isActive ? 'opacity-50' : ''}">${c.name}</h3>
+                                        <span class="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full mt-1" style="background:${isActive ? '#dcfce7' : '#f3f4f6'};color:${isActive ? '#166534' : '#6b7280'};">
+                                            <span class="w-1.5 h-1.5 rounded-full inline-block" style="background:${isActive ? '#22c55e' : '#9ca3af'};"></span>
+                                            ${isActive ? 'Active' : 'Disabled'}
+                                        </span>
+                                    </div>
                                 </div>
-                                
-                                <p class="text-[11px] text-gray-500 font-medium flex items-start gap-1.5 overflow-hidden line-clamp-2">
-                                    <ion-icon name="person" class="text-${color}-400 shrink-0 relative top-0.5"></ion-icon> 
-                                    ${(() => {
-                                        const assignedTeachers = allTeachers.filter(t => t.assigned_classes && t.assigned_classes.includes(c.name));
-                                        if (assignedTeachers.length > 0) {
-                                            return 'Lead: ' + assignedTeachers.map(t => `<span class="font-bold text-gray-700">${t.name}</span>`).join(', ');
-                                        } else if (c.class_teacher_id) {
-                                            const teacher = allTeachers.find(t => t.id === c.class_teacher_id);
-                                            return teacher ? `<span class="font-bold text-gray-700">Lead: ${teacher.name}</span>` : '<span class="italic text-gray-400">Teacher not found</span>';
-                                        } else {
-                                            return '<span class="italic text-amber-500 font-bold bg-amber-50 px-1 rounded border border-amber-100">No Lead Teacher Assigned</span>';
-                                        }
-                                    })()}
-                                </p>
+                                <!-- Level pill -->
+                                <span class="shrink-0 text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-lg" style="background:${meta.bg};color:${meta.textColor};border:1px solid ${meta.border};">${level}</span>
                             </div>
-                            
-                            <!-- Bottom Metric Bar -->
-                            <div class="flex items-center justify-between text-xs text-gray-500 border-t border-gray-100/80 pt-4 mt-auto shrink-0 relative z-10">
-                                <div class="flex items-center gap-1.5 font-medium hover:text-emerald-600 transition-colors cursor-default" title="${c.subjects ? c.subjects.length : 0} Subjects Attached">
-                                    <ion-icon name="book" class="text-emerald-400"></ion-icon>
-                                    <span>${c.subjects ? c.subjects.length : 0} Subjects</span>
+
+                            <!-- Teacher -->
+                            <div class="flex items-center gap-2 mb-4 text-sm">
+                                <div class="w-7 h-7 rounded-lg flex items-center justify-center shrink-0" style="background:${meta.bg};color:${meta.color};">
+                                    <ion-icon name="person" class="text-sm"></ion-icon>
                                 </div>
-                                <div class="w-[1px] h-3 bg-gray-200"></div>
-                                <div class="flex items-center gap-1.5 font-bold hover:text-indigo-600 transition-colors cursor-default" title="Enrolled Students">
-                                    <ion-icon name="people" class="text-indigo-400 text-sm"></ion-icon>
-                                    <span class="text-gray-800">${(allStudents || []).filter(s => s.class === c.name || s.class_id === c.id).length} Students</span>
+                                ${teacherLabel
+                                    ? `<span class="font-semibold text-gray-800 truncate">${teacherLabel}</span>`
+                                    : `<span class="italic text-amber-600 font-semibold text-xs bg-amber-50 px-2 py-0.5 rounded-lg border border-amber-100">No teacher assigned</span>`
+                                }
+                            </div>
+
+                            <!-- Stats row -->
+                            <div class="flex items-center gap-3">
+                                <div class="flex-1 rounded-xl p-3 text-center" style="background:${meta.bg};border:1px solid ${meta.border};">
+                                    <div class="text-xl font-black" style="color:${meta.color};">${studentCount}</div>
+                                    <div class="text-[10px] font-bold uppercase tracking-wider text-gray-500 mt-0.5">Students</div>
+                                </div>
+                                <div class="flex-1 rounded-xl p-3 text-center bg-gray-50 border border-gray-100">
+                                    <div class="text-xl font-black text-gray-700">${subjectCount}</div>
+                                    <div class="text-[10px] font-bold uppercase tracking-wider text-gray-400 mt-0.5">Subjects</div>
                                 </div>
                             </div>
                         </div>
-                    `).join('');
-                 }
+
+                        <!-- Action Footer — always visible -->
+                        <div class="border-t px-4 py-3 flex items-center gap-2" style="border-color:${meta.border};background:${meta.bg}08;">
+                            <button onclick="openClassManager('${c.id}')"
+                                class="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-bold transition-all"
+                                style="background:${meta.color};color:white;box-shadow:0 2px 8px ${meta.color}40;"
+                                title="Open Class Dashboard">
+                                <ion-icon name="open-outline"></ion-icon> Manage
+                            </button>
+                            <button onclick="openManageSubjectsModal('${c.id}')"
+                                class="w-9 h-9 flex items-center justify-center rounded-xl border transition-all text-gray-500 hover:text-emerald-600 hover:border-emerald-200 hover:bg-emerald-50 bg-white"
+                                style="border-color:${meta.border};" title="Edit Subjects">
+                                <ion-icon name="book-outline" class="text-sm"></ion-icon>
+                            </button>
+                            <button onclick="openAddClassModal('${c.id}')"
+                                class="w-9 h-9 flex items-center justify-center rounded-xl border transition-all text-gray-500 hover:text-blue-600 hover:border-blue-200 hover:bg-blue-50 bg-white"
+                                style="border-color:${meta.border};" title="Edit Class">
+                                <ion-icon name="create-outline" class="text-sm"></ion-icon>
+                            </button>
+                            <button onclick="openDeleteClassModal('${c.id}')"
+                                class="w-9 h-9 flex items-center justify-center rounded-xl border transition-all text-gray-500 hover:text-red-500 hover:border-red-200 hover:bg-red-50 bg-white"
+                                style="border-color:${meta.border};" title="Delete Class">
+                                <ion-icon name="trash-outline" class="text-sm"></ion-icon>
+                            </button>
+                        </div>
+                    </div>
+                    `;
+                });
             });
-            
-            // Catch-all
+
+            // Uncategorized
             const others = classes.filter(c => !levels.includes(c.level));
             if(others.length > 0) {
-                 html += `
-                    <div class="col-span-full mt-6 mb-2 flex items-center gap-3">
-                        <div class="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center text-gray-600 font-bold"><ion-icon name="folder-open"></ion-icon></div>
-                        <h3 class="font-black text-gray-800 uppercase tracking-widest text-sm flex-1 border-b border-gray-100/60 pb-1 relative top-1">Uncategorized</h3>
-                    </div>
-                 ` + others.map(c => `
-                        <div class="group bg-white rounded-3xl p-6 shadow-sm border border-gray-100 hover:shadow-xl transition-all duration-300 relative hover:-translate-y-1 flex flex-col h-[260px]">
-                             <!-- Action Menu -->
-                             <div class="absolute top-4 right-4 flex flex-col gap-1.5 opacity-0 group-hover:opacity-100 transition-all translate-x-2 group-hover:translate-x-0 z-10">
-                                <button onclick="openClassManager('${c.id}')" title="Class Dashboard" class="w-8 h-8 flex flex-col items-center justify-center bg-white border border-gray-200 rounded-lg text-gray-400 hover:text-indigo-600 hover:border-indigo-200 hover:bg-indigo-50 shadow-sm transition-colors"><ion-icon name="open-outline" class="text-sm"></ion-icon></button>
-                                <button onclick="openManageSubjectsModal('${c.id}')" title="Subject Quick-Map" class="w-8 h-8 flex flex-col items-center justify-center bg-white border border-gray-200 rounded-lg text-gray-400 hover:text-emerald-600 hover:border-emerald-200 hover:bg-emerald-50 shadow-sm transition-colors"><ion-icon name="book" class="text-sm"></ion-icon></button>
-                                <button onclick="openAddClassModal('${c.id}')" title="Edit Properties" class="w-8 h-8 flex flex-col items-center justify-center bg-white border border-gray-200 rounded-lg text-gray-400 hover:text-blue-500 hover:border-blue-200 hover:bg-blue-50 shadow-sm transition-colors"><ion-icon name="create-outline" class="text-sm"></ion-icon></button>
-                                <button onclick="confirmDeleteClass('${c.id}')" title="Delete Class" class="w-8 h-8 flex flex-col items-center justify-center bg-white border border-gray-200 rounded-lg text-gray-400 hover:text-red-500 hover:border-red-200 hover:bg-red-50 shadow-sm transition-colors"><ion-icon name="trash" class="text-sm"></ion-icon></button>
+                html += `<div class="col-span-full flex items-center gap-3 mt-4 mb-1">
+                    <div class="w-8 h-8 rounded-xl bg-gray-100 flex items-center justify-center shrink-0 text-gray-500"><ion-icon name="folder-open"></ion-icon></div>
+                    <h3 class="font-black text-gray-400 uppercase tracking-widest text-xs">Uncategorized</h3>
+                    <div class="flex-1 border-b border-gray-100 ml-2"></div>
+                </div>`;
+                others.forEach(c => {
+                    const studentCount = (allStudents || []).filter(s => s.class === c.name).length;
+                    html += `
+                    <div class="bg-white rounded-2xl border border-gray-200 shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5 overflow-hidden flex flex-col">
+                        <div class="h-1 w-full bg-gray-200"></div>
+                        <div class="p-5 flex-1">
+                            <div class="flex items-center gap-3 mb-4">
+                                <div class="w-12 h-12 rounded-xl bg-gray-100 text-gray-600 flex items-center justify-center text-xl"><ion-icon name="folder"></ion-icon></div>
+                                <div><h3 class="font-extrabold text-gray-900 text-lg">${c.name}</h3></div>
                             </div>
-
-                            <div class="w-14 h-14 rounded-2xl bg-gray-50 text-gray-600 flex items-center justify-center text-2xl mb-5 shadow-inner shrink-0 group-hover:scale-110 transition-transform">
-                                <ion-icon name="folder"></ion-icon>
-                            </div>
-                            
-                            <div class="flex-1 min-h-0">
-                                <h3 class="font-extrabold text-gray-900 text-xl truncate mb-3">${c.name}</h3>
-                            </div>
-                            
-                            <div class="flex items-center justify-between text-xs text-gray-500 border-t border-gray-100 pt-4 mt-auto shrink-0">
-                                <div class="flex items-center gap-1.5">
-                                    <ion-icon name="book" class="text-emerald-400"></ion-icon>
-                                    <span>${c.subjects ? c.subjects.length : 0} Subjects</span>
+                            <div class="flex items-center gap-3">
+                                <div class="flex-1 rounded-xl p-3 text-center bg-gray-50 border border-gray-100">
+                                    <div class="text-xl font-black text-gray-700">${studentCount}</div>
+                                    <div class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mt-0.5">Students</div>
+                                </div>
+                                <div class="flex-1 rounded-xl p-3 text-center bg-gray-50 border border-gray-100">
+                                    <div class="text-xl font-black text-gray-700">${c.subjects ? c.subjects.length : 0}</div>
+                                    <div class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mt-0.5">Subjects</div>
                                 </div>
                             </div>
                         </div>
-                 `).join('');
+                        <div class="border-t border-gray-100 px-4 py-3 flex items-center gap-2 bg-gray-50/50">
+                            <button onclick="openClassManager('${c.id}')" class="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-bold bg-gray-800 text-white transition-all hover:bg-gray-900">
+                                <ion-icon name="open-outline"></ion-icon> Manage
+                            </button>
+                            <button onclick="openAddClassModal('${c.id}')" class="w-9 h-9 flex items-center justify-center rounded-xl border border-gray-200 bg-white text-gray-500 hover:text-blue-600 hover:border-blue-200 hover:bg-blue-50 transition-all" title="Edit"><ion-icon name="create-outline" class="text-sm"></ion-icon></button>
+                            <button onclick="openDeleteClassModal('${c.id}')" class="w-9 h-9 flex items-center justify-center rounded-xl border border-gray-200 bg-white text-gray-500 hover:text-red-500 hover:border-red-200 hover:bg-red-50 transition-all" title="Delete"><ion-icon name="trash-outline" class="text-sm"></ion-icon></button>
+                        </div>
+                    </div>`;
+                });
             }
 
             grid.innerHTML = html;
         }
 
-        // CSS safe tailwind mapping
-        function getLevelColorCSS(level) {
-            if(level === 'KG') return 'pink'; 
-            if(level === 'Primary') return 'sky'; // better than blue for UI
-            if(level === 'JHS') return 'purple';
-            return 'gray';
-        }
+            
 
-        function getLevelIcon(level) {
-            if(level === 'KG') return 'color-palette';
-            if(level === 'Primary') return 'library';
-            if(level === 'JHS') return 'school';
-            return 'business';
-        }
 
         async function renderTeachers() {
             const tbody = document.getElementById('teacher-table-body');
@@ -2824,15 +2912,20 @@
             document.getElementById('mgr-students').classList.add('hidden');
             document.getElementById('mgr-grades').classList.add('hidden');
             
-            document.getElementById('tab-mgr-students').classList.remove('text-primary', 'border-primary');
-            document.getElementById('tab-mgr-students').classList.add('text-gray-400', 'border-transparent');
-            document.getElementById('tab-mgr-grades').classList.remove('text-primary', 'border-primary');
-            document.getElementById('tab-mgr-grades').classList.add('text-gray-400', 'border-transparent');
+            document.getElementById('tab-mgr-students').classList.remove('bg-primary', 'text-white', 'shadow-md');
+            document.getElementById('tab-mgr-students').classList.add('text-gray-500');
+            document.getElementById('tab-mgr-grades').classList.remove('bg-primary', 'text-white', 'shadow-md');
+            document.getElementById('tab-mgr-grades').classList.add('text-gray-500');
 
-            document.getElementById(`mgr-${tab}`).classList.remove('hidden');
-            const activeBtn = document.getElementById(`tab-mgr-${tab}`);
-            activeBtn.classList.remove('text-gray-400', 'border-transparent');
-            activeBtn.classList.add('text-primary', 'border-primary');
+            if(tab === 'students') {
+                document.getElementById('mgr-students').classList.remove('hidden');
+                document.getElementById('tab-mgr-students').classList.remove('text-gray-500');
+                document.getElementById('tab-mgr-students').classList.add('bg-primary', 'text-white', 'shadow-md');
+            } else {
+                document.getElementById('mgr-grades').classList.remove('hidden');
+                document.getElementById('tab-mgr-grades').classList.remove('text-gray-500');
+                document.getElementById('tab-mgr-grades').classList.add('bg-primary', 'text-white', 'shadow-md');
+            }
         }
 
         async function loadManagerStudents() {

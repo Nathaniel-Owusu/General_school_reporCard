@@ -1,0 +1,5 @@
+# Hostinger uses OpenResty (nginx) — most Apache directives are NOT supported here.
+
+# CORS and PHP handling is done directly inside the PHP files.
+
+# This file is intentionally minimal to avoid 403 errors.

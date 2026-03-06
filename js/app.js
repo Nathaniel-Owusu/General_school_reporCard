@@ -82,13 +82,24 @@ function checkAuth(allowedRoles) {
 }
 
 async function login(type, credentials) {
-    // 1. Online Login (Secure) attempt
+    // Build absolute API URL (works on localhost + Hostinger/mobile)
+    const base = (function() {
+        const path = window.location.pathname.replace(/\/[^\/]*$/, '');
+        return window.location.origin + path;
+    })();
+
+    // 1. Online Login (Secure) attempt — 3 second timeout for fast mobile fallback
     try {
-        const response = await fetch('api/login.php', {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 3000); // 3s timeout
+
+        const response = await fetch(base + '/api/login.php', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({...credentials, type})
+            body: JSON.stringify({...credentials, type}),
+            signal: controller.signal
         });
+        clearTimeout(timeoutId);
         
         if (response.ok) {
             const data = await response.json();
@@ -105,7 +116,12 @@ async function login(type, credentials) {
                 else if (user.role === 'student') redirect = 'student-dashboard.html';
                 
                 return { success: true, redirect };
+            } else {
+                // API responded but login failed (wrong credentials etc)
+                return { success: false, message: data.message || 'Login failed' };
             }
+        } else {
+            console.warn('⚠️ Server returned error:', response.status);
         }
     } catch (e) {
         console.warn('⚠️ Server Unreachable. Using Offline Login.', e);
@@ -118,13 +134,15 @@ async function login(type, credentials) {
         if (!db) return { success: false, message: 'Database error.' };
 
         if (type === 'student') {
-             if (student) {
-                 const user = { ...student, role: 'student' };
-                 sessionStorage.setItem('currentUser', JSON.stringify(user));
-                 return { success: true, redirect: 'student-dashboard.html' };
+            const student = db.students ? db.students.find(s => s.id === credentials.id) : null;
+            if (student) {
+                const user = { ...student, role: 'student' };
+                sessionStorage.setItem('currentUser', JSON.stringify(user));
+                return { success: true, redirect: 'student-dashboard.html' };
             }
+            return { success: false, message: 'Student ID not found' };
         } else {
-            const user = db.users.find(u => u.email === credentials.email);
+            const user = db.users ? db.users.find(u => u.email === credentials.email) : null;
             
             // Very basic auth
             if (user && user.password === credentials.password) {
@@ -249,23 +267,25 @@ async function fetchAdminData(action, params = {}) {
             let newId = params.id;
             
             if (!newId) {
-                // Auto-generate ID: [SchoolName]-[Class]-[Seq]
-                const school = db.schools.find(s => s.id === schoolId);
-                const schCode = school ? (school.name.match(/\b(\w)/g) || ['S']).join('').toUpperCase().substring(0, 3) : 'SCH';
+                // Auto-generate SIMPLE ID: ST001, ST002, etc.
+                const prefix = 'ST';
+                let maxNum = 0;
                 
-                const className = params.class || 'GEN';
-                const clsCode = className.replace(/[^a-zA-Z0-9]/g, '').toUpperCase().substring(0, 5); // e.g., JHS1A
+                // Find the highest existing ST number
+                db.students.forEach(s => {
+                    if(s.school_id === schoolId && s.id && s.id.startsWith(prefix)) {
+                        const num = parseInt(s.id.replace(prefix, ''), 10);
+                        if(!isNaN(num) && num > maxNum) maxNum = num;
+                    }
+                });
                 
-                // Find next sequence for this class
-                const classStudents = db.students.filter(s => s.school_id === schoolId && s.class === params.class);
+                let counter = maxNum + 1;
+                newId = `${prefix}${counter.toString().padStart(3, '0')}`;
                 
                 // Ensure uniqueness (loop if collision)
-                let counter = classStudents.length + 1;
-                newId = `${schCode}-${clsCode}-${counter.toString().padStart(3, '0')}`;
-                
                 while(db.students.find(s => s.id === newId)) {
                     counter++;
-                    newId = `${schCode}-${clsCode}-${counter.toString().padStart(3, '0')}`;
+                    newId = `${prefix}${counter.toString().padStart(3, '0')}`;
                 }
             }
 
@@ -302,6 +322,11 @@ async function fetchAdminData(action, params = {}) {
                  active: params.active !== 'false' && params.active !== false
              };
          } else {
+             // Automatically assign existing subjects based on the class level
+             const levelSubjects = db.subjects
+                 .filter(s => s.school_id === schoolId && s.level === params.level && s.active !== false)
+                 .map(s => s.id);
+                 
              db.classes.push({
                  id: params.id || Storage.generateId('CLS'),
                  school_id: schoolId,
@@ -309,7 +334,7 @@ async function fetchAdminData(action, params = {}) {
                  level: params.level,
                  class_teacher_id: params.class_teacher_id,
                  active: params.active !== 'false' && params.active !== false,
-                 subjects: []
+                 subjects: levelSubjects
              });
          }
          didUpdate = true;
@@ -964,30 +989,39 @@ async function registerSchool(data) {
         role: 'admin'
     });
     
-    // Seed subjects based on levels
+    // Seed subjects and classes based on levels
     if(data.levels && Array.isArray(data.levels)) {
+        const createdSubjects = [];
+        
         // Subjects
         const toAdd = GES_SUBJECTS.filter(s => data.levels.includes(s.level));
         toAdd.forEach(sub => {
-            db.subjects.push({
-                id: Storage.generateId('SUB'),
+            const subId = Storage.generateId('SUB');
+            const newSubject = {
+                id: subId,
                 school_id: schoolId,
                 name: sub.name,
                 code: sub.code,
                 level: sub.level,
                 active: true
-            });
+            };
+            db.subjects.push(newSubject);
+            createdSubjects.push(newSubject);
         });
         
-        // Classes
+        // Classes - auto assign created subjects by level
         const toAddClasses = GES_CLASSES.filter(c => data.levels.includes(c.level));
         toAddClasses.forEach(c => {
+             const classSubjectIds = createdSubjects
+                 .filter(sub => sub.level === c.level)
+                 .map(sub => sub.id);
+                 
              db.classes.push({
                  id: Storage.generateId('CLS'),
                  school_id: schoolId,
                  name: c.name,
                  level: c.level,
-                 subjects: []
+                 subjects: classSubjectIds
              });
         });
     }
