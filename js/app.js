@@ -134,7 +134,7 @@ async function login(type, credentials) {
         if (!db) return { success: false, message: 'Database error.' };
 
         if (type === 'student') {
-            const student = db.students ? db.students.find(s => s.id === credentials.id) : null;
+            const student = db.students ? db.students.find(s => s.id == credentials.id) : null;
             if (student) {
                 const user = { ...student, role: 'student' };
                 sessionStorage.setItem('currentUser', JSON.stringify(user));
@@ -206,7 +206,7 @@ async function fetchAdminData(action, params = {}) {
     }
     
     else if (action === 'get_settings') {
-         const school = db.schools.find(s => s.id === schoolId);
+         const school = db.schools.find(s => s.id == schoolId);
          result = school ? { 
              ...school.settings, 
              schoolName: school.name || (school.settings ? school.settings.schoolName : ''), 
@@ -218,7 +218,7 @@ async function fetchAdminData(action, params = {}) {
     }
 
     else if (action === 'save_settings') {
-        const school = db.schools.find(s => s.id === schoolId);
+        const school = db.schools.find(s => s.id == schoolId);
         if (school) {
             // Update Core Info
             if(params.schoolName) school.name = params.schoolName;
@@ -260,7 +260,7 @@ async function fetchAdminData(action, params = {}) {
 
     // WRITE Operations
     if (action === 'add_student') {
-        const index = db.students.findIndex(s => s.id === params.id);
+        const index = db.students.findIndex(s => s.id == params.id);
         if (index >= 0) {
             db.students[index] = { ...db.students[index], ...params };
         } else {
@@ -283,7 +283,7 @@ async function fetchAdminData(action, params = {}) {
                 newId = `${prefix}${counter.toString().padStart(3, '0')}`;
                 
                 // Ensure uniqueness (loop if collision)
-                while(db.students.find(s => s.id === newId)) {
+                while(db.students.find(s => s.id == newId)) {
                     counter++;
                     newId = `${prefix}${counter.toString().padStart(3, '0')}`;
                 }
@@ -311,7 +311,7 @@ async function fetchAdminData(action, params = {}) {
     }
 
     else if (action === 'add_class') {
-         const index = db.classes.findIndex(c => c.id === params.id);
+         const index = db.classes.findIndex(c => c.id == params.id);
          if (index >= 0) {
              // Preserve existing properties (especially subjects array) when updating
              db.classes[index] = {
@@ -342,7 +342,7 @@ async function fetchAdminData(action, params = {}) {
     }
 
     else if (action === 'delete_class') {
-        const cls = db.classes.find(c => c.id === params.id);
+        const cls = db.classes.find(c => c.id == params.id);
         if(!cls) return { success: false, message: 'Class not found' };
 
         // Check for dependencies (Students)
@@ -362,7 +362,7 @@ async function fetchAdminData(action, params = {}) {
     }
 
     else if (action === 'add_teacher') {
-        const index = db.users.findIndex(u => u.id === params.id);
+        const index = db.users.findIndex(u => u.id == params.id);
         if(index >= 0) {
             db.users[index].name = params.name;
             db.users[index].email = params.email;
@@ -390,7 +390,7 @@ async function fetchAdminData(action, params = {}) {
 
     else if (action === 'assign_teacher_classes') {
         const uid = params.teacher_id || params.id;
-        const user = db.users.find(u => u.id === uid);
+        const user = db.users.find(u => u.id == uid);
         
         if (!user) {
             result = { success: false, message: 'Teacher not found (ID: ' + uid + ')' };
@@ -412,7 +412,7 @@ async function fetchAdminData(action, params = {}) {
     }
 
     else if (action === 'add_subject') {
-         const index = db.subjects.findIndex(s => s.id === params.id);
+         const index = db.subjects.findIndex(s => s.id == params.id);
          if(index >= 0) {
              // Edit
              const s = db.subjects[index];
@@ -442,7 +442,7 @@ async function fetchAdminData(action, params = {}) {
     }
 
     else if (action === 'assign_class_subjects') {
-        const cls = db.classes.find(c => c.id === params.class_id);
+        const cls = db.classes.find(c => c.id == params.class_id);
         if (cls) {
             cls.subjects = params.subjects;
             didUpdate = true;
@@ -499,7 +499,7 @@ async function fetchAdminData(action, params = {}) {
     }
     
     else if (action === 'update_result_status') {
-         const std = db.students.find(s => s.id === params.student_id);
+         const std = db.students.find(s => s.id == params.student_id);
          if(std && std.scores) {
              const score = std.scores.find(sc => sc.subject_id === params.subject_id);
              if(score) {
@@ -513,7 +513,7 @@ async function fetchAdminData(action, params = {}) {
     else if (action === 'bulk_approve') {
         const items = params.items || [];
         items.forEach(item => {
-             const std = db.students.find(s => s.id === item.student_id);
+             const std = db.students.find(s => s.id == item.student_id);
              if(std && std.scores) {
                  const score = std.scores.find(sc => sc.subject_id === item.subject_id);
                  if(score) score.status = 'Approved';
@@ -545,7 +545,7 @@ async function fetchTeacherData(action, params = {}) {
         if(user.role === 'admin') return db.classes.filter(c => c.school_id === schoolId);
         
         // Refresh teacher object to get latest assignments
-        const me = db.users.find(u => u.id === user.id);
+        const me = db.users.find(u => u.id == user.id);
         const myClassNames = me ? (me.assigned_classes || []) : [];
         const mySubjectAssignments = me ? (me.assigned_subjects || []) : [];
         
@@ -562,7 +562,7 @@ async function fetchTeacherData(action, params = {}) {
 
     if (action === 'classes') {
         const classes = getMyClasses();
-        const me = db.users.find(u => u.id === user.id);
+        const me = db.users.find(u => u.id == user.id);
         
         // Enrich with subject objects, filtering Active ones AND assigned ones
         result = classes.map(c => {
@@ -606,7 +606,7 @@ async function fetchTeacherData(action, params = {}) {
         // Reuse the logic from 'classes' action to ensure consistency
         // getMyClasses returns raw classes, we need to enrich them to count visible subjects
         const rawClasses = getMyClasses();
-        const me = db.users.find(u => u.id === user.id);
+        const me = db.users.find(u => u.id == user.id);
         
         const enrichedClasses = rawClasses.map(c => {
              let allowedSubjects = [];
@@ -684,7 +684,7 @@ async function fetchTeacherData(action, params = {}) {
         // records is array of { student_id, attendance, conduct, teacher_remark }
         if(records && Array.isArray(records)) {
              records.forEach(r => {
-                 const std = db.students.find(s => s.id === r.student_id);
+                 const std = db.students.find(s => s.id == r.student_id);
                  if(std) {
                      // Check and update fields if provided
                      if(r.attendance) std.attendance = r.attendance; 
@@ -704,7 +704,7 @@ async function fetchTeacherData(action, params = {}) {
         const subject = db.subjects.find(s => s.id == subject_id);
         if(subject) {
              grades.forEach(g => {
-                 const std = db.students.find(s => s.id === g.student_id);
+                 const std = db.students.find(s => s.id == g.student_id);
                  if(std) {
                      if(!std.scores) std.scores = [];
                      const existing = std.scores.find(sc => sc.subject_id == subject_id);
@@ -736,10 +736,10 @@ async function fetchTeacherData(action, params = {}) {
 
 async function fetchStudentReport(studentId) {
     const db = await Storage.get();
-    const student = db.students.find(s => s.id === studentId);
+    const student = db.students.find(s => s.id == studentId);
     
     if (student) {
-        const school = db.schools.find(s => s.id === student.school_id);
+        const school = db.schools.find(s => s.id == student.school_id);
 
         // ── Compute live class position from total scores ──
         const classmates = db.students.filter(s => s.class === student.class && s.school_id === student.school_id && s.status !== 'Inactive');
@@ -754,13 +754,13 @@ async function fetchStudentReport(studentId) {
 
         // Sort descending by total score
         const sorted = [...classmates].sort((a, b) => getTotal(b) - getTotal(a));
-        const computedPosition = sorted.findIndex(s => s.id === student.id) + 1;
+        const computedPosition = sorted.findIndex(s => s.id == student.id) + 1;
 
         // ── Look up class teacher name ──
         const cls = db.classes.find(c => c.name === student.class && c.school_id === student.school_id);
         let classTeacherName = '';
         if (cls && cls.class_teacher_id) {
-            const teacher = db.users.find(u => u.id === cls.class_teacher_id);
+            const teacher = db.users.find(u => u.id == cls.class_teacher_id);
             if (teacher) classTeacherName = teacher.name;
         }
 
@@ -823,7 +823,7 @@ async function fetchSuperAdminData(action, params = {}) {
     }
     
     else if (action === 'toggle_school') {
-        const school = db.schools.find(s => s.id === params.school_id);
+        const school = db.schools.find(s => s.id == params.school_id);
         if (school) {
             school.active = params.active;
             didUpdate = true;
@@ -834,7 +834,7 @@ async function fetchSuperAdminData(action, params = {}) {
     }
     
     else if (action === 'edit_school') {
-        const school = db.schools.find(s => s.id === params.school_id);
+        const school = db.schools.find(s => s.id == params.school_id);
         if (school) {
             // Update school details
             if (params.school_name) school.name = params.school_name;
@@ -851,7 +851,7 @@ async function fetchSuperAdminData(action, params = {}) {
     }
     
     else if (action === 'delete_school') {
-        const schoolIndex = db.schools.findIndex(s => s.id === params.school_id);
+        const schoolIndex = db.schools.findIndex(s => s.id == params.school_id);
         if (schoolIndex !== -1) {
             // Hard delete: Remove from database entirely
             db.schools.splice(schoolIndex, 1);
@@ -877,7 +877,7 @@ async function fetchSuperAdminData(action, params = {}) {
         }
         
         // Check if school exists and is active
-        const school = db.schools.find(s => s.id === params.school_id);
+        const school = db.schools.find(s => s.id == params.school_id);
         if (!school) {
             return { success: false, message: 'School not found' };
         }
@@ -903,7 +903,7 @@ async function fetchSuperAdminData(action, params = {}) {
     }
     
     else if (action === 'edit_admin') {
-        const admin = db.users.find(u => u.id === params.admin_id && u.role === 'admin');
+        const admin = db.users.find(u => u.id == params.admin_id && u.role === 'admin');
         if (admin) {
             // Check if email is being changed and if new email already exists
             if (params.email && params.email !== admin.email) {
@@ -917,7 +917,7 @@ async function fetchSuperAdminData(action, params = {}) {
             // Update other fields
             if (params.name) admin.name = params.name;
             if (params.school_id) {
-                const school = db.schools.find(s => s.id === params.school_id);
+                const school = db.schools.find(s => s.id == params.school_id);
                 if (!school || school.deleted || school.active === false) {
                     return { success: false, message: 'Cannot assign to this school' };
                 }
@@ -934,7 +934,7 @@ async function fetchSuperAdminData(action, params = {}) {
     }
     
     else if (action === 'toggle_admin') {
-        const admin = db.users.find(u => u.id === params.admin_id && u.role === 'admin');
+        const admin = db.users.find(u => u.id == params.admin_id && u.role === 'admin');
         if (admin) {
             admin.active = params.active;
             admin.updated_at = Date.now();
@@ -946,7 +946,7 @@ async function fetchSuperAdminData(action, params = {}) {
     }
     
     else if (action === 'reset_admin_password') {
-        const admin = db.users.find(u => u.id === params.admin_id && u.role === 'admin');
+        const admin = db.users.find(u => u.id == params.admin_id && u.role === 'admin');
         if (admin) {
             admin.password = params.new_password;
             admin.password_reset_at = Date.now();
