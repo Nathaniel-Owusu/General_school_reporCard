@@ -133,14 +133,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             foreach ($data['schools'] as $s) {
                 $ref_settings = safe_json($s['settings'] ?? []);
                 $isActive = isset($s['active']) ? ($s['active'] ? 1 : 0) : 1;
+                $addr    = $s['address'] ?? '';
+                $logo    = $s['logo'] ?? '';
+                $email   = $s['contact_email'] ?? '';
+                $phone   = $s['contact_phone'] ?? '';
+
                 $stmt->bind_param(
                     "sssssssi",
                     $s['id'],
                     $s['name'],
-                    $s['address'] ?? '',
-                    $s['logo'] ?? '',
-                    $s['contact_email'] ?? '',
-                    $s['contact_phone'] ?? '',
+                    $addr,
+                    $logo,
+                    $email,
+                    $phone,
                     $ref_settings,
                     $isActive
                 );
@@ -173,10 +178,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 if (($u['role'] ?? '') === 'super_admin') continue; // never touch super_admin
                 $ref_classes  = safe_json($u['assigned_classes']  ?? []);
                 $ref_subjects = safe_json($u['assigned_subjects'] ?? []);
+                $u_school = $u['school_id'] ?? null;
                 $stmt->bind_param(
                     "ssssssss",
                     $u['id'],
-                    $u['school_id'] ?? null,
+                    $u_school,
                     $u['name'],
                     $u['email'],
                     $u['password'],
@@ -211,14 +217,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             foreach ($data['classes'] as $c) {
                 $ref_subs = safe_json($c['subjects'] ?? []);
                 $isActive = isset($c['active']) ? ($c['active'] ? 1 : 0) : 1;
+                $c_teacher = $c['class_teacher_id'] ?? null;
+                $c_level   = $c['level'] ?? null;
                 $stmt->bind_param(
                     "ssssssi",
                     $c['id'],
                     $c['school_id'],
                     $c['name'],
                     $ref_subs,
-                    $c['class_teacher_id'] ?? null,
-                    $c['level'] ?? null,
+                    $c_teacher,
+                    $c_level,
                     $isActive
                 );
                 $stmt->execute();
