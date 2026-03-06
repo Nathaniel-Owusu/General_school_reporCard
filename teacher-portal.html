@@ -9,10 +9,11 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
     <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+    <link rel="stylesheet" href="css/modern-ui.css">
     <script>
         tailwind.config = {
             theme: {
-                extend: { colors: { primary: '#1e3a8a', secondary: '#d97706', accent: '#0f172a' }, fontFamily: { sans: ['Outfit', 'sans-serif'] } }
+                extend: { colors: { primary: '#0f172a', accent: '#3b82f6', secondary: '#f59e0b' }, fontFamily: { sans: ['Outfit', 'sans-serif'] } }
             }
         }
     </script>
@@ -26,37 +27,46 @@
     <div class="flex h-screen overflow-hidden">
         
         <!-- Sidebar -->
-        <aside id="sidebar" class="w-64 bg-accent text-white fixed inset-y-0 left-0 md:relative z-30 transform -translate-x-full md:translate-x-0 transition duration-300 flex flex-col shadow-2xl">
-            <div class="h-20 flex items-center gap-3 px-6 border-b border-gray-800 bg-gray-900/50">
-                <div class="w-8 h-8 rounded-lg bg-primary flex items-center justify-center text-white">
-                    <ion-icon name="school" class="text-xl"></ion-icon>
+        <aside id="sidebar" class="w-64 bg-primary text-white fixed inset-y-0 left-0 md:relative z-30 transform -translate-x-full md:translate-x-0 transition duration-300 flex flex-col shadow-2xl">
+            <!-- Brand -->
+            <div style="height:76px;display:flex;align-items:center;gap:12px;padding:0 20px;border-bottom:1px solid rgba(255,255,255,0.06);flex-shrink:0;">
+                <div style="width:36px;height:36px;border-radius:12px;background:linear-gradient(135deg,#8b5cf6,#6366f1);display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 4px 12px rgba(139,92,246,0.3);">
+                    <ion-icon name="school" style="color:white;font-size:18px;"></ion-icon>
                 </div>
-                <span class="font-bold text-lg tracking-wide">Teacher Portal</span>
+                <div style="min-width:0;display:flex;flex-direction:column;gap:2px;">
+                    <div style="font-size:14px;font-weight:800;color:#ffffff;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" id="sidebar-school-name">General School</div>
+                    <div style="font-size:10px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#8b9db1;line-height:1;">TEACHER PORTAL</div>
+                </div>
             </div>
 
-            <nav class="flex-1 py-6 space-y-1">
-                <button onclick="switchView('dashboard')" id="nav-dashboard" class="w-full flex items-center gap-3 px-6 py-3 bg-primary/20 text-blue-300 border-r-4 border-blue-400">
+            <nav class="flex-1 py-4 px-3 overflow-y-auto space-y-1">
+                <div class="nav-section-label">Overview</div>
+                <button onclick="switchView('dashboard')" id="nav-dashboard" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-accent text-white font-medium shadow-lg shadow-blue-900/20 transition-all">
                     <ion-icon name="grid-outline" class="text-xl"></ion-icon>
-                    <span class="font-medium">Dashboard</span>
+                    <span>Dashboard</span>
                 </button>
-                <button onclick="switchView('entry')" id="nav-entry" class="w-full flex items-center gap-3 px-6 py-3 text-gray-400 hover:text-white hover:bg-gray-800 transition-colors">
+                
+                <div class="nav-section-label mt-4">Academic Work</div>
+                <button onclick="switchView('entry')" id="nav-entry" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-400 hover:bg-gray-800 hover:text-white font-medium transition-all">
                     <ion-icon name="create-outline" class="text-xl"></ion-icon>
-                    <span class="font-medium">Enter Results</span>
+                    <span>Enter Results</span>
                 </button>
-                <button onclick="switchView('records')" id="nav-records" class="w-full flex items-center gap-3 px-6 py-3 text-gray-400 hover:text-white hover:bg-gray-800 transition-colors">
+                <button onclick="switchView('records')" id="nav-records" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-400 hover:bg-gray-800 hover:text-white font-medium transition-all">
                     <ion-icon name="list-outline" class="text-xl"></ion-icon>
-                    <span class="font-medium">Student Records</span>
+                    <span>Student Records</span>
                 </button>
-                <a href="../index.html" class="flex items-center gap-3 px-6 py-3 text-gray-400 hover:text-white hover:bg-gray-800 transition-colors">
+                
+                <div class="nav-section-label mt-4">System</div>
+                <a href="../index.html" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-400 hover:bg-gray-800 hover:text-white font-medium transition-all">
                     <ion-icon name="home-outline" class="text-xl"></ion-icon>
-                    <span class="font-medium">Visit Site</span>
+                    <span>Visit Site</span>
                 </a>
             </nav>
 
-            <div class="p-4 border-t border-gray-800">
-                <button onclick="logout()" class="flex items-center gap-2 text-red-500 hover:text-red-400 transition w-full">
-                    <ion-icon name="log-out-outline"></ion-icon>
-                    <span class="font-medium">Sign Out</span>
+            <div class="px-3 pb-4 border-t border-gray-800 pt-3">
+                <button onclick="logout()" class="flex items-center gap-3 w-full px-4 py-2.5 rounded-xl transition-all" style="color:rgba(168,179,200,0.7);" onmouseover="this.style.background='rgba(239,68,68,0.1)';this.style.color='#fca5a5';" onmouseout="this.style.background='';this.style.color='rgba(168,179,200,0.7)';">
+                    <ion-icon name="log-out-outline" class="text-lg"></ion-icon>
+                    <span class="font-medium text-sm">Sign Out</span>
                 </button>
             </div>
         </aside>
@@ -289,6 +299,17 @@
             // Update Profile
             document.getElementById('dash-name').innerText = currentUser.name;
             document.getElementById('dash-email').innerText = currentUser.email || '';
+
+            // Inject school name into sidebar brand
+            try {
+                const db = await Storage.get();
+                const school = (db.schools || [])[0];
+                const sName = school?.settings?.schoolName || school?.name || '';
+                if (sName) {
+                    const el = document.getElementById('sidebar-school-name');
+                    if (el) el.textContent = sName;
+                }
+            } catch(e) {}
 
             // Load Stats
             const stats = await fetchTeacherData('stats');
@@ -567,14 +588,14 @@
                 document.getElementById(`view-${v}`).classList.add('hidden');
                 
                 const nav = document.getElementById(`nav-${v}`);
-                nav.classList.remove('bg-primary/20', 'text-blue-300', 'border-r-4', 'border-blue-400');
+                nav.classList.remove('bg-accent', 'text-white', 'shadow-lg', 'shadow-blue-900/20');
                 nav.classList.add('text-gray-400', 'hover:text-white', 'hover:bg-gray-800');
             });
 
             document.getElementById(`view-${view}`).classList.remove('hidden');
             const active = document.getElementById(`nav-${view}`);
             active.classList.remove('text-gray-400', 'hover:text-white', 'hover:bg-gray-800');
-            active.classList.add('bg-primary/20', 'text-blue-300', 'border-r-4', 'border-blue-400');
+            active.classList.add('bg-accent', 'text-white', 'shadow-lg', 'shadow-blue-900/20');
         }
 
         // --- RECORDS LOGIC (ATTENDANCE & REMARKS) ---

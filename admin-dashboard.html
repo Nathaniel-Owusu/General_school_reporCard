@@ -596,28 +596,31 @@
             </div>
 
             <!-- VIEW: TEACHERS -->
-             <div id="view-teachers" class="space-y-8 hidden animate-fade-in">
-                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-                    <div class="flex justify-between items-center mb-6">
+             <div id="view-teachers" class="space-y-8 hidden animate-fade-in relative z-10">
+                <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-8">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
                          <div>
-                            <h3 class="font-bold text-xl text-gray-800">Faculty Staff</h3>
-                            <p class="text-gray-400 text-sm">Manage teacher access and assignments.</p>
+                            <h3 class="font-extrabold text-2xl text-gray-900">Faculty Staff</h3>
+                            <p class="text-gray-500 text-sm font-medium">Manage teacher access and assignments.</p>
                         </div>
-                        <button onclick="openAddTeacherModal()" class="bg-accent hover:bg-blue-600 text-white px-5 py-2.5 rounded-lg font-bold shadow-lg shadow-blue-500/20 transition flex items-center gap-2">
-                            <ion-icon name="person-add"></ion-icon> New Teacher
+                        <button onclick="openAddTeacherModal()" class="bg-gradient-to-r from-accent to-purple-600 hover:shadow-xl hover:shadow-purple-500/20 text-white px-6 py-3.5 rounded-xl text-sm font-bold shadow-lg transition-all flex items-center gap-2 hover:-translate-y-0.5 whitespace-nowrap">
+                            <ion-icon name="person-add" class="text-lg"></ion-icon> New Teacher
                         </button>
                     </div>
-                    <table class="w-full text-left">
-                        <thead class="bg-gray-50 text-gray-500 font-bold uppercase text-xs">
-                            <tr>
-                                <th class="px-6 py-4 rounded-l-lg">ID</th>
-                                <th class="px-6 py-4">Teacher</th>
-                                <th class="px-6 py-4">Classes</th>
-                                <th class="px-6 py-4 rounded-r-lg text-right">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-gray-50" id="teacher-table-body"></tbody>
-                    </table>
+
+                    <div class="overflow-x-auto rounded-2xl border border-gray-100 bg-gray-50/30">
+                        <table class="w-full text-left text-sm whitespace-nowrap">
+                            <thead class="bg-gray-50/80 text-gray-500 font-bold uppercase text-xs tracking-wider">
+                                <tr>
+                                    <th class="px-6 py-4">ID</th>
+                                    <th class="px-6 py-4">Teacher</th>
+                                    <th class="px-6 py-4">Classes</th>
+                                    <th class="px-6 py-4 text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-100/60 bg-white" id="teacher-table-body"></tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
             <!-- VIEW: ADMISSIONS -->
@@ -2648,11 +2651,18 @@
                     : '<span class="text-xs text-gray-300 italic">No classes</span>';
 
                 return `
-                <tr class="hover:bg-gray-50/50 transition group">
-                    <td class="px-6 py-4 font-mono text-xs text-gray-500">${t.id}</td>
+                <tr class="hover:bg-indigo-50/30 transition-colors group">
+                    <td class="px-6 py-4 font-mono text-gray-400 font-medium text-xs">#${t.id}</td>
                     <td class="px-6 py-4">
-                        <div class="font-bold text-gray-800">${t.name}</div>
-                        <div class="text-xs text-gray-400">${t.email}</div>
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-indigo-50 to-purple-50 text-purple-600 flex items-center justify-center font-bold shadow-inner border border-white/60 group-hover:scale-110 transition-transform">
+                                ${t.name.charAt(0)}
+                            </div>
+                            <div>
+                                <p class="font-bold text-gray-900 group-hover:text-purple-600 transition-colors">${t.name}</p>
+                                <p class="text-[10px] text-gray-400 font-bold tracking-wider mt-0.5">${t.email}</p>
+                            </div>
+                        </div>
                     </td>
                     <td class="px-6 py-4">
                         <div class="flex flex-wrap gap-1">
@@ -2661,11 +2671,11 @@
                     </td>
                     <td class="px-6 py-4 text-right">
                         <div class="flex justify-end gap-2 items-center">
-                             <button onclick="openAssignTeacherClassesModal('${t.id}')" class="px-3 py-1.5 bg-purple-50 text-purple-700 hover:bg-purple-100 border border-purple-200 rounded-lg text-xs font-bold transition flex items-center gap-2 shadow-sm mr-2">
+                             <button onclick="openAssignTeacherClassesModal('${t.id}')" class="px-3 py-1.5 bg-purple-50 text-purple-700 hover:bg-purple-100 border border-purple-200 rounded-lg text-xs font-bold transition flex items-center gap-2 shadow-sm mr-2 hover:-translate-y-0.5">
                                 <ion-icon name="easel"></ion-icon> Assign
                             </button>
-                             <button onclick="openAddTeacherModal('${t.id}')" class="p-1.5 hover:bg-gray-100 rounded text-gray-400 hover:text-accent transition" title="Edit"><ion-icon name="create-outline"></ion-icon></button>
-                             <button onclick="openDeleteTeacherModal('${t.id}')" class="p-1.5 hover:bg-red-50 rounded text-gray-400 hover:text-red-500 transition" title="Delete"><ion-icon name="trash-outline"></ion-icon></button>
+                             <button onclick="openAddTeacherModal('${t.id}')" class="w-8 h-8 flex items-center justify-center bg-gray-50 hover:bg-white text-gray-400 hover:text-accent border border-gray-100 hover:border-indigo-200 rounded-lg transition-all shadow-sm hover:shadow" title="Edit"><ion-icon name="create-outline"></ion-icon></button>
+                             <button onclick="openDeleteTeacherModal('${t.id}')" class="w-8 h-8 flex items-center justify-center bg-gray-50 hover:bg-red-50 text-gray-400 hover:text-red-500 border border-gray-100 hover:border-red-200 rounded-lg transition-all shadow-sm hover:shadow" title="Delete"><ion-icon name="trash-outline"></ion-icon></button>
                         </div>
                     </td>
                 </tr>
