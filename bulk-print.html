@@ -1,0 +1,961 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bulk Print Report Cards | Admin</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --primary:       #1e3a5f;
+            --primary-light: #2c5282;
+            --accent:        #c8a84b;
+            --accent-light:  #f0d882;
+            --text:          #1a202c;
+            --muted:         #4a5568;
+            --border:        #cbd5e0;
+            --bg-head:       #1e3a5f;
+            --grade-a:       #276749;
+            --grade-b:       #2b6cb0;
+            --grade-c:       #744210;
+            --grade-f:       #9b2c2c;
+        }
+
+        /* ── Screen chrome ── */
+        body {
+            background: #e8edf5;
+            font-family: 'Outfit', sans-serif;
+            min-height: 100vh;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+            color: var(--text);
+        }
+
+        /* ══════════════════════════════
+           CONTROL BAR (screen-only)
+        ══════════════════════════════ */
+        #control-bar {
+            background: white;
+            border-bottom: 1px solid #e2e8f0;
+            padding: 0 24px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            height: 64px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 12px rgba(0,0,0,.07);
+        }
+        .ctrl-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 800;
+            font-size: 15px;
+            color: var(--primary);
+            text-decoration: none;
+            margin-right: 8px;
+            flex-shrink: 0;
+        }
+        .ctrl-brand span {
+            font-size: 22px;
+        }
+        .ctrl-divider {
+            width: 1px;
+            height: 28px;
+            background: #e2e8f0;
+            flex-shrink: 0;
+        }
+        .ctrl-label {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .1em;
+            color: #94a3b8;
+            white-space: nowrap;
+        }
+        .ctrl-select {
+            font-family: 'Outfit', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text);
+            border: 1.5px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 8px 14px;
+            outline: none;
+            cursor: pointer;
+            background: #f8fafc;
+            min-width: 180px;
+            transition: border-color .15s, box-shadow .15s;
+        }
+        .ctrl-select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(30,58,95,.1); }
+
+        .ctrl-badge {
+            background: #f0f5ff;
+            color: var(--primary);
+            font-size: 12px;
+            font-weight: 700;
+            padding: 5px 12px;
+            border-radius: 20px;
+            border: 1px solid #d0dff5;
+            white-space: nowrap;
+        }
+        .ctrl-spacer { flex: 1; }
+
+        .btn-back {
+            font-family: 'Outfit', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--muted);
+            background: #f1f5f9;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 8px 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            text-decoration: none;
+            transition: all .15s;
+            flex-shrink: 0;
+        }
+        .btn-back:hover { background: #e2e8f0; color: var(--text); }
+
+        .btn-print {
+            font-family: 'Outfit', sans-serif;
+            font-size: 13px;
+            font-weight: 700;
+            color: white;
+            background: var(--primary);
+            border: none;
+            border-radius: 10px;
+            padding: 9px 22px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 14px rgba(30,58,95,.3);
+            transition: all .15s;
+            flex-shrink: 0;
+        }
+        .btn-print:hover { background: var(--primary-light); transform: translateY(-1px); box-shadow: 0 6px 18px rgba(30,58,95,.4); }
+        .btn-print:disabled { opacity: .5; cursor: default; transform: none; }
+
+        /* ══════════════════════════════
+           MAIN CONTENT AREA
+        ══════════════════════════════ */
+        #main {
+            padding: 28px 24px 56px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        /* ── Empty / Loading state ── */
+        #state-panel {
+            padding: 72px 24px;
+            text-align: center;
+        }
+        .state-icon {
+            font-size: 52px;
+            margin-bottom: 16px;
+        }
+        .state-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 8px;
+        }
+        .state-sub {
+            font-size: 14px;
+            color: var(--muted);
+        }
+
+        /* ══════════════════════════════
+           REPORT CARD STYLES (same as student-report.html)
+        ══════════════════════════════ */
+
+        /* Each card is separated by a page break for printing */
+        .report-sheet {
+            background: #fff;
+            width: 100%;
+            position: relative;
+            box-shadow: 0 8px 32px rgba(0,0,0,.12), 0 2px 8px rgba(0,0,0,.08);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 32px;
+            page-break-after: always;
+        }
+        .report-sheet:last-child { margin-bottom: 0; page-break-after: auto; }
+
+        .rc-header-accent {
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent) 0%, var(--accent-light) 50%, var(--accent) 100%);
+        }
+        .rc-header {
+            background: var(--bg-head);
+            color: white;
+            padding: 24px 32px 20px;
+            display: grid;
+            grid-template-columns: 88px 1fr 88px;
+            align-items: center;
+            gap: 16px;
+            position: relative;
+            overflow: hidden;
+        }
+        .rc-header::before {
+            content: '';
+            position: absolute;
+            top: -40px; right: -40px;
+            width: 160px; height: 160px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.05);
+        }
+        .rc-header::after {
+            content: '';
+            position: absolute;
+            bottom: -30px; left: 60px;
+            width: 100px; height: 100px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.04);
+        }
+        .logo-box {
+            width: 88px; height: 88px;
+            border-radius: 8px;
+            border: 2px solid rgba(255,255,255,0.2);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 11px; color: rgba(255,255,255,0.5);
+            background: rgba(255,255,255,0.08);
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+        .logo-box img { width: 100%; height: 100%; object-fit: contain; }
+        .header-center {
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+        .school-authority {
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: .18em;
+            text-transform: uppercase;
+            color: var(--accent-light);
+            margin-bottom: 6px;
+        }
+        .school-name {
+            font-family: 'Playfair Display', serif;
+            font-size: 22px;
+            font-weight: 800;
+            color: #fff;
+            letter-spacing: .02em;
+            line-height: 1.1;
+            margin-bottom: 8px;
+        }
+        .school-contact {
+            font-size: 11px;
+            color: rgba(200,220,255,0.75);
+            line-height: 1.6;
+        }
+        .passport-box {
+            width: 88px; height: 108px;
+            border-radius: 8px;
+            border: 2px solid rgba(255,255,255,0.2);
+            overflow: hidden;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 11px; color: rgba(255,255,255,0.5);
+            background: rgba(255,255,255,0.08);
+            flex-shrink: 0;
+        }
+        .passport-box img { width: 100%; height: 100%; object-fit: cover; }
+
+        .rc-title-strip {
+            background: var(--accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            padding: 10px 32px;
+        }
+        .rc-title-strip .line {
+            flex: 1; height: 1px;
+            background: rgba(255,255,255,0.45);
+        }
+        .rc-title-strip span {
+            font-size: 13px;
+            font-weight: 800;
+            letter-spacing: .2em;
+            text-transform: uppercase;
+            color: var(--primary);
+            white-space: nowrap;
+        }
+
+        .rc-body {
+            padding: 24px 32px;
+            position: relative;
+        }
+        .watermark {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%,-50%);
+            width: 52%;
+            opacity: .04;
+            pointer-events: none;
+            z-index: 0;
+        }
+        .watermark img { width: 100%; height: auto; }
+        .rc-body > *:not(.watermark) { position: relative; z-index: 1; }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0;
+            border: 1.5px solid #c9d5e3;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        .info-cell {
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid #e2eaf3;
+            border-right: 1px solid #e2eaf3;
+        }
+        .info-cell:nth-child(even) { border-right: none; }
+        .info-cell:nth-last-child(-n+2) { border-bottom: none; }
+        .info-cell-label {
+            background: #f0f5fb;
+            padding: 9px 12px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .08em;
+            color: var(--primary);
+            white-space: nowrap;
+            min-width: 110px;
+            border-right: 1px solid #c9d5e3;
+            align-self: stretch;
+            display: flex;
+            align-items: center;
+        }
+        .info-cell-value {
+            padding: 9px 14px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text);
+            flex: 1;
+        }
+
+        .section-heading {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+            margin-top: 20px;
+        }
+        .section-heading span {
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: .16em;
+            text-transform: uppercase;
+            color: var(--primary);
+            white-space: nowrap;
+        }
+        .section-heading::before, .section-heading::after {
+            content: '';
+            flex: 1;
+            height: 1.5px;
+            background: linear-gradient(90deg, #c9d5e3, transparent);
+        }
+        .section-heading::before {
+            background: linear-gradient(90deg, transparent, #c9d5e3);
+            max-width: 24px;
+        }
+
+        .grades-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1.5px solid #c9d5e3;
+        }
+        .grades-table thead tr { background: var(--primary); color: white; }
+        .grades-table thead th {
+            padding: 10px 12px;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: .1em;
+            text-transform: uppercase;
+            text-align: center;
+            border: none;
+        }
+        .grades-table thead th:first-child { text-align: left; }
+        .grades-table tbody tr:nth-child(even) { background: #f7fafd; }
+        .grades-table tbody tr:nth-child(odd)  { background: #fff; }
+        .grades-table tbody td {
+            padding: 9px 12px;
+            border-bottom: 1px solid #e2eaf3;
+            border-left: 1px solid #e8eef5;
+            text-align: center;
+            color: var(--text);
+            vertical-align: middle;
+        }
+        .grades-table tbody td:first-child {
+            text-align: left;
+            font-weight: 500;
+            border-left: none;
+        }
+        .grades-table tbody tr:last-child td { border-bottom: none; }
+        .grades-table tbody .empty-row td { height: 32px; color: transparent; }
+
+        .grade-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 58px;
+            padding: 3px 10px;
+            border-radius: 99px;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: .04em;
+        }
+        .grade-a  { background: #c6f6d5; color: var(--grade-a); border: 1px solid #9ae6b4; }
+        .grade-b  { background: #bee3f8; color: var(--grade-b); border: 1px solid #90cdf4; }
+        .grade-c  { background: #fef3c7; color: var(--grade-c); border: 1px solid #f6e05e; }
+        .grade-d  { background: #fed7aa; color: #c05621;         border: 1px solid #f6ad55; }
+        .grade-e  { background: #e9d8fd; color: #553c9a;         border: 1px solid #d6bcfa; }
+        .grade-f  { background: #fed7d7; color: var(--grade-f); border: 1px solid #feb2b2; }
+        .total-score { font-weight: 700; color: var(--primary); }
+
+        .bottom-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 12px;
+            margin-top: 18px;
+        }
+        .stat-cell {
+            background: #f7fafd;
+            border: 1.5px solid #c9d5e3;
+            border-radius: 8px;
+            padding: 12px 14px;
+        }
+        .stat-cell-label {
+            font-size: 9px;
+            font-weight: 700;
+            letter-spacing: .12em;
+            text-transform: uppercase;
+            color: var(--primary);
+            margin-bottom: 6px;
+        }
+        .stat-cell-value { font-size: 15px; font-weight: 700; color: var(--text); }
+
+        .remarks-block {
+            margin-top: 12px;
+            border: 1.5px solid #c9d5e3;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .remarks-row {
+            display: flex;
+            align-items: stretch;
+            border-bottom: 1px solid #e2eaf3;
+        }
+        .remarks-row:last-child { border-bottom: none; }
+        .remarks-label {
+            background: #f0f5fb;
+            padding: 10px 14px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .08em;
+            color: var(--primary);
+            white-space: nowrap;
+            min-width: 150px;
+            display: flex;
+            align-items: center;
+            border-right: 1px solid #c9d5e3;
+        }
+        .remarks-value {
+            padding: 10px 14px;
+            font-size: 13px;
+            color: var(--text);
+            flex: 1;
+            min-height: 38px;
+        }
+
+        .sig-strip {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 16px;
+            margin-top: 20px;
+        }
+        .sig-box { text-align: center; }
+        .sig-line { border-bottom: 1.5px solid #a0aec0; margin-bottom: 6px; height: 32px; }
+        .sig-label {
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: .08em;
+            text-transform: uppercase;
+            color: var(--muted);
+        }
+
+        .rc-footer {
+            background: var(--primary);
+            padding: 10px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .rc-footer span {
+            font-size: 10px;
+            color: rgba(200,220,255,0.55);
+            letter-spacing: .06em;
+        }
+        .rc-footer .footer-seal {
+            width: 28px; height: 28px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.15);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 14px;
+        }
+
+        /* ══════════════════════════════
+           PRINT STYLES
+        ══════════════════════════════ */
+        @page { size: A4; margin: 8mm; }
+        @media print {
+            body { background: white; }
+            #control-bar { display: none !important; }
+            #main { padding: 0; max-width: none; }
+            #state-panel { display: none !important; }
+            .report-sheet {
+                box-shadow: none;
+                border-radius: 0;
+                width: 100%;
+                margin-bottom: 0;
+                page-break-after: always;
+            }
+            .report-sheet:last-child { page-break-after: auto; }
+            .rc-header, .rc-title-strip, .grades-table thead tr,
+            .info-cell-label, .remarks-label, .rc-footer,
+            .grade-badge { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ── CONTROL BAR ── -->
+    <div id="control-bar">
+        <a href="admin-dashboard.html" class="ctrl-brand">
+            <span>🏫</span> Admin
+        </a>
+        <div class="ctrl-divider"></div>
+        <span class="ctrl-label">Class</span>
+        <select id="class-select" class="ctrl-select" onchange="loadClass()">
+            <option value="">— Select a class —</option>
+        </select>
+        <div class="ctrl-divider"></div>
+        <span class="ctrl-label">Include</span>
+        <select id="status-filter" class="ctrl-select" style="min-width:155px;" onchange="rerender()">
+            <option value="all">All Students</option>
+            <option value="active">Active Only</option>
+        </select>
+        <div id="card-counter" class="ctrl-badge" style="display:none;">0 cards</div>
+        <div class="ctrl-spacer"></div>
+        <a href="admin-dashboard.html" class="btn-back">
+            <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
+            Back
+        </a>
+        <button id="print-btn" class="btn-print" onclick="window.print()" disabled>
+            <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+            Print All Cards
+        </button>
+    </div>
+
+    <!-- ── MAIN AREA ── -->
+    <div id="main">
+
+        <!-- State panel (loading / empty / prompt) -->
+        <div id="state-panel">
+            <div class="state-icon">📋</div>
+            <div class="state-title">Bulk Class Report Printer</div>
+            <div class="state-sub">Select a class above to preview and print all student report cards at once.</div>
+        </div>
+
+        <!-- Report cards container -->
+        <div id="cards-container"></div>
+
+    </div>
+
+    <script src="js/storage.js?v=10"></script>
+    <script src="js/app.js?v=10"></script>
+    <script>
+        // ─── Auth guard ───
+        checkAuth(['admin', 'super_admin']);
+
+        // ─── State ───
+        let _allStudents = [];
+        let _allSettings = {};
+        let _allTeachers = [];
+        let _currentClass = null;
+
+        // ─── Escape helper ───
+        function esc(t) {
+            if (t == null || t === '') return '';
+            return t.toString().replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
+        }
+
+        // ─── Grade Calculator ───
+        function calcGrade(score, system) {
+            if (system && system.length) {
+                for (let g of system) if (score >= g.min && score <= g.max) return { grade: g.grade, remark: g.remark };
+            }
+            if (score >= 80) return { grade: 'A',  remark: 'Excellent'  };
+            if (score >= 70) return { grade: 'B',  remark: 'Very Good'  };
+            if (score >= 60) return { grade: 'C',  remark: 'Good'       };
+            if (score >= 50) return { grade: 'D',  remark: 'Credit'     };
+            if (score >= 45) return { grade: 'E',  remark: 'Pass'       };
+            return             { grade: 'F',  remark: 'Fail'       };
+        }
+
+        function gradeBadgeClass(grade) {
+            const map = { A: 'grade-a', B: 'grade-b', C: 'grade-c', D: 'grade-d', E: 'grade-e', F: 'grade-f' };
+            return map[grade] || 'grade-f';
+        }
+
+        function posSuffix(n) {
+            n = parseInt(n);
+            if (isNaN(n)) return n;
+            const s = ['th','st','nd','rd'], v = n % 100;
+            return n + (s[(v - 20) % 10] || s[v] || s[0]);
+        }
+
+        // ─── Init: populate class dropdown ───
+        async function init() {
+            setStateLoading('Loading classes…');
+
+            const db = await Storage.get();
+            _allStudents = db.students || [];
+            _allTeachers = (db.users || []).filter(u => u.role === 'teacher');
+
+            // Settings from first school
+            const school = (db.schools || [])[0];
+            _allSettings = school?.settings || {};
+
+            const classes = db.classes || [];
+            const select = document.getElementById('class-select');
+
+            if (classes.length === 0) {
+                setStateEmpty('No classes found. Create classes in the Admin Dashboard first.');
+                return;
+            }
+
+            // Group by level
+            const levels = ['KG', 'Primary', 'JHS'];
+            const grouped = {};
+            classes.forEach(c => {
+                const lv = c.level || 'Other';
+                if (!grouped[lv]) grouped[lv] = [];
+                grouped[lv].push(c);
+            });
+
+            let html = '<option value="">— Select a class —</option>';
+            levels.concat(Object.keys(grouped).filter(l => !levels.includes(l))).forEach(lv => {
+                if (!grouped[lv]) return;
+                html += `<optgroup label="${lv} Level">`;
+                grouped[lv].sort((a,b) => a.name.localeCompare(b.name)).forEach(c => {
+                    const count = _allStudents.filter(s => s.class === c.name).length;
+                    html += `<option value="${esc(c.name)}">${esc(c.name)} (${count} students)</option>`;
+                });
+                html += '</optgroup>';
+            });
+            select.innerHTML = html;
+
+            // Auto-load if URL has ?class=
+            const urlClass = new URLSearchParams(window.location.search).get('class');
+            if (urlClass) {
+                select.value = urlClass;
+                loadClass();
+            } else {
+                setStatePrompt();
+            }
+        }
+
+        // ─── Load a specific class and render cards ───
+        async function loadClass() {
+            const className = document.getElementById('class-select').value;
+            if (!className) { setStatePrompt(); return; }
+
+            _currentClass = className;
+            window.history.replaceState({}, '', `?class=${encodeURIComponent(className)}`);
+            rerender();
+        }
+
+        function rerender() {
+            if (!_currentClass) return;
+            const statusFilter = document.getElementById('status-filter').value;
+
+            let students = _allStudents.filter(s => s.class === _currentClass);
+            if (statusFilter === 'active') students = students.filter(s => s.status !== 'Inactive');
+
+            // Sort alphabetically
+            students.sort((a,b) => (a.name || '').localeCompare(b.name || ''));
+
+            if (students.length === 0) {
+                setStateEmpty(`No ${statusFilter === 'active' ? 'active ' : ''}students found in "${_currentClass}".`);
+                return;
+            }
+
+            // Show counter
+            const counter = document.getElementById('card-counter');
+            counter.style.display = 'flex';
+            counter.textContent = `${students.length} card${students.length !== 1 ? 's' : ''}`;
+
+            // Enable print button
+            document.getElementById('print-btn').disabled = false;
+
+            // Hide state panel, show cards
+            document.getElementById('state-panel').style.display = 'none';
+
+            const container = document.getElementById('cards-container');
+            container.innerHTML = students.map(student => buildCard(student)).join('');
+        }
+
+        // ─── Build a single report card HTML ───
+        function buildCard(user) {
+            const gs = _allSettings;
+            const gradingSystem = gs.gradingSystem || null;
+
+            const scores = (user.scores || []).filter(s => s.status === 'Approved' || s.status === 'Pending');
+
+            // Compute totals
+            let grandTotal = 0;
+            scores.forEach(s => { grandTotal += (Number(s.class_score) || 0) + (Number(s.exam_score) || 0); });
+            const maxPossible  = scores.length * 100;
+            const overallPct   = maxPossible > 0 ? Math.round((grandTotal / maxPossible) * 100) : 0;
+            const overallGrade = scores.length > 0 ? calcGrade(overallPct, gradingSystem) : { grade: '–', remark: '–' };
+
+            // Table rows
+            const minRows = 10;
+            let tableRows = '';
+            scores.forEach((s, i) => {
+                const cs    = (s.class_score !== undefined && s.class_score !== null && s.class_score !== '') ? Number(s.class_score) : null;
+                const es    = (s.exam_score  !== undefined && s.exam_score  !== null && s.exam_score  !== '') ? Number(s.exam_score)  : null;
+                const total = (cs !== null ? cs : 0) + (es !== null ? es : 0);
+                const gi    = (cs !== null || es !== null) ? calcGrade(total, gradingSystem) : { grade: '–', remark: '–' };
+                const badge = gi.grade !== '–' ? `<span class="grade-badge ${gradeBadgeClass(gi.grade)}">${esc(gi.grade)}</span>` : '';
+                const rowBg = i % 2 === 1 ? '#f7fafd' : '#fff';
+                tableRows += `
+                <tr style="background:${rowBg};">
+                    <td style="text-align:left;font-weight:500;">${esc(s.subject)}</td>
+                    <td>${cs !== null ? cs : ''}</td>
+                    <td>${es !== null ? es : ''}</td>
+                    <td class="total-score">${(cs !== null || es !== null) ? total : ''}</td>
+                    <td>${s.position || ''}</td>
+                    <td>${badge}</td>
+                    <td style="font-size:12px;color:#4a5568;">${gi.grade !== '–' ? esc(gi.remark) : ''}</td>
+                </tr>`;
+            });
+
+            const empties = Math.max(0, minRows - scores.length);
+            for (let i = 0; i < empties; i++) {
+                tableRows += `<tr class="empty-row"><td>&nbsp;</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>`;
+            }
+
+            // Attendance
+            const att = user.attendance || {};
+            const present   = att.present   !== undefined ? att.present   : '–';
+            const total_att = att.total     !== undefined ? att.total     : '–';
+
+            // Logo / passport
+            const logoHtml     = gs.schoolLogo ? `<img src="${gs.schoolLogo}" alt="Logo">` : `<span>LOGO</span>`;
+            const passportHtml = user.photo    ? `<img src="${user.photo}" alt="Photo">`  : `<span style="font-size:10px;text-align:center;padding:8px;">Passport<br>Photo</span>`;
+            const wmHtml       = gs.schoolLogo ? `<div class="watermark"><img src="${gs.schoolLogo}" alt="wm"></div>` : '';
+
+            // Find class teacher
+            const teacher = _allTeachers.find(t => 
+                (t.assigned_classes || []).includes(user.class) ||
+                (t.assigned_subjects || []).some(as => as.class_id)
+            );
+            const teacherName = teacher ? teacher.name : (user.class_teacher || '');
+
+            return `
+            <div class="report-sheet">
+                <div class="rc-header-accent"></div>
+                <div class="rc-header">
+                    <div class="logo-box">${logoHtml}</div>
+                    <div class="header-center">
+                        <div class="school-authority">${esc(gs.schoolAuthority || 'Ghana Education Service')}</div>
+                        <div class="school-name">${esc(gs.schoolName || 'General School')}</div>
+                        <div class="school-contact">
+                            ${esc(gs.schoolAddress || '')}
+                            ${gs.contactEmail ? ` &nbsp;|&nbsp; ${esc(gs.contactEmail)}` : ''}
+                            ${gs.contactPhone  ? ` &nbsp;|&nbsp; Tel: ${esc(gs.contactPhone)}` : ''}
+                        </div>
+                    </div>
+                    <div class="passport-box">${passportHtml}</div>
+                </div>
+
+                <div class="rc-title-strip">
+                    <div class="line"></div>
+                    <span>Terminal Report Sheet</span>
+                    <div class="line"></div>
+                </div>
+
+                <div class="rc-body">
+                    ${wmHtml}
+
+                    <div class="info-grid">
+                        <div class="info-cell">
+                            <div class="info-cell-label">Student Name</div>
+                            <div class="info-cell-value">${esc(user.name || '')}</div>
+                        </div>
+                        <div class="info-cell">
+                            <div class="info-cell-label">Class</div>
+                            <div class="info-cell-value">${esc(user.class || '')}</div>
+                        </div>
+                        <div class="info-cell">
+                            <div class="info-cell-label">Academic Year</div>
+                            <div class="info-cell-value">${esc(user.year || gs.academicYear || '')}</div>
+                        </div>
+                        <div class="info-cell">
+                            <div class="info-cell-label">Term</div>
+                            <div class="info-cell-value">${esc(user.term || gs.currentTerm || '')}</div>
+                        </div>
+                        <div class="info-cell">
+                            <div class="info-cell-label">Class Teacher</div>
+                            <div class="info-cell-value">${esc(teacherName)}</div>
+                        </div>
+                        <div class="info-cell">
+                            <div class="info-cell-label">Position</div>
+                            <div class="info-cell-value">${user.position ? posSuffix(user.position) + (user.total_students ? ' / ' + user.total_students : '') : ''}</div>
+                        </div>
+                        <div class="info-cell">
+                            <div class="info-cell-label">Student ID</div>
+                            <div class="info-cell-value" style="font-family:monospace;letter-spacing:.05em;font-size:12px;">${esc(user.id || '')}</div>
+                        </div>
+                        <div class="info-cell">
+                            <div class="info-cell-label">Reopening Date</div>
+                            <div class="info-cell-value">${esc(user.reopening_date || gs.reopeningDate || '')}</div>
+                        </div>
+                    </div>
+
+                    <div class="section-heading"><span>Academic Performance</span></div>
+
+                    <table class="grades-table">
+                        <thead>
+                            <tr>
+                                <th style="width:28%;text-align:left;">Subject</th>
+                                <th style="width:11%;">Class Score<br><span style="font-weight:400;opacity:.75;">(30%)</span></th>
+                                <th style="width:11%;">Exam Score<br><span style="font-weight:400;opacity:.75;">(70%)</span></th>
+                                <th style="width:11%;">Total<br><span style="font-weight:400;opacity:.75;">(100%)</span></th>
+                                <th style="width:9%;">Position</th>
+                                <th style="width:10%;">Grade</th>
+                                <th style="width:20%;">Remark</th>
+                            </tr>
+                        </thead>
+                        <tbody>${tableRows}</tbody>
+                    </table>
+
+                    <div class="bottom-grid">
+                        <div class="stat-cell">
+                            <div class="stat-cell-label">Attendance</div>
+                            <div class="stat-cell-value">${present} <span style="font-size:12px;font-weight:500;color:#718096;">/ ${total_att} days</span></div>
+                        </div>
+                        <div class="stat-cell">
+                            <div class="stat-cell-label">Overall Grade</div>
+                            <div class="stat-cell-value" style="color:var(--primary);">${overallGrade.grade} <span style="font-size:12px;font-weight:500;color:#718096;">— ${overallGrade.remark}</span></div>
+                        </div>
+                        <div class="stat-cell">
+                            <div class="stat-cell-label">Promoted To</div>
+                            <div class="stat-cell-value">${esc(user.promoted_to || '')}</div>
+                        </div>
+                    </div>
+
+                    <div class="section-heading" style="margin-top:16px;"><span>Teacher's Remarks &amp; Character</span></div>
+                    <div class="remarks-block">
+                        <div class="remarks-row">
+                            <div class="remarks-label">Conduct</div>
+                            <div class="remarks-value">${esc(user.conduct || '')}</div>
+                        </div>
+                        <div class="remarks-row">
+                            <div class="remarks-label">Attitude</div>
+                            <div class="remarks-value">${esc(user.attitude || '')}</div>
+                        </div>
+                        <div class="remarks-row">
+                            <div class="remarks-label">Interest</div>
+                            <div class="remarks-value">${esc(user.interest || '')}</div>
+                        </div>
+                        <div class="remarks-row">
+                            <div class="remarks-label">Class Teacher's Remarks</div>
+                            <div class="remarks-value" style="min-height:52px;">${esc(user.teacher_remark || '')}</div>
+                        </div>
+                    </div>
+
+                    <div class="section-heading" style="margin-top:18px;"><span>Signatures &amp; Approval</span></div>
+                    <div class="sig-strip">
+                        <div class="sig-box">
+                            <div class="sig-line"></div>
+                            <div class="sig-label">Class Teacher</div>
+                        </div>
+                        <div class="sig-box">
+                            <div class="sig-line"></div>
+                            <div class="sig-label">Headmaster / Principal</div>
+                        </div>
+                        <div class="sig-box">
+                            <div class="sig-line"></div>
+                            <div class="sig-label">Parent / Guardian</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="rc-footer">
+                    <span>${esc(gs.schoolName || 'General School')} — Report Card System</span>
+                    <div class="footer-seal">🏫</div>
+                    <span>Confidential — Not for Public Circulation</span>
+                </div>
+            </div>`;
+        }
+
+        // ─── UI State helpers ───
+        function setStateLoading(msg) {
+            document.getElementById('state-panel').style.display = 'block';
+            document.getElementById('state-panel').innerHTML = `
+                <div class="state-icon">⏳</div>
+                <div class="state-title">${msg}</div>`;
+            document.getElementById('cards-container').innerHTML = '';
+            document.getElementById('card-counter').style.display = 'none';
+            document.getElementById('print-btn').disabled = true;
+        }
+
+        function setStateEmpty(msg) {
+            document.getElementById('state-panel').style.display = 'block';
+            document.getElementById('state-panel').innerHTML = `
+                <div class="state-icon">🔍</div>
+                <div class="state-title">No Students Found</div>
+                <div class="state-sub">${msg}</div>`;
+            document.getElementById('cards-container').innerHTML = '';
+            document.getElementById('card-counter').style.display = 'none';
+            document.getElementById('print-btn').disabled = true;
+        }
+
+        function setStatePrompt() {
+            document.getElementById('state-panel').style.display = 'block';
+            document.getElementById('state-panel').innerHTML = `
+                <div class="state-icon">📋</div>
+                <div class="state-title">Bulk Class Report Printer</div>
+                <div class="state-sub">Select a class above to preview and print all student report cards at once.</div>`;
+            document.getElementById('cards-container').innerHTML = '';
+            document.getElementById('card-counter').style.display = 'none';
+            document.getElementById('print-btn').disabled = true;
+        }
+
+        init();
+    </script>
+</body>
+</html>
