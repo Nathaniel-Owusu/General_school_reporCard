@@ -278,11 +278,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (!empty($data['students'])) {
             $stmt = $conn->prepare(
                 "INSERT INTO students
-                   (id, school_id, name, class, gender, status, scores, attendance,
+                   (id, school_id, name, `class`, gender, status, scores, attendance,
                     teacher_remark, head_remark, conduct, position, total_students)
                  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                  ON DUPLICATE KEY UPDATE
-                   name=VALUES(name), class=VALUES(class), gender=VALUES(gender),
+                   name=VALUES(name), `class`=VALUES(`class`), gender=VALUES(gender),
                    status=VALUES(status), scores=VALUES(scores), attendance=VALUES(attendance),
                    teacher_remark=VALUES(teacher_remark), head_remark=VALUES(head_remark),
                    conduct=VALUES(conduct), position=VALUES(position), total_students=VALUES(total_students)"
@@ -297,7 +297,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $pos   = isset($s['position'])       ? (int)$s['position']       : 0;
                 $tot   = isset($s['total_students'])  ? (int)$s['total_students'] : 0;
                 $stmt->bind_param(
-                    "ssssssssssssi",
+                    "sssssssssssii",
                     $s['id'],
                     $s['school_id'],
                     $s['name'],
