@@ -210,7 +210,10 @@
                                         <th class="px-4 py-3 border-b border-gray-200 w-16">#</th>
                                         <th class="px-4 py-3 border-b border-gray-200 w-32">Index ID</th>
                                         <th class="px-4 py-3 border-b border-gray-200">Student Name</th>
-                                        <th class="px-4 py-3 border-b border-gray-200 w-32 text-center bg-blue-50/50">Class (30)</th>
+                                        <th class="px-2 py-3 border-b border-gray-200 w-20 text-center bg-blue-50/30 text-[10px]">Proj (10)</th>
+                                        <th class="px-2 py-3 border-b border-gray-200 w-20 text-center bg-blue-50/50 text-[10px]">Test (10)</th>
+                                        <th class="px-2 py-3 border-b border-gray-200 w-20 text-center bg-blue-50/70 text-[10px]">Grp (10)</th>
+                                        <th class="px-2 py-3 border-b border-gray-200 w-24 text-center bg-blue-50/90 font-black">Class (30)</th>
                                         <th class="px-4 py-3 border-b border-gray-200 w-32 text-center bg-yellow-50/50">Exam (70)</th>
                                         <th class="px-4 py-3 border-b border-gray-200 w-24 text-center font-black">Total</th>
                                         <th class="px-4 py-3 border-b border-gray-200 w-20 text-center">Grade</th>
@@ -434,11 +437,26 @@
                         <td class="px-4 py-3 font-mono text-slate-200 text-xs">${i + 1}</td>
                         <td class="px-4 py-3 font-mono font-bold text-gray-600 text-xs">${s.id}</td>
                         <td class="px-4 py-3 font-bold text-gray-800">${s.name}</td>
-                        <td class="px-4 py-3 text-center bg-blue-50/20 p-0">
-                            <input type="number" min="0" max="30" value="${classScore}" 
-                                onchange="calculateRow(this)" data-type="class"
+                        <td class="px-2 py-3 text-center bg-blue-50/10 p-0">
+                            <input type="number" min="0" max="10" value="${parseFloat(s.project_score) || 0}" 
+                                onchange="calculateRow(this)" data-type="project"
                                 ${isLocked ? 'disabled' : ''}
-                                class="w-20 px-2 py-1 text-center font-mono font-bold bg-white border border-gray-200 rounded focus:ring-2 focus:ring-primary outline-none mx-auto block disabled:bg-gray-100 disabled:text-slate-200">
+                                class="w-14 px-1 py-1 text-center font-mono text-xs bg-white border border-gray-200 rounded focus:ring-2 focus:ring-primary outline-none mx-auto block disabled:bg-gray-100">
+                        </td>
+                        <td class="px-2 py-3 text-center bg-blue-50/20 p-0">
+                            <input type="number" min="0" max="10" value="${parseFloat(s.class_test) || 0}" 
+                                onchange="calculateRow(this)" data-type="test"
+                                ${isLocked ? 'disabled' : ''}
+                                class="w-14 px-1 py-1 text-center font-mono text-xs bg-white border border-gray-200 rounded focus:ring-2 focus:ring-primary outline-none mx-auto block disabled:bg-gray-100">
+                        </td>
+                        <td class="px-2 py-3 text-center bg-blue-50/30 p-0">
+                            <input type="number" min="0" max="10" value="${parseFloat(s.group_work) || 0}" 
+                                onchange="calculateRow(this)" data-type="group"
+                                ${isLocked ? 'disabled' : ''}
+                                class="w-14 px-1 py-1 text-center font-mono text-xs bg-white border border-gray-200 rounded focus:ring-2 focus:ring-primary outline-none mx-auto block disabled:bg-gray-100">
+                        </td>
+                        <td class="px-2 py-3 text-center bg-blue-50/50 p-0 font-bold text-gray-700 cell-class-total">
+                            ${classScore}
                         </td>
                         <td class="px-4 py-3 text-center bg-yellow-50/20 p-0">
                             <input type="number" min="0" max="70" value="${examScore}" 
@@ -513,15 +531,26 @@
 
         function calculateRow(input) {
             const row = input.closest('tr');
-            const classInput = row.querySelector('input[data-type="class"]');
-            const examInput = row.querySelector('input[data-type="exam"]');
+            const projInput  = row.querySelector('input[data-type="project"]');
+            const testInput  = row.querySelector('input[data-type="test"]');
+            const groupInput = row.querySelector('input[data-type="group"]');
+            const examInput  = row.querySelector('input[data-type="exam"]');
             
-            let classScore = parseInt(classInput.value) || 0;
+            let pScore = parseInt(projInput.value) || 0;
+            let tScore = parseInt(testInput.value) || 0;
+            let gScore = parseInt(groupInput.value) || 0;
             let examScore = parseInt(examInput.value) || 0;
 
-            // Validate Max
-            if (classScore > 30) { classScore = 30; classInput.value = 30; }
-            if (classScore < 0) { classScore = 0; classInput.value = 0; }
+            // Validate Components
+            if (pScore > 10) { pScore = 10; projInput.value = 10; }
+            if (pScore < 0)  { pScore = 0;  projInput.value = 0; }
+            if (tScore > 10) { tScore = 10; testInput.value = 10; }
+            if (tScore < 0)  { tScore = 0;  testInput.value = 0; }
+            if (gScore > 10) { gScore = 10; groupInput.value = 10; }
+            if (gScore < 0)  { gScore = 0;  groupInput.value = 0; }
+            
+            const classScore = pScore + tScore + gScore;
+
             if (examScore > 70) { examScore = 70; examInput.value = 70; }
             if (examScore < 0) { examScore = 0; examInput.value = 0; }
 
@@ -529,6 +558,7 @@
             const gradeInfo = calculateGrade(total);
 
             // Update UI
+            row.querySelector('.cell-class-total').innerText = classScore;
             row.querySelector('.cell-total').innerText = total;
             const gradeBadge = row.querySelector('.cell-grade');
             gradeBadge.innerText = gradeInfo.grade;
@@ -547,15 +577,22 @@
                 const studentId = row.dataset.studentId;
                 if (!studentId) return; // Skip headers or placeholders
 
-                const classInput = row.querySelector('input[data-type="class"]');
-                const examInput = row.querySelector('input[data-type="exam"]');
+                const projInput  = row.querySelector('input[data-type="project"]');
+                const testInput  = row.querySelector('input[data-type="test"]');
+                const groupInput = row.querySelector('input[data-type="group"]');
+                const examInput  = row.querySelector('input[data-type="exam"]');
                 
-                const classScore = classInput ? (parseInt(classInput.value) || 0) : 0;
+                const pScore = projInput ? (parseInt(projInput.value) || 0) : 0;
+                const tScore = testInput ? (parseInt(testInput.value) || 0) : 0;
+                const gScore = groupInput ? (parseInt(groupInput.value) || 0) : 0;
                 const examScore = examInput ? (parseInt(examInput.value) || 0) : 0;
                 
                 grades.push({
                     student_id: studentId,
-                    class_score: classScore,
+                    project_score: pScore,
+                    class_test: tScore,
+                    group_work: gScore,
+                    class_score: pScore + tScore + gScore,
                     exam_score: examScore
                 });
             });
@@ -733,7 +770,7 @@
         }
 
         function downloadCSVTemplate() {
-            const csvContent = "data:text/csv;charset=utf-8," + "Student ID,Student Name,Class Score (30%),Exam Score (70%)\nST001,John Doe,25,60";
+            const csvContent = "data:text/csv;charset=utf-8," + "Student ID,Student Name,Project (10),Class Test (10),Group Work (10),Exam Score (70%)\nST001,John Doe,10,10,10,60";
             const encodedUri = encodeURI(csvContent);
             const link = document.createElement("a");
             link.setAttribute("href", encodedUri);
@@ -753,17 +790,19 @@
                 const rows = text.split('\n').map(row => row.split(','));
                 
                 // Header detection
-                let idCol = 0;
-                let classCol = 2;
-                let examCol = 3;
+                let idCol     = 0;
+                let projCol   = -1;
+                let testCol   = -1;
+                let groupCol  = -1;
+                let examCol   = -1;
                 
                 const header = rows[0].map(h => h.toLowerCase().trim());
                 if(header.includes('student id') || header.includes('id')) {
                     idCol = header.findIndex(h => h.includes('id'));
-                    classCol = header.findIndex(h => h.includes('class'));
-                    if(classCol === -1) classCol = 2; 
+                    projCol = header.findIndex(h => h.includes('project') || h.includes('proj'));
+                    testCol = header.findIndex(h => h.includes('test'));
+                    groupCol = header.findIndex(h => h.includes('group'));
                     examCol = header.findIndex(h => h.includes('exam'));
-                    if(examCol === -1) examCol = 3; 
                 }
 
                 let updatedCount = 0;
@@ -785,14 +824,18 @@
                     }
 
                     if(tr) {
-                        const classInput = tr.querySelector('input[data-type="class"]');
-                        const examInput = tr.querySelector('input[data-type="exam"]');
+                        const pInput = tr.querySelector('input[data-type="project"]');
+                        const tInput = tr.querySelector('input[data-type="test"]');
+                        const gInput = tr.querySelector('input[data-type="group"]');
+                        const eInput = tr.querySelector('input[data-type="exam"]');
                         
-                        if(classInput && row[classCol]) classInput.value = parseInt(row[classCol]) || 0;
-                        if(examInput && row[examCol]) examInput.value = parseInt(row[examCol]) || 0;
+                        if(pInput && projCol !== -1 && row[projCol]) pInput.value = parseInt(row[projCol]) || 0;
+                        if(tInput && testCol !== -1 && row[testCol]) tInput.value = parseInt(row[testCol]) || 0;
+                        if(gInput && groupCol !== -1 && row[groupCol]) gInput.value = parseInt(row[groupCol]) || 0;
+                        if(eInput && examCol !== -1 && row[examCol]) eInput.value = parseInt(row[examCol]) || 0;
                         
                         // Trigger calculation
-                        calculateRow(classInput); // Can pass either input to trigger row recalc
+                        calculateRow(pInput || eInput); 
                         updatedCount++;
                     }
                 }

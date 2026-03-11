@@ -666,6 +666,9 @@ async function fetchTeacherData(action, params = {}) {
                 return {
                     id: s.id,
                     name: s.name,
+                    project_score: score.project_score || 0,
+                    class_test: score.class_test || 0,
+                    group_work: score.group_work || 0,
                     class_score: score.class_score || 0,
                     exam_score: score.exam_score || 0,
                     status: score.status,
@@ -709,6 +712,9 @@ async function fetchTeacherData(action, params = {}) {
                      if(!std.scores) std.scores = [];
                      const existing = std.scores.find(sc => sc.subject_id == subject_id);
                      if(existing) {
+                         existing.project_score = g.project_score || 0;
+                         existing.class_test = g.class_test || 0;
+                         existing.group_work = g.group_work || 0;
                          existing.class_score = g.class_score;
                          existing.exam_score = g.exam_score;
                          existing.status = 'Pending'; // Revert to pending on edit
@@ -716,6 +722,9 @@ async function fetchTeacherData(action, params = {}) {
                          std.scores.push({
                              subject_id: subject_id,
                              subject: subject.name,
+                             project_score: g.project_score || 0,
+                             class_test: g.class_test || 0,
+                             group_work: g.group_work || 0,
                              class_score: g.class_score,
                              exam_score: g.exam_score,
                              status: 'Pending'
@@ -1037,3 +1046,45 @@ window.addEventListener('db-updated', () => {
         initDashboard();
     }
 });
+// --- Global Grading Utility ---
+window.calculateGrade = function(score) {
+    let system = [];
+    try {
+        if (window.currentSettings && window.currentSettings.gradingSystem) {
+            system = typeof window.currentSettings.gradingSystem === 'string' ? JSON.parse(window.currentSettings.gradingSystem) : window.currentSettings.gradingSystem;
+        } else {
+            const ls = sessionStorage.getItem('db_cache');
+            if (ls) {
+                const db = JSON.parse(ls);
+                const s = db.schools && db.schools[0] ? db.schools[0].settings : null;
+                if (s && s.gradingSystem) {
+                    system = typeof s.gradingSystem === 'string' ? JSON.parse(s.gradingSystem) : s.gradingSystem;
+                }
+            }
+        }
+    } catch(e) { console.error('Error parsing grading system', e); }
+
+    if (system && Array.isArray(system) && system.length > 0) {
+        for(let i=0; i<system.length; i++) {
+            let rule = system[i];
+            if (score >= rule.min && score <= rule.max) {
+                 let bg = 'bg-gray-100', color = 'text-gray-700';
+                 if (rule.grade.includes('A')) { bg = 'bg-green-100'; color = 'text-green-700'; }
+                 else if (rule.grade.includes('B')) { bg = 'bg-blue-100'; color = 'text-blue-700'; }
+                 else if (rule.grade.includes('C')) { bg = 'bg-yellow-100'; color = 'text-yellow-700'; }
+                 else if (rule.grade.includes('D')) { bg = 'bg-orange-100'; color = 'text-orange-700'; }
+                 else if (rule.grade.includes('F')) { bg = 'bg-red-100'; color = 'text-red-700'; }
+                 return { grade: rule.grade, remark: rule.remark, bg, color };
+            }
+        }
+    }
+    
+    // Default GES Fallback
+    if (score >= 80) return { grade: 'A', remark: 'Excellent', bg: 'bg-green-100', color: 'text-green-700' };
+    if (score >= 70) return { grade: 'B', remark: 'Very Good', bg: 'bg-blue-100', color: 'text-blue-700' };
+    if (score >= 60) return { grade: 'C', remark: 'Good', bg: 'bg-yellow-100', color: 'text-yellow-700' };
+    if (score >= 50) return { grade: 'D', remark: 'Credit', bg: 'bg-orange-100', color: 'text-orange-700' };
+    if (score >= 45) return { grade: 'E', remark: 'Pass', bg: 'bg-gray-100', color: 'text-gray-700' };
+    return { grade: 'F', remark: 'Fail', bg: 'bg-red-100', color: 'text-red-700' };
+};
+

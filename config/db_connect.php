@@ -20,7 +20,10 @@ if (
     strpos($http_host, '::1') !== false ||
     strpos($http_host, 'localhost:') !== false ||
     $server_addr === '127.0.0.1' ||
-    $server_addr === '::1'
+    $server_addr === '::1' ||
+    // Support local network access (e.g., 192.168.x.x)
+    preg_match('/^(192\.168\.|10\.|172\.(1[6-9]|2[0-9]|3[0-1])\.)/', $server_addr) ||
+    preg_match('/^(192\.168\.|10\.|172\.(1[6-9]|2[0-9]|3[0-1])\.)/', $http_host)
 ) {
     $is_localhost = true;
 }
