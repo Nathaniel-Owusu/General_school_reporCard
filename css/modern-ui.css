@@ -132,6 +132,10 @@ aside#sidebar nav button.bg-accent ion-icon {
     color: #ffffff !important;
 }
 
+aside#sidebar nav {
+    background: #000000 !important;
+}
+
 aside#sidebar nav button.bg-accent::before {
     display: none !important;
 }
@@ -142,16 +146,16 @@ aside#sidebar nav button.bg-accent::before {
     font-weight: 800 !important;
     letter-spacing: 0.1em !important;
     text-transform: uppercase !important;
-    color: rgba(255,255,255,0.4) !important;   
+    color: rgba(255,255,255,0.55) !important;   
     padding: 24px 16px 8px !important;
 }
 
 /* Sidebar icon */
 aside#sidebar nav button ion-icon,
 aside#sidebar nav a ion-icon {
-    font-size: 17px !important;
+    font-size: 18px !important;
     flex-shrink: 0 !important;
-    opacity: 0.65 !important;
+    opacity: 1 !important; /* Full clarity */
     transition: opacity 0.2s !important;
 }
 
@@ -167,7 +171,7 @@ aside#sidebar > div:first-child {
 
 aside#sidebar nav button,
 aside#sidebar nav a {
-    color: rgba(255,255,255,0.85) !important;
+    color: #ffffff !important; /* Pure white for maximum clarity */
 }
 
 aside#sidebar nav button:hover,
