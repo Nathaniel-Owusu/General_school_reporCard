@@ -13,7 +13,7 @@
     <script>
         tailwind.config = {
             theme: {
-                extend: { colors: { primary: '#050b14', accent: '#3b82f6', secondary: '#f59e0b' }, fontFamily: { sans: ['Outfit', 'sans-serif'] } }
+                extend: { colors: { primary: '#000000', accent: '#3b82f6', secondary: '#f59e0b' }, fontFamily: { sans: ['Outfit', 'sans-serif'] } }
             }
         }
     </script>
@@ -38,44 +38,44 @@
     <div class="flex h-screen overflow-hidden">
         
         <!-- Sidebar -->
-        <aside id="sidebar" class="w-64 bg-primary text-white fixed inset-y-0 left-0 md:relative z-30 transform -translate-x-full md:translate-x-0 transition duration-300 flex flex-col shadow-2xl">
+        <aside id="sidebar" class="w-64 fixed inset-y-0 left-0 md:relative z-30 transform -translate-x-full md:translate-x-0 transition duration-300 flex flex-col shadow-2xl">
             <!-- Brand -->
-            <div style="height:76px;display:flex;align-items:center;gap:12px;padding:0 20px;border-bottom:1px solid rgba(255,255,255,0.06);flex-shrink:0;">
-                <div style="width:36px;height:36px;border-radius:12px;background:linear-gradient(135deg,#8b5cf6,#6366f1);display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 4px 12px rgba(139,92,246,0.3);">
+            <div style="height:76px;display:flex;align-items:center;gap:12px;padding:0 20px;border-bottom:1px solid rgba(255,255,255,0.1);flex-shrink:0;">
+                <div style="width:36px;height:36px;border-radius:12px;background:linear-gradient(135deg,#6366f1,#3b82f6);display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 4px 12px rgba(59,130,246,0.3);">
                     <ion-icon name="school" style="color:white;font-size:18px;"></ion-icon>
                 </div>
                 <div style="min-width:0;display:flex;flex-direction:column;gap:2px;">
                     <div style="font-size:14px;font-weight:800;color:#ffffff;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" id="sidebar-school-name">General School</div>
-                    <div style="font-size:10px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#94a3b8;line-height:1;">TEACHER PORTAL</div>
+                    <div style="font-size:10px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#d1d5db;line-height:1;">TEACHER PORTAL</div>
                 </div>
             </div>
 
             <nav class="flex-1 py-4 px-3 overflow-y-auto space-y-1">
-                <div class="nav-section-label opacity-50 text-[10px] font-bold uppercase tracking-widest px-4 mb-2">Main Menu</div>
+                <div class="nav-section-label text-white/40 text-[10px] font-bold uppercase tracking-widest px-4 mb-2">Main Menu</div>
                 <button onclick="switchView('dashboard')" id="nav-dashboard" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-accent text-white font-medium shadow-lg shadow-blue-900/20 transition-all">
                     <ion-icon name="grid-outline" class="text-xl"></ion-icon>
                     <span>Dashboard</span>
                 </button>
                 
-                <div class="nav-section-label opacity-50 text-[10px] font-bold uppercase tracking-widest px-4 mt-6 mb-2">Academic Tools</div>
-                <button onclick="switchView('entry')" id="nav-entry" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-200 hover:bg-gray-800 hover:text-white font-medium transition-all">
+                <div class="nav-section-label text-white/40 text-[10px] font-bold uppercase tracking-widest px-4 mt-6 mb-2">Academic Tools</div>
+                <button onclick="switchView('entry')" id="nav-entry" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-white hover:bg-white/10 font-medium transition-all">
                     <ion-icon name="create-outline" class="text-xl"></ion-icon>
                     <span>Results Entry</span>
                 </button>
-                <button onclick="switchView('records')" id="nav-records" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-200 hover:bg-gray-800 hover:text-white font-medium transition-all">
+                <button onclick="switchView('records')" id="nav-records" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-white hover:bg-white/10 font-medium transition-all">
                     <ion-icon name="clipboard-outline" class="text-xl"></ion-icon>
                     <span>Remarks & Attendance</span>
                 </button>
                 
-                <div class="nav-section-label opacity-50 text-[10px] font-bold uppercase tracking-widest px-4 mt-6 mb-2">Quick Links</div>
-                <a href="../index.html" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-200 hover:bg-gray-800 hover:text-white font-medium transition-all">
+                <div class="nav-section-label text-white/40 text-[10px] font-bold uppercase tracking-widest px-4 mt-6 mb-2">Quick Links</div>
+                <a href="../index.html" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-white hover:bg-white/10 font-medium transition-all">
                     <ion-icon name="home-outline" class="text-xl"></ion-icon>
                     <span>Back to Website</span>
                 </a>
             </nav>
 
-            <div class="px-3 pb-4 border-t border-gray-800 pt-3">
-                <button onclick="logout()" class="flex items-center gap-3 w-full px-4 py-2.5 rounded-xl transition-all" style="color:rgba(168,179,200,0.7);" onmouseover="this.style.background='rgba(239,68,68,0.1)';this.style.color='#fca5a5';" onmouseout="this.style.background='';this.style.color='rgba(168,179,200,0.7)';">
+            <div class="px-3 pb-4 border-t border-white/10 pt-3">
+                <button onclick="logout()" class="flex items-center gap-3 w-full px-4 py-2.5 rounded-xl transition-all" style="color:#ef4444;" onmouseover="this.style.background='rgba(239,68,68,0.1)';this.style.color='#fca5a5';" onmouseout="this.style.background='';this.style.color='#ef4444';">
                     <ion-icon name="log-out-outline" class="text-lg"></ion-icon>
                     <span class="font-medium text-sm">Sign Out</span>
                 </button>
@@ -653,12 +653,12 @@
                 
                 const nav = document.getElementById(`nav-${v}`);
                 nav.classList.remove('bg-accent', 'text-white', 'shadow-lg', 'shadow-blue-900/20');
-                nav.classList.add('text-slate-200', 'hover:text-white', 'hover:bg-gray-800');
+                nav.classList.add('text-white', 'hover:bg-white/10');
             });
 
             document.getElementById(`view-${view}`).classList.remove('hidden');
             const active = document.getElementById(`nav-${view}`);
-            active.classList.remove('text-slate-200', 'hover:text-white', 'hover:bg-gray-800');
+            active.classList.remove('text-white', 'hover:bg-white/10');
             active.classList.add('bg-accent', 'text-white', 'shadow-lg', 'shadow-blue-900/20');
         }
 

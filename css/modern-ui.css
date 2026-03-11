@@ -68,15 +68,15 @@ body {
 /* ═══════════════════════════════════════
    SIDEBAR — PREMIUM DARK
 ═══════════════════════════════════════ */
-aside#mobile-sidebar {
-    background: var(--sidebar-bg) !important;
+aside#sidebar {
+    background: #000000 !important;
     width: var(--sidebar-width) !important;
     border-right: 1px solid var(--sidebar-border) !important;
-    box-shadow: 4px 0 24px rgba(0,0,0,0.18) !important;
+    box-shadow: 4px 0 24px rgba(0,0,0,0.4) !important;
 }
 
 /* Sidebar brand area */
-aside#mobile-sidebar > div:first-child {
+aside#sidebar > div:first-child {
     background: rgba(255,255,255,0.03) !important;
     border-bottom: 1px solid var(--sidebar-border) !important;
     padding: 0 24px !important;
@@ -84,8 +84,8 @@ aside#mobile-sidebar > div:first-child {
 }
 
 /* Nav items */
-aside#mobile-sidebar nav button,
-aside#mobile-sidebar nav a {
+aside#sidebar nav button,
+aside#sidebar nav a {
     border-radius: var(--radius-md) !important;
     color: var(--sidebar-text) !important;
     font-size: 13.5px !important;
@@ -104,20 +104,20 @@ aside#mobile-sidebar nav a {
     margin-bottom: 2px !important;
 }
 
-aside#mobile-sidebar nav button:hover,
-aside#mobile-sidebar nav a:hover {
+aside#sidebar nav button:hover,
+aside#sidebar nav a:hover {
     background: rgba(255,255,255,0.07) !important;
     color: #ffffff !important;
     transform: translateX(2px) !important;
 }
 
-aside#mobile-sidebar nav button:hover ion-icon,
-aside#mobile-sidebar nav a:hover ion-icon {
+aside#sidebar nav button:hover ion-icon,
+aside#sidebar nav a:hover ion-icon {
     opacity: 1 !important;
 }
 
 /* Active nav item */
-aside#mobile-sidebar nav button.bg-accent {
+aside#sidebar nav button.bg-accent {
     background: var(--sidebar-active) !important;
     color: #ffffff !important;
     border: none !important;
@@ -126,12 +126,12 @@ aside#mobile-sidebar nav button.bg-accent {
     box-shadow: none !important;
 }
 
-aside#mobile-sidebar nav button.bg-accent ion-icon {
+aside#sidebar nav button.bg-accent ion-icon {
     opacity: 1 !important;
     color: #ffffff !important;
 }
 
-aside#mobile-sidebar nav button.bg-accent::before {
+aside#sidebar nav button.bg-accent::before {
     display: none !important;
 }
 
@@ -146,8 +146,8 @@ aside#mobile-sidebar nav button.bg-accent::before {
 }
 
 /* Sidebar icon */
-aside#mobile-sidebar nav button ion-icon,
-aside#mobile-sidebar nav a ion-icon {
+aside#sidebar nav button ion-icon,
+aside#sidebar nav a ion-icon {
     font-size: 17px !important;
     flex-shrink: 0 !important;
     opacity: 0.65 !important;
@@ -155,9 +155,27 @@ aside#mobile-sidebar nav a ion-icon {
 }
 
 /* Sidebar logout area */
-aside#mobile-sidebar > div:last-child {
-    border-top: 1px solid var(--sidebar-border) !important;
-    padding: 12px !important;
+aside#sidebar {
+    background: #000000 !important;
+}
+
+aside#sidebar > div:first-child {
+    background: rgba(255,255,255,0.03) !important;
+    border-bottom: 1px solid rgba(255,255,255,0.1) !important;
+}
+
+aside#sidebar nav button,
+aside#sidebar nav a {
+    color: #ffffff !important;
+}
+
+aside#sidebar nav button:hover,
+aside#sidebar nav a:hover {
+    background: rgba(255,255,255,0.1) !important;
+}
+
+aside#sidebar > div:last-child {
+    border-top: 1px solid rgba(255,255,255,0.1) !important;
 }
 
 /* ═══════════════════════════════════════
@@ -194,7 +212,7 @@ header .w-10.h-10.rounded-full {
 /* ═══════════════════════════════════════
    PAGE BACKGROUND
 ═══════════════════════════════════════ */
-.flex-1.overflow-y-auto {
+main.flex-1.overflow-y-auto {
     background: var(--page-bg) !important;
 }
 
