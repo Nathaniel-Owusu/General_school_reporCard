@@ -6,12 +6,13 @@
 $db_host = 'localhost';
 $db_user = 'root';
 $db_pass = '';
-$db_name = 'school_report_db';
+$db_name = 'tako_sda_db'; // 🔄 Updated to match existing database
 
 // Check for Production Credentials File (only use if NOT on localhost)
 $is_localhost = false;
 $http_host = isset($_SERVER['HTTP_HOST']) ? strtolower($_SERVER['HTTP_HOST']) : '';
 $server_addr = isset($_SERVER['SERVER_ADDR']) ? $_SERVER['SERVER_ADDR'] : '';
+$remote_addr = isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : '';
 
 if (
     php_sapi_name() === 'cli' ||
@@ -19,11 +20,15 @@ if (
     strpos($http_host, '127.0.0.1') !== false ||
     strpos($http_host, '::1') !== false ||
     strpos($http_host, 'localhost:') !== false ||
+    strpos($http_host, '.local') !== false || // Added for local hostnames
     $server_addr === '127.0.0.1' ||
     $server_addr === '::1' ||
+    $remote_addr === '127.0.0.1' ||
+    $remote_addr === '::1' ||
     // Support local network access (e.g., 192.168.x.x)
     preg_match('/^(192\.168\.|10\.|172\.(1[6-9]|2[0-9]|3[0-1])\.)/', $server_addr) ||
-    preg_match('/^(192\.168\.|10\.|172\.(1[6-9]|2[0-9]|3[0-1])\.)/', $http_host)
+    preg_match('/^(192\.168\.|10\.|172\.(1[6-9]|2[0-9]|3[0-1])\.)/', $http_host) ||
+    preg_match('/^(192\.168\.|10\.|172\.(1[6-9]|2[0-9]|3[0-1])\.)/', $remote_addr)
 ) {
     $is_localhost = true;
 }
