@@ -69,10 +69,11 @@ body {
    SIDEBAR — PREMIUM DARK
 ═══════════════════════════════════════ */
 aside#sidebar {
+    background-color: #000000 !important;
     background: #000000 !important;
     width: var(--sidebar-width) !important;
-    border-right: 1px solid var(--sidebar-border) !important;
-    box-shadow: 4px 0 24px rgba(0,0,0,0.4) !important;
+    border-right: 1px solid rgba(255,255,255,0.1) !important;
+    box-shadow: 10px 0 30px rgba(0,0,0,0.5) !important;
 }
 
 /* Sidebar brand area */
@@ -137,12 +138,12 @@ aside#sidebar nav button.bg-accent::before {
 
 /* Nav section label */
 .nav-section-label {
-    font-size: 14px;
-    font-weight: 700;
-    letter-spacing: normal;
-    text-transform: capitalize;
-    color: #ffffff;   
-    padding: 18px 12px 8px;
+    font-size: 11px !important;
+    font-weight: 800 !important;
+    letter-spacing: 0.1em !important;
+    text-transform: uppercase !important;
+    color: rgba(255,255,255,0.4) !important;   
+    padding: 24px 16px 8px !important;
 }
 
 /* Sidebar icon */
@@ -166,7 +167,7 @@ aside#sidebar > div:first-child {
 
 aside#sidebar nav button,
 aside#sidebar nav a {
-    color: #ffffff !important;
+    color: rgba(255,255,255,0.85) !important;
 }
 
 aside#sidebar nav button:hover,
