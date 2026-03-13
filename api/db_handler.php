@@ -115,7 +115,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         return implode(',', array_fill(0, count($items), '?'));
     }
 
+    $conn->query("SET FOREIGN_KEY_CHECKS = 0;");
     $conn->begin_transaction();
+
 
     try {
 
@@ -334,9 +336,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         $conn->commit();
+        $conn->query("SET FOREIGN_KEY_CHECKS = 1;");
+
         echo json_encode(["success" => true, "message" => "Sync complete"]);
     } catch (Exception $e) {
         $conn->rollback();
+        $conn->query("SET FOREIGN_KEY_CHECKS = 1;");
+
         http_response_code(500);
         echo json_encode(["success" => false, "message" => "Database Error: " . $e->getMessage()]);
     }

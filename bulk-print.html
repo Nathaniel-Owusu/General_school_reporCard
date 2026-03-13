@@ -49,6 +49,19 @@
             top: 0;
             z-index: 100;
             box-shadow: 0 2px 12px rgba(0,0,0,.07);
+            overflow-x: auto; /* Allow horizontal scroll if many items */
+            -webkit-overflow-scrolling: touch;
+        }
+        @media screen and (max-width: 600px) {
+            #control-bar {
+                height: auto;
+                min-height: 64px;
+                padding: 10px 16px;
+                gap: 8px;
+            }
+            .ctrl-brand span { display: none; } /* Hide icon on mobile brand */
+            .ctrl-select { min-width: 140px; }
+            .btn-print span { display: none; } /* Show only icon if needed, but currently has no icon text separation */
         }
         .ctrl-brand {
             display: flex;
@@ -851,8 +864,8 @@
                         <thead>
                             <tr>
                                 <th style="width:28%;text-align:left;">Subject</th>
-                                <th style="width:11%;">Class Score<br><span style="font-weight:400;opacity:.75;">(30%)</span></th>
-                                <th style="width:11%;">Exam Score<br><span style="font-weight:400;opacity:.75;">(70%)</span></th>
+                                <th style="width:11%;">Class Score<br><span style="font-weight:400;opacity:.75;">(50%)</span></th>
+                                <th style="width:11%;">Exam Score<br><span style="font-weight:400;opacity:.75;">(50%)</span></th>
                                 <th style="width:11%;">Total<br><span style="font-weight:400;opacity:.75;">(100%)</span></th>
                                 <th style="width:9%;">Position</th>
                                 <th style="width:10%;">Grade</th>

@@ -667,10 +667,12 @@ async function fetchTeacherData(action, params = {}) {
                     id: s.id,
                     name: s.name,
                     project_score: score.project_score || 0,
+                    individual_score: score.individual_score || 0,
                     class_test: score.class_test || 0,
-                    group_work: score.group_work || 0,
+                    homework_score: score.homework_score || 0,
                     class_score: score.class_score || 0,
                     exam_score: score.exam_score || 0,
+                    remark: score.remark || '',
                     status: score.status,
                     attendance: s.attendance || { present: 0, total: 0 },
                     conduct: s.conduct || '',
@@ -713,20 +715,24 @@ async function fetchTeacherData(action, params = {}) {
                      const existing = std.scores.find(sc => sc.subject_id == subject_id);
                      if(existing) {
                          existing.project_score = g.project_score || 0;
+                         existing.individual_score = g.individual_score || 0;
                          existing.class_test = g.class_test || 0;
-                         existing.group_work = g.group_work || 0;
+                         existing.homework_score = g.homework_score || 0;
                          existing.class_score = g.class_score;
                          existing.exam_score = g.exam_score;
+                         existing.remark = g.remark || '';
                          existing.status = 'Pending'; // Revert to pending on edit
                      } else {
                          std.scores.push({
                              subject_id: subject_id,
                              subject: subject.name,
                              project_score: g.project_score || 0,
+                             individual_score: g.individual_score || 0,
                              class_test: g.class_test || 0,
-                             group_work: g.group_work || 0,
+                             homework_score: g.homework_score || 0,
                              class_score: g.class_score,
                              exam_score: g.exam_score,
+                             remark: g.remark || '',
                              status: 'Pending'
                          });
                      }
@@ -1053,10 +1059,10 @@ window.calculateGrade = function(score) {
         if (window.currentSettings && window.currentSettings.gradingSystem) {
             system = typeof window.currentSettings.gradingSystem === 'string' ? JSON.parse(window.currentSettings.gradingSystem) : window.currentSettings.gradingSystem;
         } else {
-            const ls = sessionStorage.getItem('db_cache');
+            const ls = sessionStorage.getItem('grc_db_cache');
             if (ls) {
                 const db = JSON.parse(ls);
-                const s = db.schools && db.schools[0] ? db.schools[0].settings : null;
+                const s = (db && db.schools && db.schools[0]) ? db.schools[0].settings : null;
                 if (s && s.gradingSystem) {
                     system = typeof s.gradingSystem === 'string' ? JSON.parse(s.gradingSystem) : s.gradingSystem;
                 }
@@ -1088,3 +1094,17 @@ window.calculateGrade = function(score) {
     return { grade: 'F', remark: 'Fail', bg: 'bg-red-100', color: 'text-red-700' };
 };
 
+/**
+ * AI-Inspired Smart Remark Generator
+ * Generates a professional, encouraging academic remark based on score.
+ */
+window.generateSmartRemark = function(score, subjectName = "") {
+    const s = subjectName ? ` in ${subjectName}` : "";
+    if (score >= 90) return `Outstanding achievement! You have shown complete mastery of the core concepts${s}.`;
+    if (score >= 80) return `Excellent performance! Keep up the exceptionally high standard${s}.`;
+    if (score >= 70) return `Very good work. You have a solid and consistent understanding of the topics${s}.`;
+    if (score >= 60) return `Good effort. With more consistent practice, you will achieve even better results${s}.`;
+    if (score >= 50) return `A fair performance. There is room for improvement; focus more on challenging areas${s}.`;
+    if (score >= 45) return `Pass. You need to double your efforts and seek help where necessary to improve${s}.`;
+    return `Below expectations. Please see your teacher for extra guidance and dedicate more time to studies${s}.`;
+};

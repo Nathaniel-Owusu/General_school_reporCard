@@ -11,6 +11,84 @@
     <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
     <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
     <link rel="stylesheet" href="css/modern-ui.css">
+    <style>
+        /* Responsive Table Adjustments */
+        @media screen and (max-width: 768px) {
+            .overflow-x-auto {
+                -webkit-overflow-scrolling: touch;
+            }
+            
+            /* Responsive Modal Adjustment */
+            .animate-fade-in {
+                width: 95% !important;
+                margin: 10px auto !important;
+                padding: 20px 16px !important;
+            }
+
+            /* Responsive Text */
+            h1 { font-size: 1.5rem !important; }
+            h2 { font-size: 1.25rem !important; }
+            
+            /* Compact stats for mobile */
+            .grid-cols-2.lg\:grid-cols-4 {
+                gap: 12px !important;
+            }
+        }
+
+        /* Extreme Landscape / Keyboard visible optimizations */
+        @media screen and (max-height: 500px) and (orientation: landscape) {
+            header.h-14 { height: 48px !important; }
+            .py-8 { padding-top: 12px !important; padding-bottom: 12px !important; }
+            .space-y-6 > * { margin-top: 12px !important; }
+            
+            /* Make the gradebook inputs easier to hit but compact */
+            #mgr-grade-table input {
+                padding: 4px 2px !important;
+                font-size: 16px !important; /* Prevents auto-zoom on iOS */
+            }
+            
+            /* Sticky save button behavior */
+            .sticky.bottom-0 {
+                position: relative !important;
+                margin-top: 10px !important;
+            }
+        }
+
+        /* Prevent auto-zoom on iOS inputs */
+        input[type="text"], input[type="number"], select {
+            font-size: 16px !important;
+        }
+        @media screen and (min-width: 768px) {
+            input[type="text"], input[type="number"], select {
+                font-size: 14px !important;
+            }
+        }
+
+        .btn-smart-remark {
+            position: absolute;
+            right: 4px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #3b82f6;
+            cursor: pointer;
+            opacity: 0.5;
+            transition: all 0.2s;
+            background: #f1f5f9;
+            padding: 4px;
+            border-radius: 6px;
+            border: none;
+            line-height: 1;
+        }
+        .btn-smart-remark:hover {
+            opacity: 1;
+            background: #e0f2fe;
+            color: #2563eb;
+            transform: translateY(-50%) scale(1.1);
+        }
+    </style>
     <script>
         tailwind.config = {
             theme: {
@@ -30,64 +108,64 @@
     <div id="mobile-overlay" class="hidden fixed inset-0 bg-black/50 z-30 transition-opacity backdrop-blur-sm" onclick="toggleMobileMenu()"></div>
 
     <!-- Sidebar -->
-    <aside id="mobile-sidebar" class="w-64 bg-primary text-white shadow-2xl z-50 h-full transition-transform duration-300 transform -translate-x-full lg:translate-x-0 fixed inset-y-0 left-0 lg:relative hidden lg:flex flex-col">
+    <aside id="mobile-sidebar" class="w-64 bg-black text-white shadow-2xl z-50 h-full transition-transform duration-300 transform -translate-x-full lg:translate-x-0 fixed inset-y-0 left-0 lg:relative hidden lg:flex flex-col" style="background-color: #000000 !important;">
         <!-- Brand -->
-        <div style="height:76px;display:flex;align-items:center;gap:12px;padding:0 20px;border-bottom:1px solid rgba(255,255,255,0.06);flex-shrink:0;">
-            <div style="width:36px;height:36px;border-radius:12px;background:linear-gradient(135deg,#8b5cf6,#6366f1);display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 4px 12px rgba(139,92,246,0.3);">
+        <div style="height:76px;display:flex;align-items:center;gap:12px;padding:0 20px;border-bottom:1px solid rgba(255,255,255,0.1);flex-shrink:0;">
+            <div style="width:36px;height:36px;border-radius:12px;background:linear-gradient(135deg,#6366f1,#3b82f6);display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 4px 12px rgba(59,130,246,0.3);">
                 <ion-icon name="school" style="color:white;font-size:18px;"></ion-icon>
             </div>
             <div style="min-width:0;display:flex;flex-direction:column;gap:2px;">
                 <div style="font-size:14px;font-weight:800;color:#ffffff;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" id="sidebar-school-name">General School</div>
-                <div style="font-size:10px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#94a3b8;line-height:1;">ADMIN PANEL</div>
+                <div style="font-size:10px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#d1d5db;line-height:1;">ADMIN PANEL</div>
             </div>
         </div>
 
-        <nav class="flex-1 py-3 px-2.5 overflow-y-auto space-y-0.5">
+        <nav class="flex-1 py-4 px-3 overflow-y-auto space-y-1" style="background-color: #000000 !important;">
             <!-- Overview -->
-            <div class="nav-section-label">Overview</div>
+            <div class="nav-section-label text-white/40 text-[10px] font-bold uppercase tracking-widest px-4 mb-2">Overview</div>
             <button onclick="switchView('dashboard')" id="nav-dashboard" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-accent text-white font-medium shadow-lg shadow-blue-900/20 transition-all">
                 <ion-icon name="grid-outline" class="text-xl"></ion-icon>
                 <span>Dashboard</span>
             </button>
 
             <!-- Academic -->
-            <div class="nav-section-label mt-2">Academic</div>
-            <button onclick="switchView('classes')" id="nav-classes" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-200 hover:bg-gray-800 hover:text-white font-medium transition-all">
+            <div class="nav-section-label text-white/40 text-[10px] font-bold uppercase tracking-widest px-4 mt-6 mb-2">Academic</div>
+            <button onclick="switchView('classes')" id="nav-classes" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-white hover:bg-white/10 font-medium transition-all">
                 <ion-icon name="easel-outline" class="text-xl"></ion-icon>
                 <span>Manage Classes</span>
             </button>
-            <button onclick="switchView('teachers')" id="nav-teachers" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-200 hover:bg-gray-800 hover:text-white font-medium transition-all">
+            <button onclick="switchView('teachers')" id="nav-teachers" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-white hover:bg-white/10 font-medium transition-all">
                 <ion-icon name="people-outline" class="text-xl"></ion-icon>
                 <span>Manage Teachers</span>
             </button>
-            <button onclick="switchView('subjects')" id="nav-subjects" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-200 hover:bg-gray-800 hover:text-white font-medium transition-all">
+            <button onclick="switchView('subjects')" id="nav-subjects" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-white hover:bg-white/10 font-medium transition-all">
                 <ion-icon name="book-outline" class="text-xl"></ion-icon>
                 <span>Manage Subjects</span>
             </button>
 
             <!-- Administration -->
-            <div class="nav-section-label mt-2">Administration</div>
-            <button onclick="switchView('results')" id="nav-results" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-200 hover:bg-gray-800 hover:text-white font-medium transition-all">
+            <div class="nav-section-label text-white/40 text-[10px] font-bold uppercase tracking-widest px-4 mt-6 mb-2">Administration</div>
+            <button onclick="switchView('results')" id="nav-results" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-white hover:bg-white/10 font-medium transition-all">
                 <ion-icon name="checkmark-done-circle-outline" class="text-xl"></ion-icon>
                 <span>Review Results</span>
             </button>
-            <button onclick="switchView('admissions')" id="nav-admissions" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-200 hover:bg-gray-800 hover:text-white font-medium transition-all">
+            <button onclick="switchView('admissions')" id="nav-admissions" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-white hover:bg-white/10 font-medium transition-all">
                 <ion-icon name="folder-open-outline" class="text-xl"></ion-icon>
                 <span>Admissions Queue</span>
             </button>
-            <button onclick="switchView('settings')" id="nav-settings" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-200 hover:bg-gray-800 hover:text-white font-medium transition-all">
+            <button onclick="switchView('settings')" id="nav-settings" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-white hover:bg-white/10 font-medium transition-all">
                 <ion-icon name="settings-outline" class="text-xl"></ion-icon>
                 <span>System Settings</span>
             </button>
 
             <!-- Portal Links -->
-            <div class="nav-section-label mt-2">Quick Links</div>
-            <a href="teacher-portal.html" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-200 hover:bg-gray-800 hover:text-white font-medium transition-all">
+            <div class="nav-section-label text-white/40 text-[10px] font-bold uppercase tracking-widest px-4 mt-6 mb-2">Quick Links</div>
+            <a href="teacher-portal.html" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-white hover:bg-white/10 font-medium transition-all">
                 <ion-icon name="key-outline" class="text-xl"></ion-icon>
                 <span>Teacher Portal</span>
                 <ion-icon name="open-outline" class="text-sm ml-auto opacity-50"></ion-icon>
             </a>
-            <a href="student-report.html" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-200 hover:bg-gray-800 hover:text-white font-medium transition-all">
+            <a href="student-report.html" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-white hover:bg-white/10 font-medium transition-all">
                 <ion-icon name="document-text-outline" class="text-xl"></ion-icon>
                 <span>Report Cards</span>
                 <ion-icon name="open-outline" class="text-sm ml-auto opacity-50"></ion-icon>
@@ -100,10 +178,12 @@
         </nav>
 
         <!-- Sign Out -->
-        <div class="px-2.5 pb-3 border-t border-gray-800 pt-2.5">
-            <button onclick="logout()" class="flex items-center gap-3 w-full px-4 py-2.5 rounded-xl transition-all" style="color:rgba(168,179,200,0.7);" onmouseover="this.style.background='rgba(239,68,68,0.1)';this.style.color='#fca5a5';" onmouseout="this.style.background='';this.style.color='rgba(168,179,200,0.7)';">
-                <ion-icon name="log-out-outline" class="text-lg"></ion-icon>
-                <span class="font-medium text-sm">Sign Out</span>
+        <div class="px-2.5 pb-4 border-t border-white/10 pt-4" style="background-color: #000000 !important;">
+            <button onclick="logout()" class="flex items-center gap-3 w-full px-4 py-3 rounded-xl transition-all text-white/60 hover:bg-red-500/10 hover:text-red-400 group">
+                <div class="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center group-hover:bg-red-500/20 transition-colors">
+                    <ion-icon name="log-out-outline" class="text-lg"></ion-icon>
+                </div>
+                <span class="font-bold text-sm">Sign Out</span>
             </button>
         </div>
     </aside>
@@ -250,9 +330,9 @@
                         <div class="flex flex-col sm:flex-row gap-3 px-5 py-3 border-b border-gray-50 bg-gray-50/30">
                             <div class="relative flex-1">
                                 <ion-icon name="search-outline" class="absolute left-3 top-[11px] text-slate-200 text-sm"></ion-icon>
-                                <input type="text" id="search-input" onkeyup="renderStudents()" placeholder="Search by name or ID…" class="w-full pl-9 pr-3 py-2 bg-white border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-400 transition-all text-sm font-medium text-gray-700 shadow-sm">
+                                <input type="text" id="search-input" onkeyup="renderStudents(true)" placeholder="Search by name or ID…" class="w-full pl-9 pr-3 py-2 bg-white border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-400 transition-all text-sm font-medium text-gray-700 shadow-sm">
                             </div>
-                            <select id="filter-class" onchange="renderStudents()" class="w-full sm:w-40 py-2 px-3 bg-white border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-400 transition-all text-sm font-medium text-gray-700 cursor-pointer shadow-sm">
+                            <select id="filter-class" onchange="renderStudents(true)" class="w-full sm:w-40 py-2 px-3 bg-white border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-400 transition-all text-sm font-medium text-gray-700 cursor-pointer shadow-sm">
                                 <option value="">All Classes</option>
                             </select>
                         </div>
@@ -276,9 +356,8 @@
                         <!-- Footer -->
                         <div class="px-5 py-3 flex justify-between items-center border-t border-gray-50">
                             <span id="showing-count" class="text-xs font-semibold text-slate-200">Showing 0 students</span>
-                            <div class="flex gap-1">
-                                <button class="w-8 h-8 flex items-center justify-center border border-gray-200 bg-white rounded-lg hover:bg-gray-50 text-slate-200 transition-colors text-sm"><ion-icon name="chevron-back"></ion-icon></button>
-                                <button class="w-8 h-8 flex items-center justify-center border border-gray-200 bg-white rounded-lg hover:bg-gray-50 text-slate-200 transition-colors text-sm"><ion-icon name="chevron-forward"></ion-icon></button>
+                            <div class="flex gap-1 items-center" id="student-pagination">
+                                <!-- Pagination injected by JS -->
                             </div>
                         </div>
                     </div>
@@ -555,7 +634,7 @@
                         <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-6 gap-4">
                             <div>
                                 <h3 class="font-extrabold text-2xl text-gray-900">Gradebook Entry</h3>
-                                <p class="text-slate-200 text-sm font-medium">Input scores out of 30 (Class) and 70 (Exam).</p>
+                                <p class="text-slate-200 text-sm font-medium">Input scores out of 50 (Class) and 50 (Exam).</p>
                             </div>
                             <div class="flex gap-3 relative z-10">
                                 <label class="bg-white border border-gray-200 text-gray-700 px-4 py-2.5 rounded-xl text-sm font-bold hover:bg-gray-50 hover:text-indigo-600 shadow-sm cursor-pointer flex items-center gap-2 transition-all">
@@ -573,14 +652,15 @@
                                  <thead class="bg-gray-100 text-gray-600 font-bold uppercase text-[11px] tracking-wider sticky top-0 z-10">
                                      <tr>
                                          <th class="px-6 py-4 border-b border-gray-200">Student Scholar</th>
-                                         <th class="px-3 py-4 text-center w-36 border-b border-gray-200 border-l border-gray-200">Class Score (30)</th>
-                                         <th class="px-3 py-4 text-center w-36 border-b border-gray-200 border-l border-gray-200">Exam Score (70)</th>
+                                         <th class="px-3 py-4 text-center w-36 border-b border-gray-200 border-l border-gray-200">Class Score (50)</th>
+                                         <th class="px-3 py-4 text-center w-36 border-b border-gray-200 border-l border-gray-200">Exam Score (50)</th>
                                          <th class="px-4 py-4 text-center w-32 border-b border-gray-200 border-l border-gray-200">Total Score</th>
                                          <th class="px-4 py-4 text-center w-28 border-b border-gray-200 border-l border-gray-200 bg-gray-50">Final Grade</th>
+                                         <th class="px-6 py-4 text-left border-b border-gray-200 border-l border-gray-200 bg-gray-50">Remark suggestion</th>
                                      </tr>
                                  </thead>
                                  <tbody id="mgr-grade-table" class="divide-y divide-gray-200 bg-white">
-                                     <tr><td colspan="5" class="py-16 text-center text-slate-200 italic font-medium"><ion-icon name="options-outline" class="text-2xl mb-2"></ion-icon><br>Select a subject above to load the gradebook.</td></tr>
+                                     <tr><td colspan="6" class="py-16 text-center text-slate-200 italic font-medium"><ion-icon name="options-outline" class="text-2xl mb-2"></ion-icon><br>Select a subject above to load the gradebook.</td></tr>
                                  </tbody>
                             </table>
                         </div>
@@ -1015,8 +1095,8 @@
                                 <tr>
                                     <th class="px-4 py-3">Student</th>
                                     <th class="px-4 py-3">Class & Subject</th>
-                                    <th class="px-4 py-3 text-center">Class (30)</th>
-                                    <th class="px-4 py-3 text-center">Exam (70)</th>
+                                    <th class="px-4 py-3 text-center">Class (50)</th>
+                                    <th class="px-4 py-3 text-center">Exam (50)</th>
                                     <th class="px-4 py-3 text-center">Total</th>
                                     <th class="px-4 py-3 text-center">Status</th>
                                     <th class="px-4 py-3 text-right">Actions</th>
@@ -1120,7 +1200,6 @@
                         <option value="Primary">Primary</option>
                         <option value="JHS">Junior High (JHS)</option>
                     </select>
-                </div>
                 </div>
                 <div>
                      <label class="text-xs font-bold text-gray-500 uppercase">Class Teacher (Form Master)</label>
@@ -1297,9 +1376,12 @@
         }
         
         let allStudents = []; 
- 
         let allClasses = [];
         let allTeachers = [];
+        
+        // Pagination State
+        let currentStudentPage = 1;
+        const studentsPerPage = 10;
 
         async function initDashboard() {
             // Load Stats
@@ -1315,6 +1397,9 @@
             try {
                 const db = await Storage.get();
                 const school = (db.schools || [])[0];
+                if (school && school.settings) {
+                    window.currentSettings = school.settings;
+                }
                 const sName = school?.settings?.schoolName || school?.name || '';
                 if (sName) {
                     const el = document.getElementById('sidebar-school-name');
@@ -1350,14 +1435,14 @@
             viewList.forEach(v => {
                  const btn = document.getElementById(`nav-${v}`);
                  if(btn) {
-                     btn.classList.remove('bg-accent', 'text-white', 'shadow-lg');
-                     btn.classList.add('text-slate-200');
+                     btn.classList.remove('bg-accent', 'text-white', 'shadow-lg', 'shadow-blue-900/20');
+                     btn.classList.add('text-white', 'hover:bg-white/10');
                  }
             });
             const activeBtn = document.getElementById(`nav-${viewName}`);
             if(activeBtn) {
-                 activeBtn.classList.remove('text-slate-200', 'hover:bg-gray-800');
-                 activeBtn.classList.add('bg-accent', 'text-white', 'shadow-lg');
+                 activeBtn.classList.remove('text-white', 'hover:bg-white/10');
+                 activeBtn.classList.add('bg-accent', 'text-white', 'shadow-lg', 'shadow-blue-900/20');
             }
 
             // Dynamic Load
@@ -1371,31 +1456,51 @@
 
         // Student Management
         let deleteTargetId = null;
-        async function renderStudents() {
-            const search = document.getElementById('search-input').value.toLowerCase();
-            const filterClass = document.getElementById('filter-class').value;
+        async function renderStudents(resetPage = false) {
+            if(resetPage) currentStudentPage = 1;
+
+            const searchInput = document.getElementById('search-input');
+            const classFilter = document.getElementById('filter-class');
             
+            const search = (searchInput?.value || "").toLowerCase();
+            const filterClass = classFilter?.value || "";
+            
+            // Always fetch fresh data to reflect additions/deletions
             const students = await fetchAdminData('students');
             allStudents = students || [];
 
-            // Filter in memory for local engine
+            // Filter
             let filtered = allStudents.filter(s => {
                 const matchName = !search || s.name.toLowerCase().includes(search) || s.id.toLowerCase().includes(search);
                 const matchClass = !filterClass || s.class === filterClass;
                 return matchName && matchClass;
             });
 
+            // Pagination Logic
+            const totalStudents = filtered.length;
+            const totalPages = Math.ceil(totalStudents / studentsPerPage);
+            
+            // If search/filter reduces total below current page, reset to 1
+            if(currentStudentPage > totalPages && totalPages > 0) currentStudentPage = 1;
+            
+            const startIdx = (currentStudentPage - 1) * studentsPerPage;
+            const paginated = filtered.slice(startIdx, startIdx + studentsPerPage);
+
             const tbody = document.getElementById('student-table-body');
             tbody.innerHTML = '';
             
-            document.getElementById('showing-count').innerText = `Showing ${filtered.length} students`;
+            const endIdx = Math.min(startIdx + studentsPerPage, totalStudents);
+            document.getElementById('showing-count').innerText = totalStudents > 0 
+                ? `Showing ${startIdx + 1} - ${endIdx} of ${totalStudents} students`
+                : `Showing 0 students`;
             
-            if(filtered.length === 0) {
+            if(paginated.length === 0) {
                  tbody.innerHTML = `<tr><td colspan="5" class="py-12 text-center text-slate-200"><ion-icon name="school" class="text-4xl mb-3 opacity-50 block mx-auto"></ion-icon>No students found in this search.</td></tr>`;
+                 renderStudentPagination(0);
                  return;
             }
 
-            filtered.forEach(student => {
+            paginated.forEach(student => {
                 const tr = document.createElement('tr');
                 tr.className = "border-b border-gray-100/60 hover:bg-indigo-50/30 transition-colors group";
                 tr.innerHTML = `
@@ -1423,6 +1528,42 @@
                 `;
                 tbody.appendChild(tr);
             });
+            
+            renderStudentPagination(totalPages);
+        }
+
+        function renderStudentPagination(totalPages) {
+            const container = document.getElementById('student-pagination');
+            container.innerHTML = '';
+            
+            if(totalPages <= 1) return;
+
+            // Prev Button
+            const prevBtn = document.createElement('button');
+            prevBtn.className = `w-8 h-8 flex items-center justify-center border border-gray-200 rounded-lg transition-colors text-sm ${currentStudentPage === 1 ? 'opacity-30 cursor-not-allowed bg-gray-50' : 'bg-white hover:bg-gray-50'}`;
+            prevBtn.innerHTML = '<ion-icon name="chevron-back"></ion-icon>';
+            prevBtn.onclick = () => { if(currentStudentPage > 1) { currentStudentPage--; renderStudents(); } };
+            container.appendChild(prevBtn);
+
+            // Page numbers
+            let startPage = Math.max(1, currentStudentPage - 1);
+            let endPage = Math.min(totalPages, startPage + 2);
+            if(endPage - startPage < 2) startPage = Math.max(1, endPage - 2);
+
+            for(let i = startPage; i <= endPage; i++) {
+                const pg = document.createElement('button');
+                pg.className = `w-8 h-8 flex items-center justify-center rounded-lg text-xs font-bold transition-all ${currentStudentPage === i ? 'bg-primary text-white shadow-md' : 'border border-gray-200 bg-white hover:bg-gray-50 text-gray-600'}`;
+                pg.innerText = i;
+                pg.onclick = () => { currentStudentPage = i; renderStudents(); };
+                container.appendChild(pg);
+            }
+
+            // Next Button
+            const nextBtn = document.createElement('button');
+            nextBtn.className = `w-8 h-8 flex items-center justify-center border border-gray-200 rounded-lg transition-colors text-sm ${currentStudentPage === totalPages ? 'opacity-30 cursor-not-allowed bg-gray-50' : 'bg-white hover:bg-gray-50'}`;
+            nextBtn.innerHTML = '<ion-icon name="chevron-forward"></ion-icon>';
+            nextBtn.onclick = () => { if(currentStudentPage < totalPages) { currentStudentPage++; renderStudents(); } };
+            container.appendChild(nextBtn);
         }
 
         // Chart
@@ -1544,7 +1685,7 @@
                  tr.className = "border-b border-gray-100 hover:bg-gray-50 transition";
                  tr.innerHTML = `
                      <td class="px-4 py-3">
-                         <div class="font-bold text-gray-800">${r.student_name}</div>
+                         <div class="font-bold text-gray-800">${r.student_name || r.name || '---'}</div>
                          <div class="text-xs text-slate-200 font-mono">${r.student_id}</div>
                      </td>
                      <td class="px-4 py-3">
@@ -2932,6 +3073,20 @@
             alert('Feature coming soon');
         }
 
+        function applyAdminSmartHint(btn, score) {
+            const row = btn.closest('tr');
+            const remarkInput = row.querySelector('input[data-type="remark"]');
+            const subjectSelect = document.getElementById('mgr-subject-select');
+            const subjectName = subjectSelect.options[subjectSelect.selectedIndex]?.text.split('(')[0].trim();
+            
+            if(window.generateSmartRemark) {
+                const remark = window.generateSmartRemark(score, subjectName);
+                remarkInput.value = remark;
+                remarkInput.classList.add('ring-2', 'ring-blue-200');
+                setTimeout(() => remarkInput.classList.remove('ring-2', 'ring-blue-200'), 1000);
+            }
+        }
+
 
         // --- CLASS MANAGER LOGIC ---
         let currentManagerClassId = null;
@@ -3052,19 +3207,29 @@
                     <tr class="hover:bg-blue-50/10 transition border-b border-gray-50" data-student-id="${s.id}">
                         <td class="px-4 py-3 font-bold text-gray-800 text-sm">
                             <span class="block text-xs font-normal text-slate-200 mb-0.5">${s.id}</span>
-                            ${s.name}
+                            ${s.name || s.student_name || '---'}
                         </td>
                         <td class="px-4 py-3 bg-blue-50/20 p-0 text-center">
-                            <input type="number" min="0" max="30" value="${classScore}" data-type="class"
+                            <input type="number" min="0" max="50" value="${classScore}" data-type="class" inputmode="numeric"
                                 class="w-16 mx-auto text-center font-mono font-bold bg-white border border-gray-200 rounded px-1 py-1 focus:ring-2 focus:ring-accent outline-none">
                         </td>
                         <td class="px-4 py-3 bg-yellow-50/20 p-0 text-center">
-                            <input type="number" min="0" max="70" value="${examScore}" data-type="exam"
+                            <input type="number" min="0" max="50" value="${examScore}" data-type="exam" inputmode="numeric"
                                 class="w-16 mx-auto text-center font-mono font-bold bg-white border border-gray-200 rounded px-1 py-1 focus:ring-2 focus:ring-secondary outline-none">
                         </td>
                         <td class="px-4 py-3 text-center font-black text-gray-700">${total}</td>
                         <td class="px-4 py-3 text-center">
                              <span class="inline-block w-6 h-6 rounded bg-gray-100 text-xs flex items-center justify-center font-bold text-gray-600">${grade.grade || grade.grade}</span>
+                        </td>
+                        <td class="px-4 py-3 relative">
+                            <div class="relative flex items-center">
+                                <input type="text" value="${score.remark || grade.remark || ''}" 
+                                    placeholder="Remark" data-type="remark"
+                                    class="w-full pl-3 pr-9 py-1 text-xs border border-gray-200 rounded outline-none focus:ring-1 focus:ring-accent bg-gray-50/50">
+                                <button onclick="applyAdminSmartHint(this, ${total})" title="AI Suggest Remark" class="btn-smart-remark">
+                                    <ion-icon name="sparkles" class="text-xs"></ion-icon>
+                                </button>
+                            </div>
                         </td>
                     </tr>
                 `;
@@ -3084,10 +3249,12 @@
                 if(!sId) return;
                 const c = r.querySelector('input[data-type="class"]').value;
                 const e = r.querySelector('input[data-type="exam"]').value;
+                const rem = r.querySelector('input[data-type="remark"]');
                 grades.push({
                     student_id: sId,
                     class_score: parseInt(c)||0,
-                    exam_score: parseInt(e)||0
+                    exam_score: parseInt(e)||0,
+                    remark: rem ? rem.value : ''
                 });
             });
 
@@ -3105,7 +3272,7 @@
         }
 
         function downloadCSVTemplate() {
-            const csvContent = "data:text/csv;charset=utf-8," + "Student ID,Student Name,Class Score (30%),Exam Score (70%)\nST001,John Doe,25,60";
+            const csvContent = "data:text/csv;charset=utf-8," + "Student ID,Student Name,Class Score (50%),Exam Score (50%)\nST001,John Doe,45,40";
             const encodedUri = encodeURI(csvContent);
             const link = document.createElement("a");
             link.setAttribute("href", encodedUri);
@@ -3200,45 +3367,7 @@
              return { grade: 'F' };
         }
 
-        // Enhanced Add Student Modal override
-        window.openAddStudentModal = async function(id = null, preSelectedClassId = null) {
-            const modal = document.getElementById('add-student-modal');
-            const form = document.getElementById('add-student-form');
-            const title = document.getElementById('modal-title');
-            
-            form.reset();
-            const editId = document.getElementById('edit-student-id');
-            if(editId) editId.value = '';
-            
-             // Populate Classes
-            const classSelect = document.getElementById('student-class-select');
-            const classes = await fetchAdminData('classes') || [];
-            if(classSelect) {
-                classSelect.innerHTML = '<option value="">Select Class</option>' + 
-                    classes.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
-            }
-
-            if (id) {
-                if(title) title.innerText = 'Edit Student';
-                const students = await fetchAdminData('students');
-                const student = students.find(s => s.id === id);
-                if (student) {
-                    if(editId) editId.value = student.id;
-                    if(form.name) form.name.value = student.name;
-                    if(form.class) form.class.value = student.class;
-                    if(form.gender) form.gender.value = student.gender;
-                }
-            } else {
-                if(title) title.innerText = 'Add New Student';
-                if(preSelectedClassId && form.class) {
-                     let cls = classes.find(c => c.id === preSelectedClassId);
-                     if(!cls) cls = classes.find(c => c.name === preSelectedClassId);
-                     if(cls) form.class.value = cls.name; 
-                }
-            }
-            
-            modal.classList.remove('hidden');
-        }
+        // Removed duplicate openAddStudentModal override - Using version on line 1646
 
         // ==== ADMISSIONS MANAGEMENT ====
         

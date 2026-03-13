@@ -31,6 +31,168 @@
             .table-container { border-radius: 0; margin-left: -2rem; margin-right: -2rem; }
             .sticky-col { left: 0; box-shadow: 4px 0 8px -4px rgba(0,0,0,0.1); }
         }
+
+        /* Landscape / Short Screen Optimization */
+        @media (max-height: 500px) {
+            /* Aggressively disable screen-locking flex layouts to allow natural scrolling */
+            .h-screen { height: auto !important; min-height: 100vh; }
+            .overflow-hidden { overflow: visible !important; }
+            .flex-col { height: auto !important; }
+            
+            header { 
+                height: 44px !important; 
+                transition: transform 0.3s ease;
+            }
+            
+            /* Hide header entirely when an input is active to give room to the keyboard */
+            body.is-typing header {
+                transform: translateY(-100%);
+                position: absolute !important;
+            }
+
+            aside#sidebar { display: none !important; } /* Sidebar just gets in the way here */
+            
+            #term-badge { display: none; }
+            
+            /* Sticky Controls Optimization - disable stickiness to allow scrolling focused input to top */
+            .sticky.top-0 { position: relative !important; margin-bottom: 8px !important; }
+            
+            /* Reduce padding in tables and cards */
+            .p-4, .p-6, .p-8 { padding: 8px !important; }
+            .md\:p-8 { padding: 12px !important; }
+            .mb-4, .mb-6, .mb-8 { margin-bottom: 8px !important; }
+            
+            /* Hide non-essential summary cards */
+            #entry-summary, #view-dashboard > div.bg-white.rounded-2xl { display: none !important; }
+            
+            /* Make table rows more compact */
+            table td { padding: 4px 8px !important; }
+            
+            /* Adjust inputs for extreme landscape */
+            .score-input { padding: 4px 2px !important; font-size: 16px !important; }
+            .record-textarea { min-height: 30px !important; padding: 4px 8px !important; }
+        }
+
+        /* Result Entry Input Styling */
+        .score-input {
+            width: 100%;
+            max-width: 50px;
+            padding: 8px 4px;
+            text-align: center;
+            font-family: 'JetBrains Mono', 'Outfit', monospace;
+            font-weight: 600;
+            font-size: 14px;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 8px;
+            background: #ffffff;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            outline: none;
+        }
+
+        .score-input:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+            transform: translateY(-1px);
+            background: #fff;
+            min-width: 60px; /* Expand slightly on focus for better visibility */
+        }
+
+        .remark-input {
+            width: 100%;
+            min-width: 140px;
+            padding: 6px 10px;
+            font-size: 13px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        .remark-input:focus {
+            border-color: #3b82f6;
+            background: #f8fafc;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        /* Responsive Textarea for Records */
+        .record-textarea {
+            width: 100%;
+            min-width: 200px;
+            min-height: 40px;
+            padding: 8px 12px;
+            font-size: 14px;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 10px;
+            outline: none;
+            resize: vertical;
+            transition: all 0.2s;
+            line-height: 1.4;
+        }
+
+        .record-textarea:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+            background: #fff;
+        }
+
+        .score-input:hover:not(:disabled) {
+            border-color: #94a3b8;
+        }
+
+        .score-input::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        .btn-smart-remark {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #3b82f6;
+            cursor: pointer;
+            opacity: 0.4;
+            transition: all 0.2s;
+            background: #f1f5f9;
+            padding: 4px;
+            border-radius: 6px;
+        }
+        .btn-smart-remark:hover {
+            opacity: 1;
+            background: #e0f2fe;
+            color: #2563eb;
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .exam-input {
+            max-width: 60px;
+            border-color: #fde68a;
+            color: #92400e;
+        }
+
+        .exam-input:focus {
+            border-color: #f59e0b;
+            box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.1);
+        }
+
+        /* Header Enhancements */
+        .grade-header {
+            font-size: 10px;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            font-weight: 800;
+            padding: 12px 8px !important;
+            color: #64748b;
+        }
+
+        .grade-header.accent {
+            background: #f8fafc;
+            color: #1e293b;
+            border-bottom: 2px solid #3b82f6;
+        }
     </style>
 </head>
 <body class="bg-gray-100 font-sans text-gray-800">
@@ -215,19 +377,20 @@
                     <div class="bg-white rounded-xl shadow-sm border border-gray-100 flex-1 overflow-hidden flex flex-col table-container relative">
                         <div class="overflow-auto flex-1">
                             <table class="w-full text-left border-collapse">
-                                <thead class="bg-gray-50 text-gray-500 font-bold uppercase text-xs sticky top-0 z-10 shadow-sm">
+                                <thead class="bg-gray-50 text-gray-500 font-bold uppercase text-xs sticky top-0 z-10 shadow-sm border-b border-gray-200">
                                     <tr>
-                                        <th class="px-4 py-3 border-b border-gray-200 w-16">#</th>
-                                        <th class="px-4 py-3 border-b border-gray-200 w-32 hidden md:table-cell">Index ID</th>
-                                        <th class="px-4 py-3 border-b border-gray-200 sticky-col min-w-[140px]">Student Name</th>
-                                        <th class="px-2 py-3 border-b border-gray-200 w-20 text-center bg-blue-50/30 text-[10px]">Proj (10)</th>
-                                        <th class="px-2 py-3 border-b border-gray-200 w-20 text-center bg-blue-50/50 text-[10px]">Test (10)</th>
-                                        <th class="px-2 py-3 border-b border-gray-200 w-20 text-center bg-blue-50/70 text-[10px]">Grp (10)</th>
-                                        <th class="px-2 py-3 border-b border-gray-200 w-24 text-center bg-blue-50/90 font-black">Class (30)</th>
-                                        <th class="px-4 py-3 border-b border-gray-200 w-32 text-center bg-yellow-50/50">Exam (70)</th>
-                                        <th class="px-4 py-3 border-b border-gray-200 w-24 text-center font-black">Total</th>
-                                        <th class="px-4 py-3 border-b border-gray-200 w-20 text-center">Grade</th>
-                                        <th class="px-4 py-3 border-b border-gray-200 w-48 text-right">Remarks</th>
+                                        <th class="px-4 py-3 grade-header sticky-col min-w-[160px] text-left">Student Name</th>
+                                        <th class="px-4 py-3 grade-header w-12 text-center">#</th>
+                                        <th class="px-4 py-3 grade-header hidden md:table-cell">Index ID</th>
+                                        <th class="px-2 py-3 grade-header text-center accent">Proj<br><span class="opacity-50 font-medium">(10)</span></th>
+                                        <th class="px-2 py-3 grade-header text-center accent">Indiv<br><span class="opacity-50 font-medium">(15)</span></th>
+                                        <th class="px-2 py-3 grade-header text-center accent">Test<br><span class="opacity-50 font-medium">(15)</span></th>
+                                        <th class="px-2 py-3 grade-header text-center accent">H.W<br><span class="opacity-50 font-medium">(10)</span></th>
+                                        <th class="px-2 py-3 grade-header text-center bg-blue-50/10 text-primary font-black">Class<br>(50)</th>
+                                        <th class="px-4 py-3 grade-header text-center bg-amber-50/50 text-amber-900 border-b-2 border-amber-400">Exam<br>(50)</th>
+                                        <th class="px-4 py-3 grade-header text-center font-black text-slate-800">Total</th>
+                                        <th class="px-4 py-3 grade-header text-center">Grade</th>
+                                        <th class="px-4 py-3 grade-header text-right">Remarks</th>
                                     </tr>
                                 </thead>
                                 <tbody id="gradebook-body" class="divide-y divide-gray-100 text-sm">
@@ -317,6 +480,9 @@
             try {
                 const db = await Storage.get();
                 const school = (db.schools || [])[0];
+                if (school && school.settings) {
+                    window.currentSettings = school.settings;
+                }
                 const sName = school?.settings?.schoolName || school?.name || '';
                 if (sName) {
                     const el = document.getElementById('sidebar-school-name');
@@ -437,51 +603,73 @@
 
             tbody.innerHTML = currentStudents.map((s, i) => {
                 const pScore = parseFloat(s.project_score) || 0;
+                const iScore = parseFloat(s.individual_score) || 0;
                 const tScore = parseFloat(s.class_test) || 0;
-                const gScore = parseFloat(s.group_work) || 0;
-                const classScore = pScore + tScore + gScore;
+                const hScore = parseFloat(s.homework_score) || 0;
+                
+                const classScore = pScore + iScore + tScore + hScore;
                 const examScore = parseFloat(s.exam_score) || 0;
                 const total = classScore + examScore;
                 
                 const gradeInfo = calculateGrade(total);
+                const formatVal = (v) => (!v || v == 0) ? '' : v;
 
                 return `
-                    <tr class="hover:bg-blue-50/30 transition group border-b border-gray-50" data-student-id="${s.id}">
-                        <td class="px-4 py-3 font-mono text-slate-200 text-xs">${i + 1}</td>
-                        <td class="px-4 py-3 font-mono font-bold text-gray-600 text-xs hidden md:table-cell">${s.id}</td>
-                        <td class="px-4 py-3 font-bold text-gray-800 sticky-col transition-colors group-hover:bg-blue-50/50">${s.name}</td>
-                        <td class="px-2 py-3 text-center bg-blue-50/10 p-0">
-                            <input type="number" min="0" max="10" value="${parseFloat(s.project_score) || 0}" 
+                    <tr class="hover:bg-blue-50/20 transition-colors group border-b border-gray-100/50" data-student-id="${s.id}">
+                        <td class="px-4 py-3 font-bold text-gray-800 sticky-col transition-colors group-hover:bg-blue-50/50 bg-white">${s.name || s.student_name || '---'}</td>
+                        <td class="px-4 py-3 font-mono text-slate-300 text-[10px] text-center">${i + 1}</td>
+                        <td class="px-4 py-3 font-mono font-bold text-gray-400 text-xs hidden md:table-cell">${s.id}</td>
+                        
+                        <td class="px-2 py-3 text-center bg-blue-50/5">
+                            <input type="text" inputmode="decimal" placeholder="-" value="${formatVal(s.project_score)}" 
                                 onchange="calculateRow(this)" data-type="project"
                                 ${isLocked ? 'disabled' : ''}
-                                class="w-14 px-1 py-1.5 text-center font-mono text-sm bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary outline-none mx-auto block disabled:bg-gray-100 mobile-input">
+                                class="score-input mobile-input">
                         </td>
-                        <td class="px-2 py-3 text-center bg-blue-50/20 p-0">
-                            <input type="number" min="0" max="10" value="${parseFloat(s.class_test) || 0}" 
+                        <td class="px-2 py-3 text-center bg-blue-50/10">
+                            <input type="text" inputmode="decimal" placeholder="-" value="${formatVal(s.individual_score)}" 
+                                onchange="calculateRow(this)" data-type="individual"
+                                ${isLocked ? 'disabled' : ''}
+                                class="score-input mobile-input">
+                        </td>
+                        <td class="px-2 py-3 text-center bg-blue-50/15">
+                            <input type="text" inputmode="decimal" placeholder="-" value="${formatVal(s.class_test)}" 
                                 onchange="calculateRow(this)" data-type="test"
                                 ${isLocked ? 'disabled' : ''}
-                                class="w-14 px-1 py-1.5 text-center font-mono text-sm bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary outline-none mx-auto block disabled:bg-gray-100 mobile-input">
+                                class="score-input mobile-input">
                         </td>
-                        <td class="px-2 py-3 text-center bg-blue-50/30 p-0">
-                            <input type="number" min="0" max="10" value="${parseFloat(s.group_work) || 0}" 
-                                onchange="calculateRow(this)" data-type="group"
+                        <td class="px-2 py-3 text-center bg-blue-50/20">
+                            <input type="text" inputmode="decimal" placeholder="-" value="${formatVal(s.homework_score)}" 
+                                onchange="calculateRow(this)" data-type="homework"
                                 ${isLocked ? 'disabled' : ''}
-                                class="w-14 px-1 py-1.5 text-center font-mono text-sm bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary outline-none mx-auto block disabled:bg-gray-100 mobile-input">
+                                class="score-input mobile-input">
                         </td>
-                        <td class="px-2 py-3 text-center bg-blue-50/50 p-0 font-bold text-gray-700 cell-class-total">
-                            ${classScore}
+                        
+                        <td class="px-2 py-3 text-center bg-blue-50/30 p-0 font-bold text-blue-800 cell-class-total">
+                            ${classScore || '-'}
                         </td>
-                        <td class="px-4 py-3 text-center bg-yellow-50/20 p-0">
-                            <input type="number" min="0" max="70" value="${examScore}" 
+                        
+                        <td class="px-4 py-3 text-center bg-amber-50/20">
+                            <input type="text" inputmode="decimal" placeholder="-" value="${formatVal(examScore)}" 
                                 onchange="calculateRow(this)" data-type="exam"
                                 ${isLocked ? 'disabled' : ''}
-                                class="w-16 px-1 py-1.5 text-center font-mono text-sm bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-secondary outline-none mx-auto block disabled:bg-gray-100 mobile-input">
+                                class="score-input exam-input mobile-input">
                         </td>
-                        <td class="px-4 py-3 text-center font-black text-gray-800 text-lg cell-total">${total}</td>
+                        
+                        <td class="px-4 py-3 text-center font-black text-gray-900 text-lg cell-total">${total || '-'}</td>
                         <td class="px-4 py-3 text-center">
-                            <span class="cell-grade inline-block w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ${gradeInfo.bg} ${gradeInfo.color}">${gradeInfo.grade}</span>
+                            <span class="cell-grade inline-block w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ${gradeInfo.bg} ${gradeInfo.color} shadow-sm border border-black/5">${total > 0 ? gradeInfo.grade : '-'}</span>
                         </td>
-                        <td class="px-4 py-3 text-right text-xs text-gray-500 font-medium cell-remark">${gradeInfo.remark}</td>
+                        <td class="px-4 py-3 relative">
+                            <div class="relative flex items-center">
+                                <input type="text" value="${s.remark || gradeInfo.remark || ''}" 
+                                    placeholder="${gradeInfo.remark || 'Remark'}" data-type="remark"
+                                    class="remark-input mobile-input cell-remark-input pr-10">
+                                <button onclick="applySmartHint(this, ${total})" title="AI Suggest Remark" class="btn-smart-remark">
+                                    <ion-icon name="sparkles"></ion-icon>
+                                </button>
+                            </div>
+                        </td>
                     </tr>
                 `;
             }).join('');
@@ -504,12 +692,34 @@
         }
 
         function calculateGrade(score) {
+            // Use global if available
+            if(window.calculateGrade) return window.calculateGrade(score);
+            
+            // Local fallback
             if (score >= 80) return { grade: 'A', remark: 'Excellent', bg: 'bg-green-100', color: 'text-green-700' };
             if (score >= 70) return { grade: 'B', remark: 'Very Good', bg: 'bg-blue-100', color: 'text-blue-700' };
             if (score >= 60) return { grade: 'C', remark: 'Good', bg: 'bg-yellow-100', color: 'text-yellow-700' };
             if (score >= 50) return { grade: 'D', remark: 'Credit', bg: 'bg-orange-100', color: 'text-orange-700' };
             if (score >= 45) return { grade: 'E', remark: 'Pass', bg: 'bg-gray-100', color: 'text-gray-700' };
             return { grade: 'F', remark: 'Fail', bg: 'bg-red-100', color: 'text-red-700' };
+        }
+
+        function applySmartHint(btn, score) {
+            const row = btn.closest('tr');
+            const remarkInput = row.querySelector('.cell-remark-input');
+            const subjectSelect = document.getElementById('entry-subject-select');
+            const subjectName = subjectSelect.options[subjectSelect.selectedIndex]?.text.split('(')[0].trim();
+            
+            if(window.generateSmartRemark) {
+                const remark = window.generateSmartRemark(score, subjectName);
+                remarkInput.value = remark;
+                
+                // Add highlight animation
+                remarkInput.classList.add('ring-4', 'ring-blue-100', 'border-blue-500');
+                setTimeout(() => {
+                    remarkInput.classList.remove('ring-4', 'ring-blue-100', 'border-blue-500');
+                }, 1000);
+            }
         }
 
         function updateSummary(students) {
@@ -545,26 +755,30 @@
         function calculateRow(input) {
             const row = input.closest('tr');
             const projInput  = row.querySelector('input[data-type="project"]');
+            const indivInput = row.querySelector('input[data-type="individual"]');
             const testInput  = row.querySelector('input[data-type="test"]');
-            const groupInput = row.querySelector('input[data-type="group"]');
+            const homeInput  = row.querySelector('input[data-type="homework"]');
             const examInput  = row.querySelector('input[data-type="exam"]');
             
-            let pScore = parseInt(projInput.value) || 0;
-            let tScore = parseInt(testInput.value) || 0;
-            let gScore = parseInt(groupInput.value) || 0;
-            let examScore = parseInt(examInput.value) || 0;
+            let pScore = parseFloat(projInput.value) || 0;
+            let iScore = parseFloat(indivInput.value) || 0;
+            let tScore = parseFloat(testInput.value) || 0;
+            let hScore = parseFloat(homeInput.value) || 0;
+            let examScore = parseFloat(examInput.value) || 0;
 
             // Validate Components
             if (pScore > 10) { pScore = 10; projInput.value = 10; }
             if (pScore < 0)  { pScore = 0;  projInput.value = 0; }
-            if (tScore > 10) { tScore = 10; testInput.value = 10; }
+            if (iScore > 15) { iScore = 15; indivInput.value = 15; }
+            if (iScore < 0)  { iScore = 0;  indivInput.value = 0; }
+            if (tScore > 15) { tScore = 15; testInput.value = 15; }
             if (tScore < 0)  { tScore = 0;  testInput.value = 0; }
-            if (gScore > 10) { gScore = 10; groupInput.value = 10; }
-            if (gScore < 0)  { gScore = 0;  groupInput.value = 0; }
+            if (hScore > 10) { hScore = 10; homeInput.value = 10; }
+            if (hScore < 0)  { hScore = 0;  homeInput.value = 0; }
             
-            const classScore = pScore + tScore + gScore;
+            const classScore = pScore + iScore + tScore + hScore;
 
-            if (examScore > 70) { examScore = 70; examInput.value = 70; }
+            if (examScore > 50) { examScore = 50; examInput.value = 50; }
             if (examScore < 0) { examScore = 0; examInput.value = 0; }
 
             const total = classScore + examScore;
@@ -575,19 +789,28 @@
             const student = currentStudents.find(s => s.id == sId);
             if(student) {
                 student.project_score = pScore;
+                student.individual_score = iScore;
                 student.class_test = tScore;
-                student.group_work = gScore;
+                student.homework_score = hScore;
                 student.class_score = classScore;
                 student.exam_score = examScore;
             }
 
             // Update UI
-            row.querySelector('.cell-class-total').innerText = classScore;
-            row.querySelector('.cell-total').innerText = total;
+            row.querySelector('.cell-class-total').innerText = classScore || '-';
+            row.querySelector('.cell-total').innerText = total || '-';
             const gradeBadge = row.querySelector('.cell-grade');
-            gradeBadge.innerText = gradeInfo.grade;
-            gradeBadge.className = `cell-grade inline-block w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ${gradeInfo.bg} ${gradeInfo.color}`;
-            row.querySelector('.cell-remark').innerText = gradeInfo.remark;
+            const remarkInput = row.querySelector('.cell-remark-input');
+            
+            if (total > 0) {
+                gradeBadge.innerText = gradeInfo.grade;
+                gradeBadge.className = `cell-grade inline-block w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ${gradeInfo.bg} ${gradeInfo.color} shadow-sm border border-black/5`;
+                if (remarkInput && !remarkInput.value) remarkInput.placeholder = gradeInfo.remark;
+            } else {
+                gradeBadge.innerText = '-';
+                gradeBadge.className = `cell-grade inline-block w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold bg-gray-50 text-gray-300 shadow-sm border border-black/5`;
+                if (remarkInput) remarkInput.placeholder = 'Remark';
+            }
 
             updateSummary(currentStudents);
         }
@@ -604,22 +827,27 @@
                 if (!studentId) return; // Skip headers or placeholders
 
                 const projInput  = row.querySelector('input[data-type="project"]');
+                const indivInput = row.querySelector('input[data-type="individual"]');
                 const testInput  = row.querySelector('input[data-type="test"]');
-                const groupInput = row.querySelector('input[data-type="group"]');
+                const homeInput  = row.querySelector('input[data-type="homework"]');
                 const examInput  = row.querySelector('input[data-type="exam"]');
+                const remarkInput = row.querySelector('input[data-type="remark"]');
                 
-                const pScore = projInput ? (parseInt(projInput.value) || 0) : 0;
-                const tScore = testInput ? (parseInt(testInput.value) || 0) : 0;
-                const gScore = groupInput ? (parseInt(groupInput.value) || 0) : 0;
-                const examScore = examInput ? (parseInt(examInput.value) || 0) : 0;
+                const pScore = projInput ? (parseFloat(projInput.value) || 0) : 0;
+                const iScore = indivInput ? (parseFloat(indivInput.value) || 0) : 0;
+                const tScore = testInput ? (parseFloat(testInput.value) || 0) : 0;
+                const hScore = homeInput ? (parseFloat(homeInput.value) || 0) : 0;
+                const examScore = examInput ? (parseFloat(examInput.value) || 0) : 0;
                 
                 grades.push({
                     student_id: studentId,
                     project_score: pScore,
+                    individual_score: iScore,
                     class_test: tScore,
-                    group_work: gScore,
-                    class_score: pScore + tScore + gScore,
-                    exam_score: examScore
+                    homework_score: hScore,
+                    class_score: pScore + iScore + tScore + hScore,
+                    exam_score: examScore,
+                    remark: remarkInput ? remarkInput.value.trim() : ''
                 });
             });
 
@@ -716,15 +944,15 @@
                         <!-- Conduct -->
                         <td class="px-4 py-3 bg-yellow-50/10">
                             <input type="text" value="${s.conduct || ''}" 
-                                class="w-full px-3 py-1.5 text-sm bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-secondary outline-none mobile-input"
+                                class="w-full px-3 py-1.5 text-sm bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-secondary outline-none mobile-input min-w-[120px]"
                                 placeholder="e.g. Good" data-type="conduct">
                         </td>
-
+                        
                         <!-- Remark -->
                         <td class="px-4 py-3">
-                            <input type="text" value="${s.teacher_remark || ''}" 
-                                class="w-full px-3 py-1.5 text-sm bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary outline-none mobile-input"
-                                placeholder="Enter remark..." data-type="remark">
+                            <textarea rows="2" 
+                                class="record-textarea mobile-input" 
+                                placeholder="Enter general remark..." data-type="remark">${s.teacher_remark || ''}</textarea>
                         </td>
                     </tr>
                 `;
@@ -748,7 +976,7 @@
                 const presentInput = row.querySelector('input[data-type="present"]');
                 const totalInput = row.querySelector('input[data-type="total"]');
                 const conductInput = row.querySelector('input[data-type="conduct"]');
-                const remarkInput = row.querySelector('input[data-type="remark"]');
+                const remarkInput = row.querySelector('[data-type="remark"]');
 
                 if (presentInput && totalInput) {
                     const present = parseInt(presentInput.value) || 0;
@@ -796,15 +1024,34 @@
         }
 
         function downloadCSVTemplate() {
-            const csvContent = "data:text/csv;charset=utf-8," + "Student ID,Student Name,Project (10),Class Test (10),Group Work (10),Exam Score (70%)\nST001,John Doe,10,10,10,60";
+            const csvContent = "data:text/csv;charset=utf-8," + "Student ID,Student Name,Project (10),Individual (15),Class Test (15),Homework (10),Exam Score (50)\nST001,John Doe,10,15,15,10,50";
             const encodedUri = encodeURI(csvContent);
             const link = document.createElement("a");
             link.setAttribute("href", encodedUri);
-            link.setAttribute("download", "grades_template.csv");
+            link.setAttribute("download", "student_grades_template.csv");
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
         }
+
+        // Space-Saving Helper for Mobile Keyboards
+        document.addEventListener('focusin', (e) => {
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+                document.body.classList.add('is-typing');
+                // Center the input if we're in landscape
+                if (window.innerHeight < 500) {
+                    setTimeout(() => {
+                        e.target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }, 300);
+                }
+            }
+        });
+
+        document.addEventListener('focusout', (e) => {
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+                document.body.classList.remove('is-typing');
+            }
+        });
 
         function importGradesFromCSV(input) {
             if (!input.files || !input.files[0]) return;
