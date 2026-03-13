@@ -286,14 +286,21 @@
                 </button>
                 
                 <div class="nav-section-label text-white/40 text-[10px] font-bold uppercase tracking-widest px-4 mt-6 mb-2">Academic Tools</div>
-                <button onclick="switchView('entry')" id="nav-entry" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-white hover:bg-white/10 font-medium transition-all">
-                    <ion-icon name="create-outline" class="text-xl"></ion-icon>
-                    <span>Results Entry</span>
+                <button onclick="switchView('entry')" id="nav-entry" class="w-full flex items-center justify-between gap-3 px-4 py-3 rounded-xl text-white hover:bg-white/10 font-medium transition-all group">
+                    <div class="flex items-center gap-3">
+                        <ion-icon name="create-outline" class="text-xl"></ion-icon>
+                        <span>Results Entry</span>
+                    </div>
                 </button>
-                <button onclick="switchView('records')" id="nav-records" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-white hover:bg-white/10 font-medium transition-all">
-                    <ion-icon name="clipboard-outline" class="text-xl"></ion-icon>
-                    <span>Remarks & Attendance</span>
-                </button>
+                <div id="nav-records-wrapper" class="hidden">
+                    <button onclick="switchView('records')" id="nav-records" class="w-full flex items-center justify-between gap-3 px-4 py-3 rounded-xl text-white hover:bg-white/10 font-medium transition-all group">
+                        <div class="flex items-center gap-3">
+                            <ion-icon name="clipboard-outline" class="text-xl"></ion-icon>
+                            <span>Remarks & Attendance</span>
+                        </div>
+                        <span id="form-master-badge" class="px-1.5 py-0.5 bg-indigo-500/20 text-indigo-300 text-[8px] font-black uppercase tracking-tighter rounded-md border border-indigo-500/30">Master</span>
+                    </button>
+                </div>
                 
                 <div class="nav-section-label text-white/40 text-[10px] font-bold uppercase tracking-widest px-4 mt-6 mb-2">Quick Links</div>
                 <a href="../index.html" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-white hover:bg-white/10 font-medium transition-all">
@@ -602,46 +609,54 @@
             // Local engine returns list of class objects assigned to teacher
             assignedClasses = await fetchTeacherData('classes') || [];
 
-            // Render Classes Grid
-            const grid = document.getElementById('assigned-classes-grid');
-            if(assignedClasses.length === 0) {
-                grid.innerHTML = `<div class="col-span-full text-center py-10 text-slate-200">No classes assigned. Please contact the administrator.</div>`;
-            } else {
-                let totalSubjects = 0;
-                document.getElementById('assigned-classes-grid').innerHTML = assignedClasses.map(c => {
-                    // In local engine, 'subjects' property of the returned class object contains the Subject Objects directly
-                    const subjects = c.subjects || [];
-                    return `
-                        <div class="bg-white p-6 rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition group cursor-pointer" onclick="goToEntry('${c.name}')">
-                            <div class="flex justify-between items-start mb-4">
-                                <div class="w-12 h-12 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center text-xl font-bold">
-                                    ${c.name.charAt(0)}
-                                </div>
+            // Populate Records Dropdown (ONLY classes where teacher is Class Teacher aka Form Master)
+            const formMasterClasses = (currentUser.role === 'admin') ? assignedClasses : assignedClasses.filter(c => c.class_teacher_id === currentUser.id);
+            const recordsSelect = document.getElementById('records-class-select');
+            
+            if(recordsSelect) {
+                if (formMasterClasses.length > 0) {
+                    recordsSelect.innerHTML = '<option value="">-- Select Class --</option>' + 
+                        formMasterClasses.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+                    document.getElementById('nav-records-wrapper').classList.remove('hidden');
+                } else {
+                    recordsSelect.innerHTML = '<option value="">No classes managed</option>';
+                    document.getElementById('nav-records-wrapper').classList.add('hidden');
+                }
+            }
+
+            // Enhanced Classes Grid with Form Master label
+            grid.innerHTML = assignedClasses.map(c => {
+                const subjects = c.subjects || [];
+                const isFormMaster = c.class_teacher_id === currentUser.id;
+                return `
+                    <div class="bg-white p-6 rounded-xl border ${isFormMaster ? 'border-indigo-200 bg-indigo-50/5' : 'border-gray-100'} shadow-sm hover:shadow-md transition group cursor-pointer" onclick="goToEntry('${c.name}')">
+                        <div class="flex justify-between items-start mb-4">
+                            <div class="w-12 h-12 rounded-lg ${isFormMaster ? 'bg-indigo-600 text-white' : 'bg-blue-50 text-blue-600'} flex items-center justify-center text-xl font-bold shadow-sm">
+                                ${c.name.charAt(0)}
+                            </div>
+                            <div class="flex flex-col items-end gap-2">
+                                ${isFormMaster ? '<span class="px-2 py-0.5 bg-indigo-100 text-indigo-700 text-[9px] font-black uppercase tracking-tighter rounded-full">Form Master</span>' : ''}
                                 <div class="text-gray-300 group-hover:text-primary transition">
                                     <ion-icon name="arrow-forward-circle" class="text-2xl"></ion-icon>
                                 </div>
                             </div>
-                            <h4 class="font-bold text-lg text-gray-800">${c.name}</h4>
-                            <p class="text-sm text-gray-500 mb-4">${subjects.length} Subjects Assigned</p>
-                            <div class="flex flex-wrap gap-1">
-                                ${subjects.slice(0, 3).map(s => `<span class="px-2 py-1 bg-gray-50 text-gray-600 text-[10px] rounded font-mono">${s.code || s.name.substring(0,3).toUpperCase()}</span>`).join('')}
-                                ${subjects.length > 3 ? `<span class="px-2 py-1 bg-gray-50 text-slate-200 text-[10px] rounded font-mono">+${subjects.length - 3}</span>` : ''}
-                            </div>
                         </div>
-                    `;
-                }).join('');
-                // document.getElementById('dash-subject-count').innerText = totalSubjects; // Handled by stats action
-            }
-            
-            // Populate Entry Dropdown
-            const entrySelect = document.getElementById('entry-class-select');
-            const options = '<option value="">-- Select Class --</option>' + 
-                assignedClasses.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
-            entrySelect.innerHTML = options;
+                        <h4 class="font-bold text-lg text-gray-800">${c.name}</h4>
+                        <p class="text-sm text-gray-500 mb-4">${subjects.length} Subjects Assigned</p>
+                        <div class="flex flex-wrap gap-1">
+                            ${subjects.slice(0, 3).map(s => `<span class="px-2 py-1 bg-gray-50 text-gray-600 text-[10px] rounded font-mono">${s.code || (s.name||'').substring(0,3).toUpperCase()}</span>`).join('')}
+                            ${subjects.length > 3 ? `<span class="px-2 py-1 bg-gray-50 text-slate-200 text-[10px] rounded font-mono">+${subjects.length - 3}</span>` : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
 
-            // Populate Records Dropdown
-            const recordsSelect = document.getElementById('records-class-select');
-            if(recordsSelect) recordsSelect.innerHTML = options;
+            // Restore Entry Dropdown
+            const entrySelect = document.getElementById('entry-class-select');
+            if (entrySelect) {
+                entrySelect.innerHTML = '<option value="">-- Select Class --</option>' + 
+                    assignedClasses.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+            }
         }
 
         function goToEntry(className) {
@@ -1111,6 +1126,15 @@
         }
 
         async function saveRecords() {
+            const classId = document.getElementById('records-class-select').value;
+            const cls = assignedClasses.find(c => c.id == classId);
+            
+            // Security Check: Ensure user is Form Master or Admin
+            if (currentUser.role !== 'admin' && cls?.class_teacher_id !== currentUser.id) {
+                alert("Unauthorized: You are not the Form Master for this class.");
+                return;
+            }
+
             const tbody = document.getElementById('records-body');
             const rows = tbody.querySelectorAll('tr');
             const records = [];
