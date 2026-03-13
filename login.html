@@ -23,33 +23,26 @@
     
     <div class="absolute inset-0 bg-primary/80 backdrop-blur-sm"></div>
 
-    <div class="bg-white rounded-3xl shadow-2xl overflow-hidden w-full max-w-4xl flex flex-col md:flex-row min-h-[550px] relative z-10 fade-in">
+    <div class="bg-white rounded-3xl shadow-2xl overflow-hidden w-full max-w-4xl flex flex-col md:flex-row min-h-[500px] md:min-h-[550px] relative z-10 fade-in">
         
         <!-- Left Side: Brand -->
-        <div class="md:w-1/2 bg-accent relative p-12 text-white flex flex-col justify-between overflow-hidden">
+        <div class="md:w-1/2 bg-accent relative p-8 md:p-12 text-white flex flex-col justify-between overflow-hidden">
             <div class="absolute inset-0 bg-gradient-to-br from-primary to-accent opacity-90"></div>
             <div class="absolute -right-10 -bottom-10 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
             
             <div class="relative z-10">
-                <a href="index.html" class="flex items-center gap-3 mb-8 hover:opacity-80 transition">
-                    <span class="text-xl">&larr; Back</span>
+                <a href="index.html" class="flex items-center gap-2 mb-6 md:mb-8 hover:opacity-80 transition text-sm font-bold">
+                    <ion-icon name="arrow-back-outline"></ion-icon>
+                    <span>Back to Home</span>
                 </a>
-                <div class="w-16 h-16 bg-white/10 rounded-2xl flex items-center justify-center text-3xl mb-6 backdrop-blur-sm">🎓</div>
-                <h1 class="text-4xl font-bold mb-2">Welcome Back</h1>
-                <p class="text-blue-200 text-lg">Access your academic dashboard using the credentials provided by the school.</p>
-            </div>
-
-            <div class="relative z-10">
-                <div class="flex items-center gap-4 text-sm text-blue-200/60">
-                    <span>Secure Access</span>
-                    <span>•</span>
-                    <span>24/7 Availability</span>
-                </div>
+                <div class="w-14 h-14 md:w-16 md:h-16 bg-white/10 rounded-2xl flex items-center justify-center text-2xl md:text-3xl mb-4 md:mb-6 backdrop-blur-sm">🎓</div>
+                <h1 class="text-3xl md:text-4xl font-bold mb-2">Welcome Back</h1>
+                <p class="text-blue-200 text-sm md:text-lg">Access your academic dashboard using the credentials provided by the school.</p>
             </div>
         </div>
 
         <!-- Right Side: Forms -->
-        <div class="md:w-1/2 p-8 md:p-12 flex flex-col justify-center bg-white">
+        <div class="md:w-1/2 p-6 sm:p-8 md:p-12 flex flex-col justify-center bg-white">
             <div class="flex justify-center mb-10 bg-gray-100 rounded-xl p-1 w-fit mx-auto">
                 <button onclick="toggleTab('student')" id="tab-student" class="px-8 py-2.5 rounded-lg text-sm font-bold transition-all shadow-sm bg-white text-primary ring-1 ring-black/5">Student</button>
                 <button onclick="toggleTab('staff')" id="tab-staff" class="px-8 py-2.5 rounded-lg text-sm font-bold text-gray-400 transition hover:text-gray-600">Staff</button>

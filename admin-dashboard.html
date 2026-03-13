@@ -88,6 +88,24 @@
             color: #2563eb;
             transform: translateY(-50%) scale(1.1);
         }
+        .nav-link {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border-radius: 12px;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .nav-link ion-icon {
+            font-size: 1.25rem;
+        }
+        .nav-link:hover {
+            transform: translateX(4px);
+        }
+        .nav-link-active {
+            box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.3);
+        }
     </style>
     <script>
         tailwind.config = {
@@ -108,86 +126,75 @@
     <div id="mobile-overlay" class="hidden fixed inset-0 bg-black/50 z-30 transition-opacity backdrop-blur-sm" onclick="toggleMobileMenu()"></div>
 
     <!-- Sidebar -->
-    <aside id="mobile-sidebar" class="w-64 bg-black text-white shadow-2xl z-50 h-full transition-transform duration-300 transform -translate-x-full lg:translate-x-0 fixed inset-y-0 left-0 lg:relative hidden lg:flex flex-col" style="background-color: #000000 !important;">
+    <aside id="mobile-sidebar" class="w-68 bg-black text-white fixed inset-y-0 left-0 md:relative z-40 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out flex flex-col shadow-2xl h-screen overflow-hidden" style="background-color: #000000 !important;">
         <!-- Brand -->
-        <div style="height:76px;display:flex;align-items:center;gap:12px;padding:0 20px;border-bottom:1px solid rgba(255,255,255,0.1);flex-shrink:0;">
-            <div style="width:36px;height:36px;border-radius:12px;background:linear-gradient(135deg,#6366f1,#3b82f6);display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 4px 12px rgba(59,130,246,0.3);">
-                <ion-icon name="school" style="color:white;font-size:18px;"></ion-icon>
-            </div>
-            <div style="min-width:0;display:flex;flex-direction:column;gap:2px;">
-                <div style="font-size:14px;font-weight:800;color:#ffffff;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" id="sidebar-school-name">General School</div>
-                <div style="font-size:10px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#d1d5db;line-height:1;">ADMIN PANEL</div>
+        <div class="h-20 flex items-center gap-4 px-6 border-b border-white/10 flex-shrink-0">
+            <div class="w-10 h-10 bg-gradient-to-br from-blue-600 to-blue-400 rounded-xl flex items-center justify-center text-xl font-black shadow-lg shadow-blue-500/20">G</div>
+            <div class="flex flex-col min-w-0">
+                <span class="text-white font-black text-sm tracking-tight truncate" id="sidebar-school-name">General School</span>
+                <span class="text-white/40 text-[10px] font-black uppercase tracking-widest">Administrator</span>
             </div>
         </div>
 
-        <nav class="flex-1 py-4 px-3 overflow-y-auto space-y-1" style="background-color: #000000 !important;">
-            <!-- Overview -->
-            <div class="nav-section-label text-white/40 text-[10px] font-bold uppercase tracking-widest px-4 mb-2">Overview</div>
-            <button onclick="switchView('dashboard')" id="nav-dashboard" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-accent text-white font-medium shadow-lg shadow-blue-900/20 transition-all">
+        <!-- Nav -->
+        <nav class="flex-1 py-6 px-4 space-y-1.5 overflow-y-auto custom-scrollbar">
+            <div class="text-white/20 text-[10px] font-black uppercase tracking-widest px-4 mb-2">Main Menu</div>
+            <button onclick="switchView('dashboard')" id="nav-dashboard" class="nav-link-active w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-blue-600 text-white shadow-lg shadow-blue-900/40">
                 <ion-icon name="grid-outline" class="text-xl"></ion-icon>
-                <span>Dashboard</span>
+                <span class="font-bold text-sm">Dashboard</span>
             </button>
-            <button onclick="switchView('analytics')" id="nav-analytics" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-white hover:bg-white/10 font-medium transition-all">
+            <button onclick="switchView('analytics')" id="nav-analytics" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-white/60 hover:text-white hover:bg-white/10 transition-all">
                 <ion-icon name="bar-chart-outline" class="text-xl"></ion-icon>
-                <span>Analytics</span>
+                <span class="font-bold text-sm">Analytics</span>
             </button>
-
-            <!-- Academic -->
-            <div class="nav-section-label text-white/40 text-[10px] font-bold uppercase tracking-widest px-4 mt-6 mb-2">Academic</div>
-            <button onclick="switchView('classes')" id="nav-classes" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-white hover:bg-white/10 font-medium transition-all">
+            <button onclick="switchView('results')" id="nav-results" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-white/60 hover:text-white hover:bg-white/10 transition-all">
+                <ion-icon name="checkmark-circle-outline" class="text-xl"></ion-icon>
+                <span class="font-bold text-sm">Review Results</span>
+            </button>
+            
+            <div class="text-white/20 text-[10px] font-black uppercase tracking-widest px-4 mt-8 mb-2">Management</div>
+            <button onclick="switchView('classes')" id="nav-classes" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-white/60 hover:text-white hover:bg-white/10 transition-all">
                 <ion-icon name="easel-outline" class="text-xl"></ion-icon>
-                <span>Manage Classes</span>
+                <span class="font-bold text-sm">Classes</span>
             </button>
-            <button onclick="switchView('teachers')" id="nav-teachers" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-white hover:bg-white/10 font-medium transition-all">
-                <ion-icon name="people-outline" class="text-xl"></ion-icon>
-                <span>Manage Teachers</span>
-            </button>
-            <button onclick="switchView('subjects')" id="nav-subjects" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-white hover:bg-white/10 font-medium transition-all">
+            <button onclick="switchView('subjects')" id="nav-subjects" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-white/60 hover:text-white hover:bg-white/10 transition-all">
                 <ion-icon name="book-outline" class="text-xl"></ion-icon>
-                <span>Manage Subjects</span>
+                <span class="font-bold text-sm">Curriculum</span>
             </button>
-
-            <!-- Administration -->
-            <div class="nav-section-label text-white/40 text-[10px] font-bold uppercase tracking-widest px-4 mt-6 mb-2">Administration</div>
-            <button onclick="switchView('results')" id="nav-results" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-white hover:bg-white/10 font-medium transition-all">
-                <ion-icon name="checkmark-done-circle-outline" class="text-xl"></ion-icon>
-                <span>Review Results</span>
+            <button onclick="switchView('teachers')" id="nav-teachers" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-white/60 hover:text-white hover:bg-white/10 transition-all">
+                <ion-icon name="people-outline" class="text-xl"></ion-icon>
+                <span class="font-bold text-sm">Faculty</span>
             </button>
-            <button onclick="switchView('admissions')" id="nav-admissions" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-white hover:bg-white/10 font-medium transition-all">
-                <ion-icon name="folder-open-outline" class="text-xl"></ion-icon>
-                <span>Admissions Queue</span>
+            <button onclick="switchView('admissions')" id="nav-admissions" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-white/60 hover:text-white hover:bg-white/10 transition-all">
+                <ion-icon name="paper-plane-outline" class="text-xl"></ion-icon>
+                <span class="font-bold text-sm">Admissions</span>
             </button>
-            <button onclick="switchView('settings')" id="nav-settings" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-white hover:bg-white/10 font-medium transition-all">
+            <button onclick="switchView('settings')" id="nav-settings" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-white/60 hover:text-white hover:bg-white/10 transition-all">
                 <ion-icon name="settings-outline" class="text-xl"></ion-icon>
-                <span>System Settings</span>
+                <span class="font-bold text-sm">Settings</span>
             </button>
 
-            <!-- Portal Links -->
-            <div class="nav-section-label text-white/40 text-[10px] font-bold uppercase tracking-widest px-4 mt-6 mb-2">Quick Links</div>
-            <a href="teacher-portal.html" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-white hover:bg-white/10 font-medium transition-all">
+            <div class="text-white/20 text-[10px] font-black uppercase tracking-widest px-4 mt-8 mb-2">Internal Portals</div>
+            <a href="teacher-portal.html" target="_blank" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-white/60 hover:text-white hover:bg-white/10 transition-all group">
                 <ion-icon name="key-outline" class="text-xl"></ion-icon>
-                <span>Teacher Portal</span>
-                <ion-icon name="open-outline" class="text-sm ml-auto opacity-50"></ion-icon>
+                <span class="font-bold text-sm text-blue-400">Teacher Portal &rarr;</span>
             </a>
-            <a href="student-report.html" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-white hover:bg-white/10 font-medium transition-all">
-                <ion-icon name="document-text-outline" class="text-xl"></ion-icon>
-                <span>Report Cards</span>
-                <ion-icon name="open-outline" class="text-sm ml-auto opacity-50"></ion-icon>
-            </a>
-            <a href="bulk-print.html" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all" style="color:#fbbf24;" onmouseover="this.style.background='rgba(251,191,36,0.1)';this.style.color='#fde68a';" onmouseout="this.style.background='';this.style.color='#fbbf24';">
+            <a href="bulk-print.html" target="_blank" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-white/60 hover:text-white hover:bg-white/10 transition-all group">
                 <ion-icon name="print-outline" class="text-xl"></ion-icon>
-                <span>Bulk Print Cards</span>
-                <ion-icon name="open-outline" class="text-sm ml-auto opacity-50"></ion-icon>
+                <span class="font-bold text-sm text-yellow-500">Bulk Print Reports</span>
+            </a>
+
+            <div class="text-white/20 text-[10px] font-black uppercase tracking-widest px-4 mt-8 mb-2">System</div>
+            <a href="index.html" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-white/60 hover:text-white hover:bg-white/10 transition-all">
+                <ion-icon name="home-outline" class="text-xl"></ion-icon>
+                <span class="font-bold text-sm">Back to Home</span>
             </a>
         </nav>
 
-        <!-- Sign Out -->
-        <div class="px-2.5 pb-4 border-t border-white/10 pt-4" style="background-color: #000000 !important;">
-            <button onclick="logout()" class="flex items-center gap-3 w-full px-4 py-3 rounded-xl transition-all text-white/60 hover:bg-red-500/10 hover:text-red-400 group">
-                <div class="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center group-hover:bg-red-500/20 transition-colors">
-                    <ion-icon name="log-out-outline" class="text-lg"></ion-icon>
-                </div>
-                <span class="font-bold text-sm">Sign Out</span>
+        <div class="p-4 bg-white/5 border-t border-white/5">
+            <button onclick="logout()" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-red-400 hover:bg-red-500/10 transition-all font-bold text-sm active:scale-95">
+                <ion-icon name="log-out-outline" class="text-xl"></ion-icon>
+                Sign Out
             </button>
         </div>
     </aside>
@@ -1527,8 +1534,24 @@
         // View Management
         const viewList = ['dashboard', 'classes', 'teachers', 'subjects', 'settings', 'results', 'admissions', 'analytics'];
         function switchView(viewName) {
-            viewList.forEach(v => document.getElementById(`view-${v}`).classList.add('hidden'));
-            document.getElementById(`view-${viewName}`).classList.remove('hidden');
+            viewList.forEach(v => {
+                const el = document.getElementById(`view-${v}`);
+                if(el) el.classList.add('hidden');
+                
+                // Update nav styles
+                const nav = document.getElementById(`nav-${v}`);
+                if(nav) {
+                    nav.className = 'nav-link text-white/60 hover:text-white hover:bg-white/10';
+                }
+            });
+
+            const targetView = document.getElementById(`view-${viewName}`);
+            if(targetView) targetView.classList.remove('hidden');
+
+            const activeNav = document.getElementById(`nav-${viewName}`);
+            if(activeNav) {
+                activeNav.className = 'nav-link nav-link-active bg-blue-600 text-white shadow-lg shadow-blue-900/40';
+            }
             
             // Close Mobile Menu if open
             const sidebar = document.getElementById('mobile-sidebar');

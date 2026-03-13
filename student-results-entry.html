@@ -47,25 +47,58 @@
 
         /* Landscape / Short Screen Optimization */
         @media (max-height: 500px) {
-            header { padding-top: 0.5rem !important; padding-bottom: 0.5rem !important; }
-            header h1 { font-size: 1rem !important; }
+            header { padding-top: 0.25rem !important; padding-bottom: 0.25rem !important; min-height: 44px !important; }
+            header h1 { font-size: 0.875rem !important; }
             header h1 + p { display: none; }
-            .mb-10 { margin-bottom: 1rem !important; }
-            .mt-6 { margin-top: 0.5rem !important; }
-            .p-6 { padding: 0.75rem !important; }
+            .mb-10, .mb-8 { margin-bottom: 0.5rem !important; }
+            .mt-6 { margin-top: 0.25rem !important; }
+            .p-6, .p-8 { padding: 0.5rem !important; }
             #instructions-box { display: none; }
             
             /* Table optimization for landscape */
-            table td { padding-top: 0.5rem !important; padding-bottom: 0.5rem !important; }
-            .w-12, .h-12, .w-14, .h-14 { width: 2.5rem !important; height: 2.5rem !important; }
-            .text-3xl { font-size: 1.5rem !important; }
+            table td { padding-top: 0.4rem !important; padding-bottom: 0.4rem !important; }
+            .w-10, .h-10, .w-12, .h-12, .w-14, .h-14 { width: 2.25rem !important; height: 2.25rem !important; }
+            .text-3xl { font-size: 1.25rem !important; }
+            
+            /* Compact Header for Gradebook */
+            #view-students > div:first-child { margin-bottom: 0.5rem !important; }
+            #view-students h2 { font-size: 1.1rem !important; }
+            
+            /* Hide non-essential rows if needed or just make compact */
+            footer { padding: 1rem !important; }
+            
+            /* Sticky Header Offset */
+            header { position: sticky !important; }
         }
 
         /* Prevent overscroll on header */
         .backdrop-blur-md { backdrop-filter: blur(12px) saturate(180%); }
 
         /* Input highlight */
-        input:focus { transform: scale(1.05); z-index: 50; position: relative; }
+        input:focus { 
+            transform: scale(1.1); 
+            z-index: 50; 
+            position: relative; 
+            border-color: #4f46e5 !important;
+            box-shadow: 0 0 0 10px rgba(79, 70, 229, 0.1) !important;
+        }
+        
+        /* Auto-scroll helper style */
+        body.is-typing header {
+            transform: translateY(-100%);
+            transition: transform 0.3s;
+        }
+        
+        .mobile-input {
+            width: 48px !important;
+            height: 48px !important;
+            font-size: 16px !important; /* Forces NO ZOOM on Safari/iOS */
+            padding: 0 !important;
+            border-radius: 12px !important;
+        }
+        
+        th.sticky-col { background: #f8fafc !important; }
+        td.sticky-col { background: white !important; font-weight: 800; font-size:0.85rem; }
     </style>
 </head>
 <body class="bg-indigo-50/30 font-sans text-slate-900">
@@ -443,6 +476,24 @@
             document.getElementById('classes-grid').classList.remove('hidden');
             document.getElementById('instructions-box').classList.remove('hidden');
         }
+
+        // Mobile Keyboard Helper
+        document.addEventListener('focusin', (e) => {
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+                document.body.classList.add('is-typing');
+                if (window.innerHeight < 500) {
+                    setTimeout(() => {
+                        e.target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }, 300);
+                }
+            }
+        });
+
+        document.addEventListener('focusout', (e) => {
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+                document.body.classList.remove('is-typing');
+            }
+        });
 
         init();
     </script>
