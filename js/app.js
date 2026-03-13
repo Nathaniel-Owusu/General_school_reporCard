@@ -230,6 +230,8 @@ async function fetchAdminData(action, params = {}) {
                 if(!school.settings) school.settings = {};
                 school.settings.schoolLogo = params.schoolLogo; // Dual save for compatibility
             }
+            if(params.schoolStamp) school.settings.schoolStamp = params.schoolStamp;
+            if(params.principalSignature) school.settings.principalSignature = params.principalSignature;
             
             // Update Settings Object
             // We merge carefully
@@ -775,6 +777,20 @@ async function fetchTeacherData(action, params = {}) {
         result = { success: true };
     }
 
+    else if (action === 'update_profile') {
+        const index = db.users.findIndex(u => u.id == user.id);
+        if (index >= 0) {
+            if (params.digital_signature) db.users[index].digital_signature = params.digital_signature;
+            
+            // Update session storage so UI reflects changes without logout
+            const updatedUser = { ...user, ...params };
+            sessionStorage.setItem('currentUser', JSON.stringify(updatedUser));
+            
+            didUpdate = true;
+            result = { success: true };
+        }
+    }
+
     if (didUpdate) await Storage.save(db);
     return result;
 }
@@ -819,12 +835,15 @@ async function fetchStudentReport(studentId) {
                 position: computedPosition || student.position || '',
                 total_students: classmates.length,
                 class_teacher: classTeacherName || student.class_teacher || '',
+                class_teacher_sig: (cls && cls.class_teacher_id) ? (db.users.find(u => u.id == cls.class_teacher_id)?.digital_signature || '') : '',
                 reopening_date: school?.settings?.reopeningDate || ''
             },
             settings: {
                 ...school.settings,
                 schoolName: school.name || (school.settings ? school.settings.schoolName : ''),
                 schoolLogo: school.logo || (school.settings ? school.settings.schoolLogo : ''),
+                schoolStamp: school?.settings?.schoolStamp || '',
+                principalSignature: school?.settings?.principalSignature || '',
                 schoolAddress: school.address || (school.settings ? school.settings.schoolAddress : ''),
                 contactPhone: school.contact_phone || (school.settings ? school.settings.contactPhone : ''),
                 contactEmail: school.contact_email || (school.settings ? school.settings.contactEmail : ''),

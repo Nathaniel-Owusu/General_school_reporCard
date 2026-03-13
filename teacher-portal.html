@@ -298,6 +298,11 @@
                         <span id="form-master-badge" class="px-1.5 py-0.5 bg-indigo-500/20 text-indigo-300 text-[8px] font-black uppercase tracking-tighter rounded-md border border-indigo-500/30">Master</span>
                     </button>
                 </div>
+
+                <button onclick="switchView('settings')" id="nav-settings" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-white hover:bg-white/10 font-medium transition-all group">
+                    <ion-icon name="settings-outline" class="text-xl"></ion-icon>
+                    <span>Account Settings</span>
+                </button>
                 
                 <div class="nav-section-label text-white/40 text-[10px] font-bold uppercase tracking-widest px-4 mt-6 mb-2">Quick Links</div>
                 <a href="../index.html" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-white hover:bg-white/10 font-medium transition-all">
@@ -393,49 +398,66 @@
                     </div>
                 </div>
 
-                <!-- VIEW: RECORDS (ATTENDANCE & REMARKS) -->
-                <div id="view-records" class="hidden max-w-full mx-auto h-full flex flex-col">
-                    
-                    <!-- Controls -->
-                    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 mb-6 sticky top-0 z-20">
-                        <div class="flex flex-wrap gap-4 items-end">
-                            <div class="flex-1 min-w-[200px]">
-                                <label class="block text-xs font-bold text-slate-200 uppercase mb-1">Select Class</label>
-                                <select id="records-class-select" onchange="loadRecords()" class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-primary"></select>
+                <!-- VIEW: SETTINGS -->
+                <div id="view-settings" class="hidden animate-fade-in max-w-4xl mx-auto py-8">
+                    <div class="bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden">
+                        <div class="bg-gradient-to-r from-gray-900 to-gray-800 p-8 text-white">
+                            <h2 class="text-2xl font-bold">Account Settings</h2>
+                            <p class="text-gray-400 text-sm mt-1">Manage your teacher profile and digital assets.</p>
+                        </div>
+                        
+                        <div class="p-8 space-y-8">
+                            <!-- Digital Signature Section -->
+                            <div class="flex flex-col md:flex-row gap-8 items-center bg-gray-50/50 p-8 rounded-2xl border border-gray-100">
+                                <div class="flex-1 space-y-4 text-center md:text-left">
+                                    <div class="w-12 h-12 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center text-2xl mx-auto md:mx-0">
+                                        <ion-icon name="create-outline"></ion-icon>
+                                    </div>
+                                    <h3 class="text-xl font-bold text-gray-800">Your Digital Signature</h3>
+                                    <p class="text-gray-500 text-sm leading-relaxed">
+                                        Upload a clear image of your signature on white paper. The system will automatically place this on the report cards of students in classes where you are the **Class Teacher**.
+                                    </p>
+                                    <div class="flex flex-wrap gap-2 justify-center md:justify-start">
+                                        <span class="px-2 py-1 bg-white border border-gray-200 rounded-lg text-[10px] font-bold text-gray-400 uppercase">PNG Preferred</span>
+                                        <span class="px-2 py-1 bg-white border border-gray-200 rounded-lg text-[10px] font-bold text-gray-400 uppercase">Transparent</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="shrink-0 space-y-4">
+                                    <div id="teacher-sig-preview" class="w-48 h-48 bg-white rounded-2xl border-2 border-dashed border-gray-200 flex items-center justify-center relative group overflow-hidden shadow-inner">
+                                        <div class="text-center p-4">
+                                            <ion-icon name="pencil" class="text-4xl text-gray-200"></ion-icon>
+                                            <p class="text-[10px] text-gray-300 font-bold uppercase mt-2">No Signature</p>
+                                        </div>
+                                    </div>
+                                    <label class="block">
+                                        <span class="w-full flex items-center justify-center gap-2 px-5 py-3 bg-gray-900 text-white rounded-xl font-bold cursor-pointer hover:bg-black transition-all shadow-lg active:scale-95">
+                                            <ion-icon name="cloud-upload-outline"></ion-icon> Upload Image
+                                        </span>
+                                        <input type="file" onchange="handleTeacherSigUpload(this)" accept="image/*" class="hidden">
+                                    </label>
+                                </div>
                             </div>
-                            <div class="flex justify-end">
-                                <button onclick="saveRecords()" id="btn-save-records" disabled class="px-6 py-2 bg-primary text-white rounded-lg font-bold shadow-lg opacity-50 cursor-not-allowed flex items-center gap-2 transition hover:bg-blue-800">
-                                    <ion-icon name="save"></ion-icon> Save Records
-                                </button>
+
+                            <div class="bg-amber-50 border border-amber-100/50 rounded-2xl p-6 flex items-start gap-4">
+                                <ion-icon name="bulb" class="text-2xl text-amber-500 shrink-0"></ion-icon>
+                                <div>
+                                    <h4 class="font-bold text-amber-900 text-sm">Why upload this?</h4>
+                                    <p class="text-xs text-amber-700 mt-1">This allows you to "e-sign" report cards automatically. Parents can verify that you reviewed the student's performance personally.</p>
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- Records Table -->
-                    <div class="bg-white rounded-xl shadow-sm border border-gray-100 flex-1 overflow-hidden flex flex-col table-container relative">
-                        <div class="overflow-auto flex-1">
-                            <table class="w-full text-left border-collapse min-w-[800px]">
-                                <thead class="bg-gray-50 text-gray-500 font-bold uppercase text-xs sticky top-0 z-10 shadow-sm">
-                                    <tr>
-                                        <th class="px-4 py-3 border-b border-gray-200 w-16">#</th>
-                                        <th class="px-4 py-3 border-b border-gray-200 w-32 hidden md:table-cell">Index ID</th>
-                                        <th class="px-4 py-3 border-b border-gray-200 w-48 sticky-col min-w-[140px]">Student Name</th>
-                                        <th class="px-4 py-3 border-b border-gray-200 w-40 text-center bg-blue-50/20">Attendance<br><span class="text-[10px] font-normal lowercase">(pres / total)</span></th>
-                                        <th class="px-4 py-3 border-b border-gray-200 w-48 text-left bg-yellow-50/20">Conduct</th>
-                                        <th class="px-4 py-3 border-b border-gray-200 text-left">Class Teacher's Remark</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="records-body" class="divide-y divide-gray-100 text-sm">
-                                    <tr>
-                                        <td colspan="6" class="text-center py-20 text-slate-200 italic">
-                                            Select a Class to manage records.
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                        <div class="p-8 bg-gray-50 border-t border-gray-100 flex justify-end gap-3">
+                            <button onclick="switchView('dashboard')" class="px-6 py-3 border border-gray-200 rounded-xl font-bold text-gray-500 hover:bg-gray-100 transition">Cancel</button>
+                            <button onclick="saveTeacherSettings()" class="px-8 py-3 bg-blue-600 text-white rounded-xl font-bold shadow-lg shadow-blue-500/20 hover:bg-blue-700 transition">Save Profile Changes</button>
                         </div>
                     </div>
                 </div>
+
+                <!-- Footer View Margin -->
+                <div class="h-20"></div>
+            </main>
 
             </main>
         </div>
@@ -571,8 +593,9 @@
 
 
         function switchView(view) {
-            ['dashboard', 'records'].forEach(v => {
-                document.getElementById(`view-${v}`).classList.add('hidden');
+            ['dashboard', 'records', 'settings'].forEach(v => {
+                const el = document.getElementById(`view-${v}`);
+                if(el) el.classList.add('hidden');
                 
                 const nav = document.getElementById(`nav-${v}`);
                 if(nav) {
@@ -768,6 +791,72 @@
                  sidebar.classList.add('-translate-x-full');
                  overlay.classList.add('hidden');
              }
+        }
+
+        // --- SETTINGS / PROFILE LOGIC ---
+
+        function handleTeacherSigUpload(input) {
+            if (input.files && input.files[0]) {
+                const file = input.files[0];
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = new Image();
+                    img.onload = function() {
+                        const canvas = document.createElement('canvas');
+                        const ctx = canvas.getContext('2d');
+                        const MAX_SIZE = 400;
+                        let width = img.width;
+                        let height = img.height;
+
+                        if (width > height) {
+                            if (width > MAX_SIZE) {
+                                height *= MAX_SIZE / width;
+                                width = MAX_SIZE;
+                            }
+                        } else {
+                            if (height > MAX_SIZE) {
+                                width *= MAX_SIZE / height;
+                                height = MAX_SIZE;
+                            }
+                        }
+                        canvas.width = width;
+                        canvas.height = height;
+                        ctx.drawImage(img, 0, 0, width, height);
+                        const base64 = canvas.toDataURL('image/png');
+                        
+                        document.getElementById('teacher-sig-preview').innerHTML = `<img src="${base64}" class="w-full h-full object-contain animate-fade-in">`;
+                        currentUser.digital_signature = base64;
+                    };
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        async function saveTeacherSettings() {
+            const btn = event.target;
+            const originalText = btn.innerText;
+            btn.innerText = 'Saving profile...';
+            btn.disabled = true;
+
+            const result = await fetchTeacherData('update_profile', { digital_signature: currentUser.digital_signature });
+            
+            btn.innerText = originalText;
+            btn.disabled = false;
+
+            if (result && result.success) {
+                alert('Profile updated successfully!');
+            } else {
+                alert('Failed to update profile.');
+            }
+        }
+
+        // Add to initDashboard or auth check
+        if (currentUser.digital_signature) {
+            const preview = document.getElementById('teacher-sig-preview');
+            if (preview) {
+                preview.innerHTML = `<img src="${currentUser.digital_signature}" class="w-full h-full object-contain">`;
+            }
         }
 
         // Init

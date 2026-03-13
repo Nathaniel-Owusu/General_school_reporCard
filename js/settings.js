@@ -11,7 +11,7 @@ function switchSettingsTab(tabName) {
     if(tabEl) tabEl.classList.remove('hidden');
 
     // Update buttons
-    const buttons = ['general', 'grading', 'attendance', 'system', 'academic', 'data'];
+    const buttons = ['general', 'grading', 'attendance', 'system', 'academic', 'assets', 'data'];
     buttons.forEach(btn => {
         const el = document.getElementById(`tab-${btn}`);
         if(!el) return;
@@ -64,6 +64,14 @@ async function initSettingsView() {
     updateTermButtons();
     if(document.getElementById('term-lock-toggle')) document.getElementById('term-lock-toggle').checked = s.termLocked === 'true' || s.termLocked === true;
     
+    // Assets
+    if(s.schoolStamp && document.getElementById('stamp-preview-area')) {
+        document.getElementById('stamp-preview-area').innerHTML = `<img src="${s.schoolStamp}" class="w-full h-full object-contain">`;
+    }
+    if(s.principalSignature && document.getElementById('principal-sig-preview-area')) {
+        document.getElementById('principal-sig-preview-area').innerHTML = `<img src="${s.principalSignature}" class="w-full h-full object-contain">`;
+    }
+
     switchSettingsTab('general');
 }
 
@@ -129,6 +137,60 @@ async function saveGeneralSettings() {
         alert('School identity updated successfully!');
     } else {
         alert('Failed to save settings.');
+    }
+}
+
+// --- ASSETS ---
+
+function handleAssetUpload(input, type) {
+    if (input.files && input.files[0]) {
+        const file = input.files[0];
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const img = new Image();
+            img.onload = function() {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                const MAX_SIZE = 500;
+                let width = img.width;
+                let height = img.height;
+
+                if (width > height) {
+                    if (width > MAX_SIZE) {
+                        height *= MAX_SIZE / width;
+                        width = MAX_SIZE;
+                    }
+                } else {
+                    if (height > MAX_SIZE) {
+                        width *= MAX_SIZE / height;
+                        height = MAX_SIZE;
+                    }
+                }
+                canvas.width = width;
+                canvas.height = height;
+                ctx.drawImage(img, 0, 0, width, height);
+                const base64 = canvas.toDataURL('image/png');
+                
+                const previewId = type === 'schoolStamp' ? 'stamp-preview-area' : 'principal-sig-preview-area';
+                document.getElementById(previewId).innerHTML = `<img src="${base64}" class="w-full h-full object-contain animate-fade-in">`;
+                currentSettings[type] = base64;
+            };
+            img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+    }
+}
+
+async function saveAssetSettings() {
+    const data = {
+        schoolStamp: currentSettings.schoolStamp,
+        principalSignature: currentSettings.principalSignature
+    };
+    const result = await fetchAdminData('save_settings', data, 'POST');
+    if(result && result.success) {
+        alert('Digital assets saved successfully!');
+    } else {
+        alert('Failed to save assets.');
     }
 }
 

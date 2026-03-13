@@ -875,6 +875,7 @@
                     <button onclick="switchSettingsTab('attendance')" id="tab-attendance" class="px-4 py-2 rounded-lg font-bold text-sm text-gray-500 hover:bg-gray-100 transition whitespace-nowrap">Attendance</button>
                     <button onclick="switchSettingsTab('system')" id="tab-system" class="px-4 py-2 rounded-lg font-bold text-sm text-gray-500 hover:bg-gray-100 transition whitespace-nowrap">System</button>
                     <button onclick="switchSettingsTab('academic')" id="tab-academic" class="px-4 py-2 rounded-lg font-bold text-sm text-gray-500 hover:bg-gray-100 transition whitespace-nowrap">Academic Year</button>
+                    <button onclick="switchSettingsTab('assets')" id="tab-assets" class="px-4 py-2 rounded-lg font-bold text-sm text-gray-500 hover:bg-gray-100 transition whitespace-nowrap">Digital Assets</button>
                     <button onclick="switchSettingsTab('data')" id="tab-data" class="px-4 py-2 rounded-lg font-bold text-sm text-gray-500 hover:bg-gray-100 transition whitespace-nowrap">Data Management</button>
                 </div>
 
@@ -1098,6 +1099,67 @@
                         </div>
                     </div>
                 </div>
+
+            <!-- TAB: SCHOOL ASSETS -->
+            <div id="set-assets" class="settings-tab hidden">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <!-- School Stamp -->
+                    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex flex-col items-center">
+                        <div class="text-center mb-6">
+                            <h3 class="font-bold text-xl text-gray-800">School Official Stamp</h3>
+                            <p class="text-slate-200 text-sm">Upload a PNG with transparent background for best results.</p>
+                        </div>
+                        <div id="stamp-preview-area" class="mb-6 w-48 h-48 bg-gray-50 rounded-2xl border-2 border-dashed border-gray-200 flex items-center justify-center overflow-hidden">
+                            <div class="text-center p-4">
+                                <ion-icon name="ribbon-outline" class="text-4xl text-gray-300"></ion-icon>
+                                <p class="text-[10px] text-gray-400 font-bold uppercase mt-2">No Stamp Uploaded</p>
+                            </div>
+                        </div>
+                        <label class="w-full">
+                            <span class="block w-full text-center py-3 bg-gray-900 text-white rounded-xl font-bold cursor-pointer hover:bg-black transition-all shadow-lg active:scale-95">
+                                <ion-icon name="cloud-upload" class="mr-2"></ion-icon> Upload Stamp
+                            </span>
+                            <input type="file" onchange="handleAssetUpload(this, 'schoolStamp')" accept="image/*" class="hidden">
+                        </label>
+                        <p class="text-[10px] text-slate-200 mt-3 italic text-center text-balance">This stamp will appear on all electronic and printed report cards.</p>
+                    </div>
+
+                    <!-- Principal's Signature -->
+                    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex flex-col items-center">
+                        <div class="text-center mb-6">
+                            <h3 class="font-bold text-xl text-gray-800">Principal's Signature</h3>
+                            <p class="text-slate-200 text-sm">Upload a digital scan of the principal's signature.</p>
+                        </div>
+                        <div id="principal-sig-preview-area" class="mb-6 w-48 h-48 bg-gray-50 rounded-2xl border-2 border-dashed border-gray-200 flex items-center justify-center overflow-hidden">
+                            <div class="text-center p-4">
+                                <ion-icon name="pencil-outline" class="text-4xl text-gray-300"></ion-icon>
+                                <p class="text-[10px] text-gray-400 font-bold uppercase mt-2">No Signature Scan</p>
+                            </div>
+                        </div>
+                        <label class="w-full">
+                            <span class="block w-full text-center py-3 border-2 border-slate-900 text-slate-900 rounded-xl font-bold cursor-pointer hover:bg-slate-50 transition-all active:scale-95">
+                                <ion-icon name="create" class="mr-2"></ion-icon> Upload Signature
+                            </span>
+                            <input type="file" onchange="handleAssetUpload(this, 'principalSignature')" accept="image/*" class="hidden">
+                        </label>
+                        <p class="text-[10px] text-slate-200 mt-3 italic text-center text-balance">The principal's signature will be auto-placed in the "Principal" remark section.</p>
+                    </div>
+                </div>
+                
+                <div class="mt-8 bg-blue-50 border border-blue-100 rounded-2xl p-6 flex items-start gap-4">
+                    <div class="w-10 h-10 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center shrink-0">
+                        <ion-icon name="information-circle" class="text-2xl"></ion-icon>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-blue-900">Professional Tip</h4>
+                        <p class="text-sm text-blue-800 mt-1">For maximum realism, use a **transparent PNG** image. If your image has a white background, the system will try to subtract it, but for high-quality results, use a background-removal tool before uploading.</p>
+                    </div>
+                </div>
+
+                <div class="mt-8 pt-6 border-t border-gray-100 flex justify-end">
+                    <button onclick="saveAssetSettings()" class="bg-accent text-white px-8 py-3 rounded-xl font-bold hover:bg-blue-600 transition shadow-lg shadow-blue-500/30">Save All Assets</button>
+                </div>
+            </div>
 
             <!-- TAB: DATA MANAGEMENT -->
             <div id="set-data" class="settings-tab hidden">

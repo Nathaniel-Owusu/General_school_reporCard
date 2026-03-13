@@ -931,17 +931,26 @@
 
                     <!-- Signatures -->
                     <div class="section-heading" style="margin-top:18px;"><span>Signatures &amp; Approval</span></div>
-                    <div class="sig-strip">
+                    <div class="sig-strip" style="position:relative;">
+                        <!-- Optional Stamp -->
+                        ${gs.schoolStamp ? `<div style="position:absolute; top:-40px; left:55%; transform:translateX(-50%) rotate(-10deg); width:130px; height:130px; opacity:0.8; z-index:10; pointer-events:none;"><img src="${gs.schoolStamp}" style="width:100%; height:100%; object-fit:contain;"></div>` : ''}
+                        
                         <div class="sig-box">
-                            <div class="sig-line"></div>
+                            <div class="sig-line" style="position:relative; border-bottom:none; height:45px;">
+                                ${user.class_teacher_sig ? `<img src="${user.class_teacher_sig}" style="height:60px; max-width:140px; object-fit:contain; position:absolute; bottom:2px; left:50%; transform:translateX(-50%); z-index:5;">` : ''}
+                                <div style="border-bottom: 1.5px solid #a0aec0; width:100%; height:100%; position:absolute; bottom:0;"></div>
+                            </div>
                             <div class="sig-label">Class Teacher</div>
                         </div>
                         <div class="sig-box">
-                            <div class="sig-line"></div>
+                            <div class="sig-line" style="position:relative; border-bottom:none; height:45px;">
+                                ${gs.principalSignature ? `<img src="${gs.principalSignature}" style="height:60px; max-width:140px; object-fit:contain; position:absolute; bottom:2px; left:50%; transform:translateX(-50%); z-index:5;">` : ''}
+                                <div style="border-bottom: 1.5px solid #a0aec0; width:100%; height:100%; position:absolute; bottom:0;"></div>
+                            </div>
                             <div class="sig-label">Headmaster / Principal</div>
                         </div>
                         <div class="sig-box">
-                            <div class="sig-line"></div>
+                            <div class="sig-line" style="border-bottom: 1.5px solid #a0aec0; height:45px;"></div>
                             <div class="sig-label">Parent / Guardian</div>
                         </div>
                     </div>
