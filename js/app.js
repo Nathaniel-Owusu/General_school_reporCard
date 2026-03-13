@@ -769,6 +769,12 @@ async function fetchTeacherData(action, params = {}) {
         }
     }
 
+    else if (action === 'delete_student') {
+        db.students = db.students.filter(s => s.id !== params.id);
+        didUpdate = true;
+        result = { success: true };
+    }
+
     if (didUpdate) await Storage.save(db);
     return result;
 }
