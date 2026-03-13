@@ -127,6 +127,10 @@
                 <ion-icon name="grid-outline" class="text-xl"></ion-icon>
                 <span>Dashboard</span>
             </button>
+            <button onclick="switchView('analytics')" id="nav-analytics" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-white hover:bg-white/10 font-medium transition-all">
+                <ion-icon name="bar-chart-outline" class="text-xl"></ion-icon>
+                <span>Analytics</span>
+            </button>
 
             <!-- Academic -->
             <div class="nav-section-label text-white/40 text-[10px] font-bold uppercase tracking-widest px-4 mt-6 mb-2">Academic</div>
@@ -425,6 +429,102 @@
                                     <ion-icon name="chevron-forward" class="ml-auto text-gray-300 text-sm"></ion-icon>
                                 </button>
                             </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW: ANALYTICS -->
+            <div id="view-analytics" class="space-y-6 hidden animate-fade-in">
+                <!-- Stat Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-2xl">
+                            <ion-icon name="trending-up-outline"></ion-icon>
+                        </div>
+                        <div>
+                            <p class="text-xs font-bold text-slate-200 uppercase tracking-widest">School Average</p>
+                            <h3 class="text-2xl font-black text-gray-900" id="ana-school-avg">0.0%</h3>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-2xl">
+                            <ion-icon name="trophy-outline"></ion-icon>
+                        </div>
+                        <div>
+                            <p class="text-xs font-bold text-slate-200 uppercase tracking-widest">Top Class</p>
+                            <h3 class="text-2xl font-black text-gray-900" id="ana-top-class">-</h3>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center text-2xl">
+                            <ion-icon name="star-outline"></ion-icon>
+                        </div>
+                        <div>
+                            <p class="text-xs font-bold text-slate-200 uppercase tracking-widest">A-Grades Count</p>
+                            <h3 class="text-2xl font-black text-gray-900" id="ana-a-count">0</h3>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Chart Grid -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- Class Comparison -->
+                    <div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm">
+                        <div class="flex items-center justify-between mb-6">
+                            <div>
+                                <h3 class="font-extrabold text-xl text-gray-900">Class Performance Comparison</h3>
+                                <p class="text-sm text-slate-200">Average score percentage by class</p>
+                            </div>
+                            <div class="w-10 h-10 rounded-xl bg-gray-50 flex items-center justify-center text-xl text-gray-400">
+                                <ion-icon name="bar-chart"></ion-icon>
+                            </div>
+                        </div>
+                        <div class="h-[300px] relative">
+                            <canvas id="classComparisonChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Grade Distribution -->
+                    <div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm">
+                        <div class="flex items-center justify-between mb-6">
+                            <div>
+                                <h3 class="font-extrabold text-xl text-gray-900">Grade Distribution</h3>
+                                <p class="text-sm text-slate-200">Overall academic standing (Approved Results)</p>
+                            </div>
+                            <div class="w-10 h-10 rounded-xl bg-gray-50 flex items-center justify-center text-xl text-gray-400">
+                                <ion-icon name="pie-chart"></ion-icon>
+                            </div>
+                        </div>
+                        <div class="h-[300px] relative">
+                            <canvas id="gradeDistributionChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Gender Stats -->
+                    <div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm">
+                        <div class="flex items-center justify-between mb-6">
+                            <div>
+                                <h3 class="font-extrabold text-xl text-gray-900">Enrollment by Gender</h3>
+                                <p class="text-sm text-slate-200">School-wide gender breakdown</p>
+                            </div>
+                            <div class="w-10 h-10 rounded-xl bg-gray-50 flex items-center justify-center text-xl text-gray-400">
+                                <ion-icon name="people-circle"></ion-icon>
+                            </div>
+                        </div>
+                        <div class="h-[300px] relative">
+                            <canvas id="genderStatsChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Subject Rankings -->
+                    <div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm overflow-hidden">
+                        <div class="mb-6">
+                            <h3 class="font-extrabold text-xl text-gray-900">Subject Performance</h3>
+                            <p class="text-sm text-slate-200">Top 5 highest performing subjects</p>
+                        </div>
+                        <div class="space-y-4" id="ana-subject-rankings">
+                            <!-- Injected by JS -->
                         </div>
                     </div>
                 </div>
@@ -1425,7 +1525,7 @@
         }
 
         // View Management
-        const viewList = ['dashboard', 'classes', 'teachers', 'subjects', 'settings', 'results', 'admissions'];
+        const viewList = ['dashboard', 'classes', 'teachers', 'subjects', 'settings', 'results', 'admissions', 'analytics'];
         function switchView(viewName) {
             viewList.forEach(v => document.getElementById(`view-${v}`).classList.add('hidden'));
             document.getElementById(`view-${viewName}`).classList.remove('hidden');
@@ -1458,6 +1558,7 @@
             if(viewName === 'results') renderResults();
             if(viewName === 'settings') initSettingsView();
             if(viewName === 'admissions') renderAdmissions();
+            if(viewName === 'analytics') initAnalyticsView();
         }
 
         // Student Management
@@ -3024,6 +3125,156 @@
             }
         }
         
+        // --- ANALYTICS VIEW LOGIC ---
+        let analyticsCharts = {};
+
+        async function initAnalyticsView() {
+            const students = await fetchAdminData('students') || [];
+            const classes = await fetchAdminData('classes') || [];
+            
+            // 1. Data Processing: Gender
+            const genderData = { Male: 0, Female: 0, Other: 0 };
+            students.forEach(s => {
+                const g = s.gender || 'Other';
+                if (genderData.hasOwnProperty(g)) genderData[g]++;
+            });
+
+            // 2. Data Processing: Performance & Grades
+            const classTotals = {}; // { className: { sum: 0, count: 0 } }
+            const gradeCounts = { 'A': 0, 'B': 0, 'C': 0, 'D': 0, 'E': 0, 'F': 0 };
+            const subjectStats = {}; // { subName: { sum: 0, count: 0 } }
+            
+            let totalScoreSum = 0;
+            let totalScoreCount = 0;
+
+            students.forEach(s => {
+                if (!s.scores) return;
+                
+                const clsName = s.class;
+                if (!classTotals[clsName]) classTotals[clsName] = { sum: 0, count: 0 };
+
+                s.scores.forEach(sc => {
+                    if (sc.status !== 'Approved') return;
+                    
+                    const score = (parseFloat(sc.class_score) || 0) + (parseFloat(sc.exam_score) || 0);
+                    const gradeData = calculateGrade(score);
+                    const grade = gradeData.grade.charAt(0); // Take first letter A, B, C...
+
+                    if (gradeCounts.hasOwnProperty(grade)) gradeCounts[grade]++;
+                    
+                    classTotals[clsName].sum += score;
+                    classTotals[clsName].count++;
+                    
+                    if (!subjectStats[sc.subject]) subjectStats[sc.subject] = { sum: 0, count: 0 };
+                    subjectStats[sc.subject].sum += score;
+                    subjectStats[sc.subject].count++;
+
+                    totalScoreSum += score;
+                    totalScoreCount++;
+                });
+            });
+
+            // --- Stats Updates ---
+            const schoolAvg = totalScoreCount > 0 ? (totalScoreSum / totalScoreCount).toFixed(1) : "0.0";
+            document.getElementById('ana-school-avg').innerText = schoolAvg + "%";
+            document.getElementById('ana-a-count').innerText = gradeCounts['A'];
+            
+            let topClass = "-";
+            let topAvg = -1;
+            const classComparisonLabels = [];
+            const classComparisonData = [];
+
+            Object.keys(classTotals).forEach(name => {
+                const avg = classTotals[name].count > 0 ? classTotals[name].sum / classTotals[name].count : 0;
+                classComparisonLabels.push(name);
+                classComparisonData.push(avg.toFixed(1));
+                
+                if (avg > topAvg) {
+                    topAvg = avg;
+                    topClass = name;
+                }
+            });
+            document.getElementById('ana-top-class').innerText = topClass;
+
+            // --- Chart Implementation ---
+
+            // A. Class Comparison (Bar)
+            renderBarChart('classComparisonChart', classComparisonLabels, classComparisonData, 'Score %');
+
+            // B. Grade Distribution (Pie)
+            renderPieChart('gradeDistributionChart', Object.keys(gradeCounts), Object.values(gradeCounts), ['#10b981', '#3b82f6', '#f59e0b', '#f97316', '#8b5cf6', '#ef4444']);
+
+            // C. Gender Stats (Doughnut)
+            renderPieChart('genderStatsChart', ['Male', 'Female', 'Other'], [genderData.Male, genderData.Female, genderData.Other], ['#3b82f6', '#f472b6', '#cbd5e1'], true);
+
+            // D. Subject Rankings
+            const subjectRankingsHtml = Object.keys(subjectStats)
+                .map(name => ({ name, avg: subjectStats[name].sum / subjectStats[name].count }))
+                .sort((a, b) => b.avg - a.avg)
+                .slice(0, 5)
+                .map((s, idx) => `
+                    <div class="flex items-center gap-4">
+                        <div class="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center font-bold text-xs text-gray-400">${idx + 1}</div>
+                        <div class="flex-1">
+                            <div class="flex justify-between mb-1">
+                                <span class="text-sm font-bold text-gray-800">${s.name}</span>
+                                <span class="text-sm font-black text-indigo-600">${s.avg.toFixed(1)}%</span>
+                            </div>
+                            <div class="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                                <div class="h-full bg-indigo-500 rounded-full" style="width: ${s.avg}%"></div>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            document.getElementById('ana-subject-rankings').innerHTML = subjectRankingsHtml || '<p class="text-center py-10 text-slate-200 italic">No grade data available.</p>';
+        }
+
+        function renderBarChart(id, labels, data, label) {
+            if(analyticsCharts[id]) analyticsCharts[id].destroy();
+            const ctx = document.getElementById(id).getContext('2d');
+            analyticsCharts[id] = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels,
+                    datasets: [{
+                        label,
+                        data,
+                        backgroundColor: '#6366f1',
+                        borderRadius: 8,
+                        barThickness: 32
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: { y: { beginAtZero: true, max: 100, grid: { display: false } }, x: { grid: { display: false } } },
+                    plugins: { legend: { display: false } }
+                }
+            });
+        }
+
+        function renderPieChart(id, labels, data, colors, isDoughnut = false) {
+            if(analyticsCharts[id]) analyticsCharts[id].destroy();
+            const ctx = document.getElementById(id).getContext('2d');
+            analyticsCharts[id] = new Chart(ctx, {
+                type: isDoughnut ? 'doughnut' : 'pie',
+                data: {
+                    labels,
+                    datasets: [{
+                        data,
+                        backgroundColor: colors,
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: isDoughnut ? '70%' : 0,
+                    plugins: { legend: { position: 'bottom', labels: { usePointStyle: true, boxWidth: 6, font: { weight: 'bold', size: 10 } } } }
+                }
+            });
+        }
+
         // Live Update System
         let liveUpdateInterval = null;
 
@@ -3054,6 +3305,9 @@
                 }
                 else if(!document.getElementById('view-subjects').classList.contains('hidden')) {
                      await initSubjectView();
+                }
+                else if(!document.getElementById('view-analytics').classList.contains('hidden')) {
+                     await initAnalyticsView();
                 }
 
             }, 5000); // 5 seconds interval
