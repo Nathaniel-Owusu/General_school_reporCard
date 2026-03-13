@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Results Entry | General School</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+    <link rel="stylesheet" href="css/modern-ui.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: { 
+                    colors: { 
+                        primary: '#000000', 
+                        accent: '#3b82f6', 
+                        secondary: '#f59e0b',
+                        indigo: {
+                            50: '#f5f7ff',
+                            100: '#ebf0ff',
+                            600: '#4f46e5',
+                            700: '#4338ca'
+                        }
+                    }, 
+                    fontFamily: { sans: ['Outfit', 'sans-serif'] } 
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-indigo-50/30 font-sans text-slate-900">
+    <div class="min-h-screen flex flex-col">
+        <!-- Main Header -->
+        <header class="bg-white/80 backdrop-blur-md sticky top-0 z-50 border-b border-indigo-100/50 px-6 py-4">
+            <div class="max-w-7xl mx-auto flex justify-between items-center">
+                <div class="flex items-center gap-4">
+                    <button onclick="window.location.href='teacher-portal.html'" class="w-10 h-10 rounded-xl flex items-center justify-center bg-white border border-indigo-100 text-indigo-600 hover:bg-indigo-50 transition-all shadow-sm">
+                        <ion-icon name="arrow-back-outline" class="text-xl"></ion-icon>
+                    </button>
+                    <div>
+                        <h1 class="text-xl font-black tracking-tight text-slate-900">Student Results Entry</h1>
+                        <p class="text-[10px] uppercase font-black tracking-widest text-indigo-400">Academic Assessment Portal</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-center gap-3">
+                    <div class="text-right hidden sm:block">
+                        <p class="text-sm font-bold leading-tight" id="user-name">Loading...</p>
+                        <p class="text-[10px] font-black text-indigo-500 uppercase tracking-tighter" id="user-role">Teacher</p>
+                    </div>
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-indigo-700 text-white flex items-center justify-center font-black shadow-lg shadow-indigo-200" id="user-initial">
+                        ?
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <main class="flex-1 max-w-7xl mx-auto w-full p-6">
+            <!-- Instructions -->
+            <div class="mb-10 text-center max-w-2xl mx-auto mt-6">
+                <h2 class="text-3xl font-black text-slate-900 mb-2">Select Your Class</h2>
+                <p class="text-slate-500 font-medium">Please select the class you wish to enter results for. You will then be able to choose specific subjects.</p>
+            </div>
+
+            <!-- Loader -->
+            <div id="loader" class="flex flex-col items-center justify-center py-20">
+                <div class="w-12 h-12 border-4 border-indigo-100 border-t-indigo-600 rounded-full animate-spin mb-4"></div>
+                <p class="text-xs font-black text-indigo-400 uppercase tracking-widest animate-pulse">Initializing Portal...</p>
+            </div>
+
+            <!-- Classes Grid -->
+            <div id="classes-grid" class="hidden grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 animate-fade-in px-4">
+                <!-- Classes injected here -->
+            </div>
+            
+            <!-- Empty State -->
+            <div id="empty-state" class="hidden flex flex-col items-center justify-center py-20 text-center">
+                <div class="w-20 h-20 rounded-3xl bg-white border border-dashed border-indigo-200 flex items-center justify-center text-4xl text-indigo-100 mb-4">
+                    <ion-icon name="school-outline"></ion-icon>
+                </div>
+                <h3 class="text-xl font-black text-slate-900 mb-1">No Classes Assigned</h3>
+                <p class="text-slate-400 text-sm max-w-xs">It seems you haven't been assigned to any classes yet. Please contact the administrator.</p>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="p-8 text-center text-[10px] font-black uppercase tracking-widest text-slate-400">
+            &copy; 2026 General School Management System &bull; Results Entry Module v2.0
+        </footer>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/storage.js?v=11"></script>
+    <script src="js/app.js?v=11"></script>
+    <script>
+        // Auth Check
+        const currentUser = checkAuth(['teacher', 'admin']);
+        
+        async function init() {
+            if (!currentUser) return;
+            
+            // Set User Info
+            document.getElementById('user-name').textContent = currentUser.name;
+            document.getElementById('user-initial').textContent = currentUser.name.charAt(0);
+            document.getElementById('user-role').textContent = currentUser.role || 'Teacher';
+
+            try {
+                // Fetch Assigned Classes
+                const assignedClasses = await fetchTeacherData('classes') || [];
+                
+                const loader = document.getElementById('loader');
+                const grid = document.getElementById('classes-grid');
+                const empty = document.getElementById('empty-state');
+                
+                loader.classList.add('hidden');
+                
+                if (assignedClasses.length === 0) {
+                    empty.classList.remove('hidden');
+                    return;
+                }
+
+                grid.classList.remove('hidden');
+                grid.innerHTML = assignedClasses.map(c => {
+                    const subjects = c.subjects || [];
+                    const isFormMaster = c.class_teacher_id == currentUser.id;
+                    
+                    return `
+                        <div class="group bg-white p-6 rounded-[2.5rem] border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-indigo-900/5 hover:-translate-y-1 transition-all cursor-pointer relative overflow-hidden">
+                            <!-- Background Accent -->
+                            <div class="absolute -right-6 -bottom-6 w-24 h-24 bg-indigo-50 rounded-full opacity-20 group-hover:scale-150 transition-transform duration-700"></div>
+                            
+                            <div class="flex justify-between items-start mb-6">
+                                <div class="w-14 h-14 rounded-2xl ${isFormMaster ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-200' : 'bg-indigo-50 text-indigo-600'} flex items-center justify-center text-2xl font-black">
+                                    ${c.name.charAt(0)}
+                                </div>
+                                <div class="flex flex-col items-end gap-2 text-right">
+                                    ${isFormMaster ? 
+                                        '<span class="px-2 py-0.5 bg-indigo-100 text-indigo-700 text-[9px] font-black uppercase tracking-tighter rounded-full">Form Master</span>' : 
+                                        '<span class="px-2 py-0.5 bg-slate-100 text-slate-400 text-[9px] font-black uppercase tracking-tighter rounded-full">Subject Expert</span>'
+                                    }
+                                    <div class="text-indigo-200 group-hover:text-indigo-600 transition-colors">
+                                        <ion-icon name="arrow-forward-circle" class="text-3xl"></ion-icon>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <h3 class="text-2xl font-black text-slate-900 leading-none mb-2">${c.name}</h3>
+                            <p class="text-xs font-bold text-slate-400 mb-6">${subjects.length} Subjects Assigned</p>
+                            
+                            <div class="flex flex-wrap gap-1.5">
+                                ${subjects.slice(0, 3).map(s => `
+                                    <span class="px-3 py-1 bg-slate-50 text-slate-500 text-[9px] font-black uppercase tracking-widest rounded-lg border border-slate-100">
+                                        ${s.code || (s.name||'').substring(0,3).toUpperCase()}
+                                    </span>
+                                `).join('')}
+                                ${subjects.length > 3 ? `
+                                    <span class="px-3 py-1 bg-indigo-50 text-indigo-400 text-[9px] font-black uppercase tracking-widest rounded-lg">
+                                        +${subjects.length - 3}
+                                    </span>
+                                ` : ''}
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+                
+            } catch (err) {
+                console.error(err);
+                document.getElementById('loader').innerHTML = `
+                    <div class="text-red-500 flex flex-col items-center">
+                        <ion-icon name="alert-circle" class="text-4xl mb-2"></ion-icon>
+                        <p class="font-bold">Failed to load classes. Please try again.</p>
+                    </div>
+                `;
+            }
+        }
+
+        init();
+    </script>
+</body>
+</html>
