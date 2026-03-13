@@ -660,7 +660,12 @@ async function fetchTeacherData(action, params = {}) {
         // params: class_id, subject_id
         const cls = db.classes.find(c => c.id == params.class_id);
         if(cls) {
-            const students = db.students.filter(s => s.school_id === schoolId && s.class === cls.name);
+            // Robust class matching: check by ID or Name
+            const students = db.students.filter(s => 
+                (s.school_id == schoolId) && 
+                (s.class == cls.name || s.class_id == cls.id || s.class == cls.id)
+            );
+
             result = students.map(s => {
                 const scoresArr = Array.isArray(s.scores) ? s.scores : [];
                 const score = scoresArr.find(sc => sc.subject_id == params.subject_id) || {};
@@ -668,6 +673,7 @@ async function fetchTeacherData(action, params = {}) {
                 return {
                     id: s.id,
                     name: studentName,
+                    index_number: s.index_number || s.id, // Fallback to id if index_number missing
                     student_name: studentName,
                     project_score: score.project_score || 0,
                     individual_score: score.individual_score || 0,

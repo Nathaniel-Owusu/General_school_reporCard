@@ -780,7 +780,7 @@
                                 </div>
                                 <div class="min-w-0">
                                     <p class="font-black text-gray-900 text-sm truncate leading-tight">${displayName}</p>
-                                    <p class="text-[9px] text-slate-300 font-black uppercase tracking-widest mt-1">${s.id}</p>
+                                    <p class="text-[9px] text-slate-400 font-black uppercase tracking-widest mt-1">${s.index_number || s.id}</p>
                                 </div>
                             </div>
                         </td>
@@ -1099,7 +1099,7 @@
                 return `
                     <tr class="hover:bg-blue-50/10 transition border-b border-gray-50" data-student-id="${s.id}">
                         <td class="px-4 py-3 font-mono text-slate-200 text-xs">${i + 1}</td>
-                        <td class="px-4 py-3 font-mono font-bold text-gray-600 text-xs hidden md:table-cell">${s.id}</td>
+                        <td class="px-4 py-3 font-mono font-bold text-gray-600 text-xs hidden md:table-cell">${s.index_number || s.id}</td>
                         <td class="px-4 py-3 font-bold text-gray-800 sticky-col transition-colors group-hover:bg-blue-50/10">${s.name || `Student (${s.id})`}</td>
                         
                         <!-- Attendance -->
