@@ -2860,6 +2860,29 @@
             `;}).join('');
         }
 
+        async function handleSaveSubject(e) {
+            e.preventDefault();
+            const form = e.target;
+            const data = {
+                id: form.id.value,
+                name: form.name.value,
+                code: form.code.value,
+                level: form.level.value,
+                status: form.status.value,
+                active: form.status.value === 'Active'
+            };
+            
+            const result = await fetchAdminData('add_subject', data, 'POST');
+            if (result && result.success) {
+                alert('Subject saved successfully');
+                closeModal('add-subject-modal');
+                initSubjectView();
+                initDashboard();
+            } else {
+                alert('Failed to save subject');
+            }
+        }
+
         async function initSubjectView() {
             const tbody = document.getElementById('subject-table-body');
             const subjects = await fetchAdminData('subjects');

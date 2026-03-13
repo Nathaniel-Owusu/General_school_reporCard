@@ -434,6 +434,7 @@ async function fetchAdminData(action, params = {}) {
              s.name = params.name;
              s.code = params.code;
              s.level = params.level;
+             s.status = params.status || (params.active ? 'Active' : 'Inactive');
              s.active = params.active; // Boolean
          } else {
             // New
@@ -443,6 +444,7 @@ async function fetchAdminData(action, params = {}) {
                 name: params.name,
                 code: params.code,
                 level: params.level, 
+                status: params.status || 'Active',
                 active: params.active !== false // Default true
             });
          }
