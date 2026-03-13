@@ -701,11 +701,33 @@
                 </tr>
             `;
 
-            // Fetch Students from API
-            currentStudents = await fetchTeacherData('students', { class_id: classId, subject_id: subjectId }) || [];
-            
-            if(currentStudents.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="12" class="text-center py-20 text-slate-200">No students found.</td></tr>`;
+            try {
+                // Fetch Students from API
+                console.log("📡 Fetching students...", { classId, subjectId });
+                currentStudents = await fetchTeacherData('students', { class_id: classId, subject_id: subjectId });
+                
+                if(!currentStudents || !Array.isArray(currentStudents)) {
+                    console.error("❌ Invalid student data received:", currentStudents);
+                    tbody.innerHTML = `<tr><td colspan="12" class="text-center py-20 text-red-500 font-bold">Error: Received invalid data from server.</td></tr>`;
+                    return;
+                }
+
+                if(currentStudents.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="12" class="text-center py-20 text-slate-400 font-medium">No students found in this class.</td></tr>`;
+                    document.getElementById('subject-status-label').innerText = 'Class is empty';
+                    return;
+                }
+                
+                document.getElementById('subject-status-label').innerText = `Loaded ${currentStudents.length} students`;
+            } catch (err) {
+                console.error("❌ Gradebook load failed:", err);
+                tbody.innerHTML = `<tr><td colspan="12" class="text-center py-20 text-red-600 font-bold bg-red-50/50">
+                    <div class="flex flex-col items-center gap-3">
+                        <ion-icon name="alert-circle" class="text-4xl"></ion-icon>
+                        <p>Connection Error: Unable to fetch students.</p>
+                        <button onclick="loadGradebook()" class="text-xs underline">Try Again</button>
+                    </div>
+                </td></tr>`;
                 return;
             }
 

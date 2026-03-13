@@ -662,7 +662,8 @@ async function fetchTeacherData(action, params = {}) {
         if(cls) {
             const students = db.students.filter(s => s.school_id === schoolId && s.class === cls.name);
             result = students.map(s => {
-                const score = (s.scores||[]).find(sc => sc.subject_id == params.subject_id) || {};
+                const scoresArr = Array.isArray(s.scores) ? s.scores : [];
+                const score = scoresArr.find(sc => sc.subject_id == params.subject_id) || {};
                 return {
                     id: s.id,
                     name: s.name || s.student_name || '---',
