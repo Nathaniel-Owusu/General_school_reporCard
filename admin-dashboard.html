@@ -1662,7 +1662,9 @@
                  const matchClass = !filterClass || r.class === filterClass;
                  const matchSubject = !filterSubject || r.subject === filterSubject;
                  const matchStatus = !filterStatus || r.status === filterStatus;
-                 const matchSearch = !search || r.student_name.toLowerCase().includes(search) || r.student_id.toLowerCase().includes(search);
+                 const sName = (r.student_name || r.name || '').toLowerCase();
+                 const sId = (r.student_id || '').toLowerCase();
+                 const matchSearch = !search || sName.includes(search) || sId.includes(search);
                  return matchClass && matchSubject && matchStatus && matchSearch;
              });
 

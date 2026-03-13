@@ -841,7 +841,7 @@
                     <div class="info-grid">
                         <div class="info-cell">
                             <div class="info-cell-label">Student Name</div>
-                            <div class="info-cell-value">${esc(user.name || '')}</div>
+                            <div class="info-cell-value">${esc(user.name || user.student_name || '---')}</div>
                         </div>
                         <div class="info-cell">
                             <div class="info-cell-label">Class</div>
