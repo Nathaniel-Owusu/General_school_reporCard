@@ -512,30 +512,50 @@
                  grid.innerHTML = `<div class="col-span-full py-20 text-center text-slate-300 font-medium">No classes assigned. Please contact Administrator.</div>`;
             } else {
                  grid.innerHTML = assignedClasses.map(c => {
-                const subjects = c.subjects || [];
-                const isFormMaster = c.class_teacher_id == currentUser.id;
-                return `
-                    <div class="bg-white p-6 rounded-xl border ${isFormMaster ? 'border-indigo-200 bg-indigo-50/5' : 'border-gray-100'} shadow-sm hover:shadow-md transition group cursor-pointer" onclick="${isFormMaster ? `goToRecords('${c.name}')` : ''}">
-                        <div class="flex justify-between items-start mb-4">
-                            <div class="w-12 h-12 rounded-lg ${isFormMaster ? 'bg-indigo-600 text-white' : 'bg-blue-50 text-blue-600'} flex items-center justify-center text-xl font-bold shadow-sm">
-                                ${c.name.charAt(0)}
-                            </div>
-                            <div class="flex flex-col items-end gap-2 text-right">
-                                ${isFormMaster ? '<span class="px-2 py-0.5 bg-indigo-100 text-indigo-700 text-[9px] font-black uppercase tracking-tighter rounded-full">Form Master</span>' : '<span class="px-2 py-0.5 bg-gray-100 text-gray-400 text-[9px] font-black uppercase tracking-tighter rounded-full">Subject Expert</span>'}
-                                <div class="${isFormMaster ? 'text-gray-300 group-hover:text-primary' : 'text-gray-100'} transition">
-                                    <ion-icon name="arrow-forward-circle" class="text-2xl"></ion-icon>
+                    const subjects = c.subjects || [];
+                    const isFormMaster = c.class_teacher_id == currentUser.id;
+                    return `
+                        <div class="bg-white p-6 rounded-2xl border ${isFormMaster ? 'border-indigo-100 bg-indigo-50/10' : 'border-gray-100'} shadow-sm hover:shadow-xl transition-all group overflow-hidden relative">
+                            <!-- Card Header -->
+                            <div class="flex justify-between items-start mb-6">
+                                <div class="w-14 h-14 rounded-2xl ${isFormMaster ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-200' : 'bg-slate-100 text-slate-400'} flex items-center justify-center text-2xl font-black">
+                                    ${c.name.charAt(0)}
+                                </div>
+                                <div class="flex flex-col items-end gap-2 text-right">
+                                    ${isFormMaster ? 
+                                        '<span class="px-2 py-0.5 bg-indigo-100 text-indigo-700 text-[9px] font-black uppercase tracking-tighter rounded-full">Form Master</span>' : 
+                                        '<span class="px-2 py-0.5 bg-slate-100 text-slate-400 text-[9px] font-black uppercase tracking-tighter rounded-full">Subject Expert</span>'
+                                    }
                                 </div>
                             </div>
+
+                            <!-- Class Info -->
+                            <h4 class="font-black text-xl text-slate-900 mb-1">${c.name}</h4>
+                            <p class="text-xs font-bold text-slate-400 mb-6">${subjects.length} Subjects Assigned</p>
+                            
+                            <!-- Actions Grid -->
+                            <div class="grid grid-cols-1 gap-2 border-t border-slate-50 pt-4 mt-2">
+                                <a href="student-results-entry.html" class="flex items-center justify-between px-4 py-3 bg-indigo-50 text-indigo-700 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-indigo-600 hover:text-white transition-all group/btn">
+                                    <div class="flex items-center gap-2">
+                                        <ion-icon name="create" class="text-lg"></ion-icon>
+                                        Enter Results
+                                    </div>
+                                    <ion-icon name="arrow-forward" class="text-lg opacity-0 group-hover/btn:opacity-100 transition-opacity"></ion-icon>
+                                </a>
+                                
+                                ${isFormMaster ? `
+                                    <button onclick="goToRecords('${c.name}')" class="flex items-center justify-between px-4 py-3 bg-slate-50 text-slate-600 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-secondary hover:text-white transition-all group/btn">
+                                        <div class="flex items-center gap-2">
+                                            <ion-icon name="clipboard" class="text-lg"></ion-icon>
+                                            Manage Remarks
+                                        </div>
+                                        <ion-icon name="arrow-forward" class="text-lg opacity-0 group-hover/btn:opacity-100 transition-opacity"></ion-icon>
+                                    </button>
+                                ` : ''}
+                            </div>
                         </div>
-                        <h4 class="font-bold text-lg text-gray-800">${c.name}</h4>
-                        <p class="text-sm text-gray-500 mb-4">${subjects.length} Subjects Assigned</p>
-                        <div class="flex flex-wrap gap-1">
-                            ${subjects.slice(0, 3).map(s => `<span class="px-2 py-1 bg-gray-50 text-gray-600 text-[10px] rounded font-mono">${s.code || (s.name||'').substring(0,3).toUpperCase()}</span>`).join('')}
-                            ${subjects.length > 3 ? `<span class="px-2 py-1 bg-gray-50 text-slate-200 text-[10px] rounded font-mono">+${subjects.length - 3}</span>` : ''}
-                        </div>
-                    </div>
-                `;
-            }).join('');
+                    `;
+                }).join('');
             }
         }
 
