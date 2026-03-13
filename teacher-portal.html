@@ -285,13 +285,7 @@
                     <span>Dashboard</span>
                 </button>
                 
-                <div class="nav-section-label text-white/40 text-[10px] font-bold uppercase tracking-widest px-4 mt-6 mb-2">Academic Tools</div>
-                <button onclick="switchView('entry')" id="nav-entry" class="w-full flex items-center justify-between gap-3 px-4 py-3 rounded-xl text-white hover:bg-white/10 font-medium transition-all group">
-                    <div class="flex items-center gap-3">
-                        <ion-icon name="create-outline" class="text-xl"></ion-icon>
-                        <span>Results Entry</span>
-                    </div>
-                </button>
+
                 <div id="nav-records-wrapper" class="hidden">
                     <button onclick="switchView('records')" id="nav-records" class="w-full flex items-center justify-between gap-3 px-4 py-3 rounded-xl text-white hover:bg-white/10 font-medium transition-all group">
                         <div class="flex items-center gap-3">
@@ -387,122 +381,6 @@
                     </div>
                 </div>
 
-                <!-- VIEW: RESULT ENTRY -->
-                <div id="view-entry" class="hidden max-w-full mx-auto h-full flex flex-col">
-                    <!-- STEP 1: Header & Filters -->
-                    <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-6 md:p-8 mb-6 animate-fade-in">
-                        <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
-                            <div>
-                                <h1 class="text-3xl font-black text-gray-900 tracking-tight">Gradebook</h1>
-                                <p class="text-sm text-slate-400 font-medium mt-1">Manage class performance and individual subject results.</p>
-                            </div>
-                            <div class="flex items-center gap-3">
-                                <label class="bg-gray-50 text-gray-600 px-5 py-3 rounded-2xl font-bold hover:bg-gray-100 cursor-pointer flex items-center gap-2 border border-gray-200 text-sm transition-all shadow-sm">
-                                    <input type="file" id="import_csv_file" accept=".csv" class="hidden" onchange="importGradesFromCSV(this)">
-                                    <ion-icon name="cloud-upload-outline" class="text-lg"></ion-icon> Import
-                                </label>
-                                <button onclick="saveAllGrades()" id="btn-save-all" disabled class="px-8 py-3 bg-primary text-white rounded-2xl font-bold shadow-xl shadow-blue-900/20 opacity-50 cursor-not-allowed flex items-center gap-2 transition-all text-sm">
-                                    <ion-icon name="save" class="text-lg"></ion-icon> Save Changes
-                                </button>
-                            </div>
-                        </div>
-
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            <div class="space-y-2">
-                                <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Select Class</label>
-                                <div class="relative">
-                                    <select id="entry-class-select" onchange="loadEntrySubjects()" 
-                                        class="w-full pl-11 pr-4 py-4 bg-gray-50 border border-gray-200 rounded-2xl outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary text-sm font-bold transition-all appearance-none cursor-pointer">
-                                    </select>
-                                    <ion-icon name="school-outline" class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-xl"></ion-icon>
-                                </div>
-                            </div>
-                            <div class="space-y-2">
-                                <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Select Subject</label>
-                                <div class="relative">
-                                    <select id="entry-subject-select" onchange="loadGradebook()" disabled 
-                                        class="w-full pl-11 pr-4 py-4 bg-gray-50 border border-gray-200 rounded-2xl outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary disabled:opacity-50 text-sm font-bold transition-all appearance-none cursor-pointer">
-                                    </select>
-                                    <ion-icon name="book-outline" class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-xl"></ion-icon>
-                                </div>
-                            </div>
-                            <div id="subject-info-card" class="bg-indigo-50/50 border border-indigo-100 rounded-2xl p-4 flex items-center gap-4 hidden md:flex animate-fade-in shadow-inner">
-                                <div class="w-12 h-12 rounded-xl bg-white text-primary flex items-center justify-center flex-shrink-0 shadow-sm border border-indigo-100">
-                                    <ion-icon name="stats-chart" class="text-xl"></ion-icon>
-                                </div>
-                                <div class="overflow-hidden">
-                                    <p class="text-[10px] font-black text-indigo-400 uppercase tracking-widest">Entry Status</p>
-                                    <p class="text-sm font-bold text-indigo-900 truncate" id="subject-status-label">Please select options</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- STEP 2: Summary Stats -->
-                    <div id="entry-summary" class="hidden grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8 animate-fade-in px-1">
-                        <div class="bg-white p-6 rounded-[2rem] border border-gray-100 shadow-sm flex items-center justify-between hover:shadow-md transition-shadow">
-                            <div>
-                                <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Students</p>
-                                <p class="text-2xl font-black text-gray-900" id="summary-count">0</p>
-                            </div>
-                            <div class="w-12 h-12 rounded-2xl bg-blue-50 text-blue-500 flex items-center justify-center text-2xl">
-                                <ion-icon name="people-outline"></ion-icon>
-                            </div>
-                        </div>
-                        <div class="bg-white p-6 rounded-[2rem] border border-gray-100 shadow-sm flex items-center justify-between hover:shadow-md transition-shadow">
-                            <div>
-                                <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Average Score</p>
-                                <p class="text-2xl font-black text-gray-900" id="summary-avg">0.0</p>
-                            </div>
-                            <div class="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-500 flex items-center justify-center text-2xl">
-                                <ion-icon name="analytics-outline"></ion-icon>
-                            </div>
-                        </div>
-                        <div class="bg-white p-6 rounded-[2rem] border border-gray-100 shadow-sm flex items-center justify-between hover:shadow-md transition-shadow">
-                            <div>
-                                <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Pending Sync</p>
-                                <p class="text-2xl font-black text-gray-900" id="summary-pending">0</p>
-                            </div>
-                            <div class="w-12 h-12 rounded-2xl bg-amber-50 text-amber-500 flex items-center justify-center text-2xl">
-                                <ion-icon name="time-outline"></ion-icon>
-                            </div>
-                        </div>
-                        <div class="bg-white p-6 rounded-[2rem] border border-gray-100 shadow-sm flex items-center justify-between hover:shadow-md transition-shadow">
-                            <div>
-                                <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Records Done</p>
-                                <p class="text-2xl font-black text-gray-900" id="summary-done">0</p>
-                            </div>
-                            <div class="w-12 h-12 rounded-2xl bg-purple-50 text-purple-500 flex items-center justify-center text-2xl">
-                                <ion-icon name="checkmark-done-outline"></ion-icon>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- STEP 3: Gradebook Table -->
-                    <div class="bg-white rounded-[2.5rem] shadow-xl border border-gray-100 flex-1 overflow-hidden flex flex-col relative mb-8">
-                        <div class="overflow-auto flex-1 scroll-smooth">
-                            <table class="w-full text-left border-collapse min-w-[1100px]">
-                                <thead class="bg-gray-50/80 backdrop-blur-md text-slate-500 font-black uppercase text-[10px] tracking-widest sticky top-0 z-10 border-b border-gray-100">
-                                    <tr>
-                                        <th class="px-8 py-5 sticky-col bg-gray-50/80 z-20 min-w-[250px] shadow-sm">Student Identity</th>
-                                        <th class="px-4 py-5 w-12 text-center text-slate-300">No.</th>
-                                        <th class="px-2 py-5 text-center text-primary border-b-2 border-primary/20">Proj<br><span class="opacity-50 text-[8px]">(10)</span></th>
-                                        <th class="px-2 py-5 text-center text-primary border-b-2 border-primary/20">Indiv<br><span class="opacity-50 text-[8px]">(15)</span></th>
-                                        <th class="px-2 py-5 text-center text-primary border-b-2 border-primary/20">Test<br><span class="opacity-50 text-[8px]">(15)</span></th>
-                                        <th class="px-2 py-5 text-center text-primary border-b-2 border-primary/20">H.W<br><span class="opacity-50 text-[8px]">(10)</span></th>
-                                        <th class="px-4 py-5 text-center bg-blue-50/30 text-primary font-black">Class<br>(50)</th>
-                                        <th class="px-4 py-5 text-center bg-amber-50/30 text-amber-900/70 font-black">Exam<br>(50)</th>
-                                        <th class="px-6 py-5 text-center font-black text-gray-900 bg-gray-50/50">Total<br>(100)</th>
-                                        <th class="px-4 py-5 text-center">Grade</th>
-                                        <th class="px-8 py-5 text-right">Teacher Remark</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="gradebook-body" class="divide-y divide-gray-50 text-sm">
-                                    <tr>
-                                        <td colspan="11" class="text-center py-40">
-                                            <div class="flex flex-col items-center gap-4 text-slate-300">
-                                                <ion-icon name="file-tray-outline" class="text-6xl opacity-20"></ion-icon>
-                                                <p class="font-bold uppercase tracking-widest text-xs opacity-50">Select filter to view students</p>
                                             </div>
                                         </td>
                                     </tr>
@@ -634,14 +512,14 @@
                 const subjects = c.subjects || [];
                 const isFormMaster = c.class_teacher_id == currentUser.id;
                 return `
-                    <div class="bg-white p-6 rounded-xl border ${isFormMaster ? 'border-indigo-200 bg-indigo-50/5' : 'border-gray-100'} shadow-sm hover:shadow-md transition group cursor-pointer" onclick="goToEntry('${c.name}')">
+                    <div class="bg-white p-6 rounded-xl border ${isFormMaster ? 'border-indigo-200 bg-indigo-50/5' : 'border-gray-100'} shadow-sm hover:shadow-md transition group cursor-pointer" onclick="${isFormMaster ? `goToRecords('${c.name}')` : ''}">
                         <div class="flex justify-between items-start mb-4">
                             <div class="w-12 h-12 rounded-lg ${isFormMaster ? 'bg-indigo-600 text-white' : 'bg-blue-50 text-blue-600'} flex items-center justify-center text-xl font-bold shadow-sm">
                                 ${c.name.charAt(0)}
                             </div>
-                            <div class="flex flex-col items-end gap-2">
-                                ${isFormMaster ? '<span class="px-2 py-0.5 bg-indigo-100 text-indigo-700 text-[9px] font-black uppercase tracking-tighter rounded-full">Form Master</span>' : ''}
-                                <div class="text-gray-300 group-hover:text-primary transition">
+                            <div class="flex flex-col items-end gap-2 text-right">
+                                ${isFormMaster ? '<span class="px-2 py-0.5 bg-indigo-100 text-indigo-700 text-[9px] font-black uppercase tracking-tighter rounded-full">Form Master</span>' : '<span class="px-2 py-0.5 bg-gray-100 text-gray-400 text-[9px] font-black uppercase tracking-tighter rounded-full">Subject Expert</span>'}
+                                <div class="${isFormMaster ? 'text-gray-300 group-hover:text-primary' : 'text-gray-100'} transition">
                                     <ion-icon name="arrow-forward-circle" class="text-2xl"></ion-icon>
                                 </div>
                             </div>
@@ -656,411 +534,38 @@
                 `;
             }).join('');
             }
-
-            // Restore Entry Dropdown
-            const entrySelect = document.getElementById('entry-class-select');
-            if (entrySelect) {
-                entrySelect.innerHTML = '<option value="">-- Select Class --</option>' + 
-                    assignedClasses.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
-            }
         }
 
-        function goToEntry(className) {
-            switchView('entry');
+        function goToRecords(className) {
+            switchView('records');
             const cls = assignedClasses.find(c => c.name === className);
             if(cls) {
-                document.getElementById('entry-class-select').value = cls.id;
-                loadEntrySubjects();
+                document.getElementById('records-class-select').value = cls.id;
+                loadRecords();
             }
         }
 
-        // --- ENTRY & GRADEBOOK LOGIC ---
 
-        function loadEntrySubjects() {
-            // Using loose equality for ID matching just in case (string vs int)
-            const classId = document.getElementById('entry-class-select').value;
-            const subjectSelect = document.getElementById('entry-subject-select');
-            
-            subjectSelect.innerHTML = '<option value="">-- Select Subject --</option>';
-            subjectSelect.disabled = true;
-            document.getElementById('btn-save-all').disabled = true;
-            document.getElementById('btn-save-all').classList.add('opacity-50', 'cursor-not-allowed');
-            document.getElementById('gradebook-body').innerHTML = `<tr><td colspan="8" class="text-center py-20 text-slate-200 italic">Select a Subject to load students.</td></tr>`;
-
-            if(!classId) return;
-
-            const cls = assignedClasses.find(c => c.id == classId);
-            if(cls && cls.subjects) {
-                // Return all subjects assigned to class (as per API)
-                subjectSelect.innerHTML += cls.subjects.map(s => `<option value="${s.id}">${s.name} (${s.code || ''})</option>`).join('');
-                subjectSelect.disabled = false;
-            }
-        }
-
-        async function loadGradebook() {
-            const classId = document.getElementById('entry-class-select').value;
-            const subjectId = document.getElementById('entry-subject-select').value;
-            
-            if(!classId || !subjectId) return;
-
-            currentClassId = classId;
-            currentSubjectId = subjectId;
-
-            // Show loading
-            const tbody = document.getElementById('gradebook-body');
-            document.getElementById('subject-info-card').classList.remove('hidden');
-            document.getElementById('subject-status-label').innerText = 'Syncing data...';
-            
-            tbody.innerHTML = `
-                <tr>
-                    <td colspan="12" class="text-center py-32">
-                        <div class="flex flex-col items-center justify-center space-y-4">
-                            <div class="w-12 h-12 border-4 border-indigo-100 border-t-indigo-600 rounded-full animate-spin"></div>
-                            <p class="text-sm font-bold text-gray-400 uppercase tracking-widest animate-pulse">Fetching students...</p>
-                        </div>
-                    </td>
-                </tr>
-            `;
-
-            try {
-                // Fetch Students from API
-                console.log("📡 Fetching students...", { classId, subjectId });
-                currentStudents = await fetchTeacherData('students', { class_id: classId, subject_id: subjectId });
-                console.log("✅ Gradebook: Loaded Students", currentStudents);
-                
-                if(!currentStudents || !Array.isArray(currentStudents)) {
-                    console.error("❌ Invalid student data received:", currentStudents);
-                    tbody.innerHTML = `<tr><td colspan="12" class="text-center py-20 text-red-500 font-bold">Error: Received invalid data from server.</td></tr>`;
-                    return;
-                }
-
-                if(currentStudents.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="12" class="text-center py-20 text-slate-400 font-medium">No students found in this class.</td></tr>`;
-                    document.getElementById('subject-status-label').innerText = 'Class is empty';
-                    return;
-                }
-                
-                document.getElementById('subject-status-label').innerText = `Loaded ${currentStudents.length} students`;
-            } catch (err) {
-                console.error("❌ Gradebook load failed:", err);
-                tbody.innerHTML = `<tr><td colspan="12" class="text-center py-20 text-red-600 font-bold bg-red-50/50">
-                    <div class="flex flex-col items-center gap-3">
-                        <ion-icon name="alert-circle" class="text-4xl"></ion-icon>
-                        <p>Connection Error: Unable to fetch students.</p>
-                        <button onclick="loadGradebook()" class="text-xs underline">Try Again</button>
-                    </div>
-                </td></tr>`;
-                return;
-            }
-
-            const isLocked = settings.termLocked;
-
-            tbody.innerHTML = currentStudents.map((s, i) => {
-                const pScore = parseFloat(s.project_score) || 0;
-                const iScore = parseFloat(s.individual_score) || 0;
-                const tScore = parseFloat(s.class_test) || 0;
-                const hScore = parseFloat(s.homework_score) || 0;
-                
-                const classScore = pScore + iScore + tScore + hScore;
-                const examScore = parseFloat(s.exam_score) || 0;
-                const total = classScore + examScore;
-                
-                const gradeInfo = calculateGrade(total);
-                const formatVal = (v) => (!v || v == 0) ? '' : v;
-
-                const displayName = s.name || `Student (${s.id})`;
-                const initial = displayName.charAt(0);
-
-                return `
-                    <tr class="hover:bg-blue-50/5 transition-all group border-b border-gray-50" data-student-id="${s.id}">
-                        <td class="px-8 py-5 sticky-col transition-colors group-hover:bg-blue-50/80 bg-white z-0">
-                            <div class="flex items-center gap-4">
-                                <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-primary/5 to-primary/10 text-primary flex items-center justify-center font-black text-sm shadow-inner border border-white group-hover:scale-110 transition-transform">
-                                    ${initial}
-                                </div>
-                                <div class="min-w-0">
-                                    <p class="font-black text-gray-900 text-sm truncate leading-tight">${displayName}</p>
-                                    <p class="text-[9px] text-slate-400 font-black uppercase tracking-widest mt-1">${s.index_number || s.id}</p>
-                                </div>
-                            </div>
-                        </td>
-                        <td class="px-4 py-5 font-mono text-slate-300 text-[10px] text-center">${i + 1}</td>
-                        
-                        <td class="px-2 py-5 text-center bg-blue-50/5">
-                            <input type="text" inputmode="decimal" placeholder="-" value="${formatVal(s.project_score)}" 
-                                onchange="calculateRow(this)" data-type="project"
-                                ${isLocked ? 'disabled' : ''}
-                                class="score-input mobile-input font-bold text-center w-12 py-2 rounded-lg border-transparent focus:border-primary/50 focus:bg-white transition-all">
-                        </td>
-                        <td class="px-2 py-5 text-center bg-blue-50/5">
-                            <input type="text" inputmode="decimal" placeholder="-" value="${formatVal(s.individual_score)}" 
-                                onchange="calculateRow(this)" data-type="individual"
-                                ${isLocked ? 'disabled' : ''}
-                                class="score-input mobile-input font-bold text-center w-12 py-2 rounded-lg border-transparent focus:border-primary/50 focus:bg-white transition-all">
-                        </td>
-                        <td class="px-2 py-5 text-center bg-blue-50/5">
-                            <input type="text" inputmode="decimal" placeholder="-" value="${formatVal(s.class_test)}" 
-                                onchange="calculateRow(this)" data-type="test"
-                                ${isLocked ? 'disabled' : ''}
-                                class="score-input mobile-input font-bold text-center w-12 py-2 rounded-lg border-transparent focus:border-primary/50 focus:bg-white transition-all">
-                        </td>
-                        <td class="px-2 py-5 text-center bg-blue-50/5">
-                            <input type="text" inputmode="decimal" placeholder="-" value="${formatVal(s.homework_score)}" 
-                                onchange="calculateRow(this)" data-type="homework"
-                                ${isLocked ? 'disabled' : ''}
-                                class="score-input mobile-input font-bold text-center w-12 py-2 rounded-lg border-transparent focus:border-primary/50 focus:bg-white transition-all">
-                        </td>
-                        
-                        <td class="px-4 py-5 text-center bg-blue-50/20 font-black text-primary cell-class-total">
-                            ${classScore || '-'}
-                        </td>
-                        
-                        <td class="px-4 py-5 text-center bg-amber-50/20">
-                            <input type="text" inputmode="decimal" placeholder="-" value="${formatVal(examScore)}" 
-                                onchange="calculateRow(this)" data-type="exam"
-                                ${isLocked ? 'disabled' : ''}
-                                class="score-input exam-input mobile-input font-black text-center w-14 py-2 rounded-lg border-transparent focus:border-amber-500/50 focus:bg-white transition-all text-amber-900">
-                        </td>
-                        
-                        <td class="px-6 py-5 text-center font-black text-gray-900 bg-gray-50/30 cell-total">${total || '-'}</td>
-                        <td class="px-4 py-5 text-center">
-                            <span class="cell-grade inline-block w-9 h-9 rounded-xl flex items-center justify-center text-xs font-black shadow-sm ${gradeInfo.bg} ${gradeInfo.color} border border-black/5 transition-transform group-hover:rotate-12">
-                                ${total > 0 ? gradeInfo.grade : '-'}
-                            </span>
-                        </td>
-                        <td class="px-8 py-5 relative">
-                            <div class="relative flex items-center">
-                                <input type="text" value="${s.remark || gradeInfo.remark || ''}" 
-                                    placeholder="${gradeInfo.remark || 'Enter remark...'}" data-type="remark"
-                                    class="remark-input mobile-input cell-remark-input pr-12 text-xs font-medium py-3 px-4 bg-gray-50/50 rounded-2xl border-transparent focus:border-primary/30 focus:bg-white transition-all w-full">
-                                <button onclick="applySmartHint(this, ${total})" title="AI Suggest Remark" class="absolute right-2 w-8 h-8 rounded-xl bg-white shadow-sm border border-gray-100 text-primary flex items-center justify-center hover:bg-primary hover:text-white transition-all active:scale-95">
-                                    <ion-icon name="sparkles"></ion-icon>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                `;
-            }).join('');
-
-            // Enable Save Button
-            const saveBtn = document.getElementById('btn-save-all');
-            if(isLocked) {
-                saveBtn.innerHTML = '<ion-icon name="lock-closed"></ion-icon> Locked';
-                saveBtn.disabled = true;
-                saveBtn.classList.add('opacity-50', 'cursor-not-allowed', 'bg-red-500');
-                saveBtn.classList.remove('bg-primary');
-            } else {
-                saveBtn.innerHTML = '<ion-icon name="save"></ion-icon> Save Results';
-                saveBtn.disabled = false;
-                saveBtn.classList.remove('opacity-50', 'cursor-not-allowed', 'bg-red-500');
-                saveBtn.classList.add('bg-primary');
-            }
-
-            updateSummary(currentStudents);
-        }
-
-        function calculateGrade(score) {
-            // Use global if available
-            if(window.calculateGrade) return window.calculateGrade(score);
-            
-            // Local fallback
-            if (score >= 80) return { grade: 'A', remark: 'Excellent', bg: 'bg-green-100', color: 'text-green-700' };
-            if (score >= 70) return { grade: 'B', remark: 'Very Good', bg: 'bg-blue-100', color: 'text-blue-700' };
-            if (score >= 60) return { grade: 'C', remark: 'Good', bg: 'bg-yellow-100', color: 'text-yellow-700' };
-            if (score >= 50) return { grade: 'D', remark: 'Credit', bg: 'bg-orange-100', color: 'text-orange-700' };
-            if (score >= 45) return { grade: 'E', remark: 'Pass', bg: 'bg-gray-100', color: 'text-gray-700' };
-            return { grade: 'F', remark: 'Fail', bg: 'bg-red-100', color: 'text-red-700' };
-        }
-
-        function applySmartHint(btn, score) {
-            const row = btn.closest('tr');
-            const remarkInput = row.querySelector('.cell-remark-input');
-            const subjectSelect = document.getElementById('entry-subject-select');
-            const subjectName = subjectSelect.options[subjectSelect.selectedIndex]?.text.split('(')[0].trim();
-            
-            if(window.generateSmartRemark) {
-                const remark = window.generateSmartRemark(score, subjectName);
-                remarkInput.value = remark;
-                
-                // Add highlight animation
-                remarkInput.classList.add('ring-4', 'ring-blue-100', 'border-blue-500');
-                setTimeout(() => {
-                    remarkInput.classList.remove('ring-4', 'ring-blue-100', 'border-blue-500');
-                }, 1000);
-            }
-        }
-
-        function updateSummary(students) {
-            const summaryDiv = document.getElementById('entry-summary');
-            if(!summaryDiv) return;
-            summaryDiv.classList.remove('hidden');
-            summaryDiv.classList.add('grid');
-
-            let totalScore = 0;
-            let scoreCount = 0;
-            let pendingCount = 0;
-            let doneCount = 0;
-
-            students.forEach(s => {
-                const classScore = parseFloat(s.class_score) || 0;
-                const examScore = parseFloat(s.exam_score) || 0;
-                const total = classScore + examScore;
-                
-                if (total > 0 || s.status) {
-                    totalScore += total;
-                    scoreCount++;
-                }
-
-                if(s.status === 'Approved') doneCount++;
-                else pendingCount++; // Everything else is pending in results entry
-            });
-
-            const countEl = document.getElementById('summary-count');
-            const avgEl = document.getElementById('summary-avg');
-            const pendingEl = document.getElementById('summary-pending');
-            const doneEl = document.getElementById('summary-done');
-
-            if(countEl) countEl.innerText = students.length;
-            if(avgEl) avgEl.innerText = scoreCount > 0 ? (totalScore / scoreCount).toFixed(1) : "0.0";
-            if(pendingEl) pendingEl.innerText = pendingCount;
-            if(doneEl) doneEl.innerText = doneCount;
-        }
-
-        function calculateRow(input) {
-            const row = input.closest('tr');
-            const projInput  = row.querySelector('input[data-type="project"]');
-            const indivInput = row.querySelector('input[data-type="individual"]');
-            const testInput  = row.querySelector('input[data-type="test"]');
-            const homeInput  = row.querySelector('input[data-type="homework"]');
-            const examInput  = row.querySelector('input[data-type="exam"]');
-            
-            let pScore = parseFloat(projInput.value) || 0;
-            let iScore = parseFloat(indivInput.value) || 0;
-            let tScore = parseFloat(testInput.value) || 0;
-            let hScore = parseFloat(homeInput.value) || 0;
-            let examScore = parseFloat(examInput.value) || 0;
-
-            // Validate Components
-            if (pScore > 10) { pScore = 10; projInput.value = 10; }
-            if (pScore < 0)  { pScore = 0;  projInput.value = 0; }
-            if (iScore > 15) { iScore = 15; indivInput.value = 15; }
-            if (iScore < 0)  { iScore = 0;  indivInput.value = 0; }
-            if (tScore > 15) { tScore = 15; testInput.value = 15; }
-            if (tScore < 0)  { tScore = 0;  testInput.value = 0; }
-            if (hScore > 10) { hScore = 10; homeInput.value = 10; }
-            if (hScore < 0)  { hScore = 0;  homeInput.value = 0; }
-            
-            const classScore = pScore + iScore + tScore + hScore;
-
-            if (examScore > 50) { examScore = 50; examInput.value = 50; }
-            if (examScore < 0) { examScore = 0; examInput.value = 0; }
-
-            const total = classScore + examScore;
-            const gradeInfo = calculateGrade(total);
-
-            // Update Data Source
-            const sId = row.dataset.studentId;
-            const student = currentStudents.find(s => s.id == sId);
-            if(student) {
-                student.project_score = pScore;
-                student.individual_score = iScore;
-                student.class_test = tScore;
-                student.homework_score = hScore;
-                student.class_score = classScore;
-                student.exam_score = examScore;
-            }
-
-            // Update UI
-            row.querySelector('.cell-class-total').innerText = classScore || '-';
-            row.querySelector('.cell-total').innerText = total || '-';
-            const gradeBadge = row.querySelector('.cell-grade');
-            const remarkInput = row.querySelector('.cell-remark-input');
-            
-            if (total > 0) {
-                gradeBadge.innerText = gradeInfo.grade;
-                gradeBadge.className = `cell-grade inline-block w-9 h-9 rounded-xl flex items-center justify-center text-xs font-black shadow-sm ${gradeInfo.bg} ${gradeInfo.color} border border-black/5 transition-transform group-hover:rotate-12`;
-                if (remarkInput && !remarkInput.value) remarkInput.placeholder = gradeInfo.remark;
-            } else {
-                gradeBadge.innerText = '-';
-                gradeBadge.className = `cell-grade inline-block w-9 h-9 rounded-xl flex items-center justify-center text-xs font-black bg-gray-50 text-gray-300 shadow-sm border border-black/5`;
-                if (remarkInput) remarkInput.placeholder = 'Enter remark...';
-            }
-
-            updateSummary(currentStudents);
-        }
-
-        async function saveAllGrades() {
-            if(settings.termLocked) return;
-
-            const tbody = document.getElementById('gradebook-body');
-            const rows = tbody.querySelectorAll('tr');
-            
-            const grades = [];
-            rows.forEach(row => {
-                const studentId = row.dataset.studentId;
-                if (!studentId) return; // Skip headers or placeholders
-
-                const projInput  = row.querySelector('input[data-type="project"]');
-                const indivInput = row.querySelector('input[data-type="individual"]');
-                const testInput  = row.querySelector('input[data-type="test"]');
-                const homeInput  = row.querySelector('input[data-type="homework"]');
-                const examInput  = row.querySelector('input[data-type="exam"]');
-                const remarkInput = row.querySelector('input[data-type="remark"]');
-                
-                const pScore = projInput ? (parseFloat(projInput.value) || 0) : 0;
-                const iScore = indivInput ? (parseFloat(indivInput.value) || 0) : 0;
-                const tScore = testInput ? (parseFloat(testInput.value) || 0) : 0;
-                const hScore = homeInput ? (parseFloat(homeInput.value) || 0) : 0;
-                const examScore = examInput ? (parseFloat(examInput.value) || 0) : 0;
-                
-                grades.push({
-                    student_id: studentId,
-                    project_score: pScore,
-                    individual_score: iScore,
-                    class_test: tScore,
-                    homework_score: hScore,
-                    class_score: pScore + iScore + tScore + hScore,
-                    exam_score: examScore,
-                    remark: remarkInput ? remarkInput.value.trim() : ''
-                });
-            });
-
-            const payload = {
-                class_id: currentClassId,
-                subject_id: currentSubjectId,
-                grades: grades
-            };
-
-            const result = await fetchTeacherData('save_grades', payload, 'POST');
-            
-            if(result && result.success) {
-                const btn = document.getElementById('btn-save-all');
-                const oldHtml = btn.innerHTML;
-                btn.innerHTML = `<ion-icon name="checkmark-done"></ion-icon> Saved ${grades.length} Students`;
-                btn.classList.replace('bg-primary', 'bg-green-600');
-                
-                setTimeout(() => {
-                    btn.innerHTML = oldHtml;
-                    btn.classList.replace('bg-green-600', 'bg-primary');
-                }, 2000);
-            } else {
-                alert('Error asking server: ' + (result?.message || 'Unknown error'));
-            }
-        }
 
         function switchView(view) {
-            ['dashboard', 'entry', 'records'].forEach(v => {
+            ['dashboard', 'records'].forEach(v => {
                 document.getElementById(`view-${v}`).classList.add('hidden');
                 
                 const nav = document.getElementById(`nav-${v}`);
-                nav.classList.remove('bg-accent', 'text-white', 'shadow-lg', 'shadow-blue-900/20');
-                nav.classList.add('text-white', 'hover:bg-white/10');
+                if(nav) {
+                    nav.classList.remove('bg-accent', 'text-white', 'shadow-lg', 'shadow-blue-900/20');
+                    nav.classList.add('text-white', 'hover:bg-white/10');
+                }
             });
 
-            document.getElementById(`view-${view}`).classList.remove('hidden');
-            const active = document.getElementById(`nav-${view}`);
-            active.classList.remove('text-white', 'hover:bg-white/10');
-            active.classList.add('bg-accent', 'text-white', 'shadow-lg', 'shadow-blue-900/20');
+            const targetView = document.getElementById(`view-${view}`);
+            if(targetView) targetView.classList.remove('hidden');
+            
+            const activeNav = document.getElementById(`nav-${view}`);
+            if(activeNav) {
+                activeNav.classList.remove('text-white', 'hover:bg-white/10');
+                activeNav.classList.add('bg-accent', 'text-white', 'shadow-lg', 'shadow-blue-900/20');
+            }
         }
 
         // --- RECORDS LOGIC (ATTENDANCE & REMARKS) ---
@@ -1206,16 +711,7 @@
             }
         }
 
-        function downloadCSVTemplate() {
-            const csvContent = "data:text/csv;charset=utf-8," + "Student ID,Student Name,Project (10),Individual (15),Class Test (15),Homework (10),Exam Score (50)\nST001,John Doe,10,15,15,10,50";
-            const encodedUri = encodeURI(csvContent);
-            const link = document.createElement("a");
-            link.setAttribute("href", encodedUri);
-            link.setAttribute("download", "student_grades_template.csv");
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        }
+
 
         // Space-Saving Helper for Mobile Keyboards
         document.addEventListener('focusin', (e) => {
@@ -1236,72 +732,7 @@
             }
         });
 
-        function importGradesFromCSV(input) {
-            if (!input.files || !input.files[0]) return;
-            const file = input.files[0];
-            const reader = new FileReader();
 
-            reader.onload = function(e) {
-                const text = e.target.result;
-                const rows = text.split('\n').map(row => row.split(','));
-                
-                // Header detection
-                let idCol     = 0;
-                let projCol   = -1;
-                let testCol   = -1;
-                let groupCol  = -1;
-                let examCol   = -1;
-                
-                const header = rows[0].map(h => h.toLowerCase().trim());
-                if(header.includes('student id') || header.includes('id')) {
-                    idCol = header.findIndex(h => h.includes('id'));
-                    projCol = header.findIndex(h => h.includes('project') || h.includes('proj'));
-                    testCol = header.findIndex(h => h.includes('test'));
-                    groupCol = header.findIndex(h => h.includes('group'));
-                    examCol = header.findIndex(h => h.includes('exam'));
-                }
-
-                let updatedCount = 0;
-                const tbody = document.getElementById('gradebook-body'); // Teacher portal table ID
-                
-                const startRow = (header.includes('id') || header.includes('student')) ? 1 : 0;
-                
-                for(let i = startRow; i < rows.length; i++) {
-                    const row = rows[i];
-                    if(row.length < 2) continue; 
-                    
-                    const sId = row[idCol]?.trim();
-                    if(!sId) continue;
-                    
-                    let tr = tbody.querySelector(`tr[data-student-id="${sId}"]`);
-                    if(!tr) {
-                         const allTrs = Array.from(tbody.querySelectorAll('tr[data-student-id]'));
-                         tr = allTrs.find(t => t.dataset.studentId.toUpperCase() === sId.toUpperCase());
-                    }
-
-                    if(tr) {
-                        const pInput = tr.querySelector('input[data-type="project"]');
-                        const tInput = tr.querySelector('input[data-type="test"]');
-                        const gInput = tr.querySelector('input[data-type="group"]');
-                        const eInput = tr.querySelector('input[data-type="exam"]');
-                        
-                        if(pInput && projCol !== -1 && row[projCol]) pInput.value = parseInt(row[projCol]) || 0;
-                        if(tInput && testCol !== -1 && row[testCol]) tInput.value = parseInt(row[testCol]) || 0;
-                        if(gInput && groupCol !== -1 && row[groupCol]) gInput.value = parseInt(row[groupCol]) || 0;
-                        if(eInput && examCol !== -1 && row[examCol]) eInput.value = parseInt(row[examCol]) || 0;
-                        
-                        // Trigger calculation
-                        calculateRow(pInput || eInput); 
-                        updatedCount++;
-                    }
-                }
-                
-                alert(`Imported grades for ${updatedCount} students.\n\nPlease review and click 'Save Results' to confirm.`);
-                input.value = '';
-            };
-            
-            reader.readAsText(file);
-        }
 
         function toggleSidebar() {
              const sidebar = document.getElementById('sidebar');
