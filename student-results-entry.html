@@ -199,6 +199,11 @@
                                 <div id="duplicate-resolution-area" class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <!-- Resolved items injected here -->
                                 </div>
+
+                                <button onclick="autoResolveTeacherDuplicates()" class="mt-6 flex items-center justify-center gap-2 w-full py-4 bg-red-600 text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl shadow-red-900/20 hover:bg-red-700 transition active:scale-95">
+                                    <ion-icon name="sparkles" class="text-xl"></ion-icon>
+                                    Clear Duplicates Automatically
+                                </button>
                             </div>
                             <button onclick="document.getElementById('duplicate-alert-admin').classList.add('hidden')" class="text-red-300 hover:text-red-500 transition">
                                 <ion-icon name="close-circle" class="text-2xl"></ion-icon>
@@ -565,9 +570,6 @@
         async function confirmAndDeleteDuplicate(id, name) {
             if (!confirm(`Are you sure you want to delete ${name} (ID: ${id})?\nThis will remove the student record entirely. Continue?`)) return;
             
-            // Note: Since teachers use fetchTeacherData and admins use fetchAdminData,
-            // we use the appropriate one based on role. admin can delete, teacher usually can't
-            // but for this "Ask them to delete" request, we'll route it.
             const actionFunc = currentUser.role === 'admin' ? fetchAdminData : fetchTeacherData;
             const res = await actionFunc('delete_student', { id }, 'POST');
             
@@ -575,6 +577,55 @@
                 loadGradebook();
             } else {
                 alert('Deletion failed: ' + (res?.message || 'Unauthorized Action'));
+            }
+        }
+
+        async function autoResolveTeacherDuplicates() {
+            if (!confirm("Would you like the system to automatically clean up these duplicates for you?\n\nIt will keep the record with the most results/scores and remove the redundant ones.")) return;
+
+            const resolutionArea = document.getElementById('duplicate-resolution-area');
+            const originalHtml = resolutionArea.innerHTML;
+            resolutionArea.innerHTML = '<div class="col-span-full py-8 text-center text-red-600 font-bold animate-pulse">CLEANING UP... PLEASE WAIT</div>';
+
+            try {
+                // Determine victims
+                const toDelete = [];
+                const nameCounts = {};
+                const nameGroups = {};
+                
+                currentStudents.forEach(s => {
+                    const n = (s.name || '').trim().toLowerCase();
+                    if(n) {
+                        nameCounts[n] = (nameCounts[n] || 0) + 1;
+                        if(!nameGroups[n]) nameGroups[n] = [];
+                        nameGroups[n].push(s);
+                    }
+                });
+
+                Object.keys(nameGroups).forEach(name => {
+                    const group = nameGroups[name];
+                    if (group.length > 1) {
+                        // Keep best one (most scores)
+                        group.sort((a, b) => {
+                            const aLen = (a.scores || []).length;
+                            const bLen = (b.scores || []).length;
+                            return bLen - aLen; 
+                        });
+                        for(let i = 1; i < group.length; i++) toDelete.push(group[i].id);
+                    }
+                });
+
+                const actionFunc = currentUser.role === 'admin' ? fetchAdminData : fetchTeacherData;
+                for (const id of toDelete) {
+                    await actionFunc('delete_student', { id }, 'POST');
+                }
+
+                alert(`Successfully cleaned up ${toDelete.length} duplicate records!`);
+                loadGradebook();
+            } catch (err) {
+                console.error(err);
+                alert('Error during auto-resolution.');
+                resolutionArea.innerHTML = originalHtml;
             }
         }
 

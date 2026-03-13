@@ -2118,9 +2118,14 @@
                 if (duplicates.length > 5) html += `<span class="text-[10px] text-amber-600 font-bold">+ ${duplicates.length - 5} more</span>`;
                 
                 html += `
-                    <button onclick="openResolveModal()" class="ml-auto px-4 py-1.5 bg-amber-500 text-white rounded-lg text-[10px] font-black uppercase tracking-widest hover:bg-amber-600 transition shadow-md flex items-center gap-1">
-                        <ion-icon name="trash"></ion-icon> Resolve All
-                    </button>
+                    <div class="ml-auto flex gap-2">
+                        <button onclick="autoResolveDuplicates()" class="px-4 py-1.5 bg-emerald-500 text-white rounded-lg text-[10px] font-black uppercase tracking-widest hover:bg-emerald-600 transition shadow-md flex items-center gap-1">
+                            <ion-icon name="sparkles"></ion-icon> Quick Fix
+                        </button>
+                        <button onclick="openResolveModal()" class="px-4 py-1.5 bg-amber-500 text-white rounded-lg text-[10px] font-black uppercase tracking-widest hover:bg-amber-600 transition shadow-md flex items-center gap-1">
+                            <ion-icon name="list"></ion-icon> Manual Review
+                        </button>
+                    </div>
                 `;
                 
                 listEl.innerHTML = html;
@@ -2198,6 +2203,56 @@
                 if(typeof renderStudents === 'function') renderStudents();
             } else {
                 alert('Deletion failed: ' + (result?.message || 'Unknown error'));
+            }
+        }
+
+        async function autoResolveDuplicates() {
+            if (!confirm("Would you like the system to automatically fix these duplicates for you?\n\nIt will keep the student record with the most data (scores) and remove the empty ones.")) return;
+
+            const listEl = document.getElementById('duplicate-names-list');
+            const originalHtml = listEl.innerHTML;
+            listEl.innerHTML = '<span class="text-[10px] font-bold text-emerald-600 animate-pulse flex items-center gap-2"><ion-icon name="sync" class="animate-spin"></ion-icon> Fixing duplicates, please wait...</span>';
+
+            try {
+                const students = await fetchAdminData('students');
+                const nameGroups = {};
+                students.forEach(s => {
+                    const n = s.name.trim().toLowerCase();
+                    if (!nameGroups[n]) nameGroups[n] = [];
+                    nameGroups[n].push(s);
+                });
+
+                const toDelete = [];
+                Object.keys(nameGroups).forEach(name => {
+                    const group = nameGroups[name];
+                    if (group.length > 1) {
+                        // Sort by data completeness (most scores first)
+                        group.sort((a, b) => {
+                            const aLen = (a.scores || []).length;
+                            const bLen = (b.scores || []).length;
+                            return bLen - aLen; 
+                        });
+                        
+                        // Keep the first one (index 0), delete the rest
+                        for(let i = 1; i < group.length; i++) {
+                            toDelete.push(group[i].id);
+                        }
+                    }
+                });
+
+                let count = 0;
+                for (const id of toDelete) {
+                    await fetchAdminData('delete_student', { id }, 'POST');
+                    count++;
+                }
+
+                alert(`Success! We have automatically removed ${count} redundant student records.`);
+                initDashboard();
+                if(typeof renderStudents === 'function') renderStudents();
+            } catch (err) {
+                console.error(err);
+                alert('An error occurred during the quick fix.');
+                listEl.innerHTML = originalHtml;
             }
         }
 
