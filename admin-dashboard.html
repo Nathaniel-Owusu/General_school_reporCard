@@ -1123,7 +1123,8 @@
                 
                 <div class="space-y-1">
                     <label class="text-xs font-bold text-gray-500 uppercase">Full Name</label>
-                    <input type="text" name="name" id="input-name" required placeholder="e.g. John Doe" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-accent outline-none">
+                    <input type="text" name="name" id="input-name" required placeholder="e.g. John Doe" oninput="checkDuplicateName(this.value)" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-accent outline-none">
+                    <span id="name-duplicate-error" class="text-[10px] text-red-500 font-bold hidden px-1">⚠️ This name already exists in another class.</span>
                 </div>
                 
                 <div class="space-y-1 hidden" id="input-id-container">
@@ -1799,6 +1800,7 @@
              
              // Show modal immediately for responsiveness
              modal.classList.remove('hidden');
+             document.getElementById('name-duplicate-error').classList.add('hidden');
              
              // Show loading state in class select
              const classSelect = document.getElementById('student-class-select');
@@ -1865,6 +1867,29 @@
                  console.error("Error in openAddStudentModal:", error);
                  alert("An error occurred while loading the form. Please check your connection.");
              }
+        }
+
+        async function checkDuplicateName(name) {
+            const errorSpan = document.getElementById('name-duplicate-error');
+            const editId = document.getElementById('edit-mode-id').value;
+            
+            if (!name || name.trim().length < 2) {
+                errorSpan.classList.add('hidden');
+                return;
+            }
+
+            const isDuplicate = allStudents.some(s => 
+                s.name.trim().toLowerCase() === name.trim().toLowerCase() && 
+                s.id != editId
+            );
+
+            if (isDuplicate) {
+                const dup = allStudents.find(s => s.name.trim().toLowerCase() === name.trim().toLowerCase());
+                errorSpan.innerText = `⚠️ This name exists in ${dup.class}. Duplicates are allowed but not recommended.`;
+                errorSpan.classList.remove('hidden');
+            } else {
+                errorSpan.classList.add('hidden');
+            }
         }
 
         async function handleSaveStudent(e) {

@@ -261,6 +261,21 @@ async function fetchAdminData(action, params = {}) {
     // WRITE Operations
     if (action === 'add_student') {
         const index = db.students.findIndex(s => s.id == params.id);
+        
+        // --- Duplicate Name Check ---
+        const duplicate = db.students.find(s => 
+            s.school_id === schoolId && 
+            s.name.trim().toLowerCase() === params.name.trim().toLowerCase() &&
+            s.id != params.id // Exclude self if editing
+        );
+        
+        if (duplicate) {
+            return { 
+                success: false, 
+                message: `Duplicate Name: A student named "${params.name}" already exists in ${duplicate.class}.`
+            };
+        }
+
         if (index >= 0) {
             db.students[index] = { ...db.students[index], ...params };
         } else {

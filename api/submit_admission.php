@@ -32,6 +32,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 
+    // --- Duplicate Check ---
+    $dup_stmt = $conn->prepare("SELECT id FROM admission_applications WHERE school_id = ? AND first_name = ? AND last_name = ? AND dob = ? AND status != 'Rejected' LIMIT 1");
+    $dup_stmt->bind_param("ssss", $data['school_id'], $data['first_name'], $data['last_name'], $data['dob']);
+    $dup_stmt->execute();
+    $dup_res = $dup_stmt->get_result();
+    if($dup_res->num_rows > 0) {
+        echo json_encode(["success" => false, "message" => "An application for this student has already been submitted for this school."]);
+        $dup_stmt->close();
+        exit;
+    }
+    $dup_stmt->close();
+
     $stmt = $conn->prepare("INSERT INTO admission_applications (school_id, first_name, last_name, dob, gender, parent_name, contact_phone, email) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
     if ($stmt) {
         $stmt->bind_param(
