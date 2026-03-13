@@ -2930,34 +2930,6 @@
                 allTeachers.map(t => `<option value="${t.id}" ${t.id === selectedId ? 'selected' : ''}>${t.name}</option>`).join('');
         }
 
-        async function openAddClassModal() {
-            const form = document.querySelector('#add-class-modal form');
-            form.reset();
-            form.id.value = "";
-            await populateClassTeacherSelect();
-            document.querySelector('#add-class-modal h2').innerText = "New Class";
-            document.getElementById('add-class-modal').classList.remove('hidden');
-        }
-
-        async function openEditClassModal(id) {
-             const classes = await fetchAdminData('classes');
-             const cls = classes.find(c => c.id === id);
-             if(!cls) return;
-
-             const form = document.querySelector('#add-class-modal form');
-             form.id.value = cls.id;
-             form.name.value = cls.name;
-             if(form.level) form.level.value = cls.level;
-             // handle active/inactive
-             if(form.active) form.active.value = cls.active === false ? "false" : "true";
-             
-             await populateClassTeacherSelect(cls.class_teacher_id);
-             
-             document.querySelector('#add-class-modal h2').innerText = "Edit Class";
-             document.getElementById('add-class-modal').classList.remove('hidden');
-        }
-
-
 
         let allSubjects = [];
 
