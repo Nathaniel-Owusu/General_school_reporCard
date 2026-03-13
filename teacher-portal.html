@@ -705,6 +705,7 @@
                 // Fetch Students from API
                 console.log("📡 Fetching students...", { classId, subjectId });
                 currentStudents = await fetchTeacherData('students', { class_id: classId, subject_id: subjectId });
+                console.log("✅ Gradebook: Loaded Students", currentStudents);
                 
                 if(!currentStudents || !Array.isArray(currentStudents)) {
                     console.error("❌ Invalid student data received:", currentStudents);

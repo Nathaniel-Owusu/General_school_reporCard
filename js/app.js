@@ -664,10 +664,12 @@ async function fetchTeacherData(action, params = {}) {
             result = students.map(s => {
                 const scoresArr = Array.isArray(s.scores) ? s.scores : [];
                 const score = scoresArr.find(sc => sc.subject_id == params.subject_id) || {};
+                const rawName = s.name || s.student_name || s.full_name || s.fullName || '';
+                const finalName = rawName.trim() || `Student (${s.id})`;
                 return {
                     id: s.id,
-                    name: s.name || s.student_name || '---',
-                    student_name: s.name || s.student_name || '---',
+                    name: finalName,
+                    student_name: finalName,
                     project_score: score.project_score || 0,
                     individual_score: score.individual_score || 0,
                     class_test: score.class_test || 0,
