@@ -552,7 +552,7 @@ async function fetchTeacherData(action, params = {}) {
         // Match by Class Teacher ID, Name/ID assignment, OR Subject Assignment
         return db.classes.filter(c => 
             c.school_id === schoolId && (
-                c.class_teacher_id === user.id ||
+                c.class_teacher_id == user.id ||
                 myClassNames.includes(c.name) || 
                 myClassNames.includes(c.id) ||
                 mySubjectAssignments.some(as => as.class_id === c.id)
@@ -569,7 +569,7 @@ async function fetchTeacherData(action, params = {}) {
              let allowedSubjects = [];
              
              // Check roles
-             const isDirectClassTeacher = c.class_teacher_id === user.id;
+             const isDirectClassTeacher = c.class_teacher_id == user.id;
              const isLegacyClassTeacher = (me.assigned_classes || []).includes(c.name) || (me.assigned_classes || []).includes(c.id);
              const isAdmin = user.role === 'admin';
              const isGeneralAccess = isAdmin || isDirectClassTeacher || isLegacyClassTeacher;
@@ -610,7 +610,7 @@ async function fetchTeacherData(action, params = {}) {
         
         const enrichedClasses = rawClasses.map(c => {
              let allowedSubjects = [];
-             const isDirectClassTeacher = c.class_teacher_id === user.id;
+             const isDirectClassTeacher = c.class_teacher_id == user.id;
              const isLegacyClassTeacher = (me.assigned_classes || []).includes(c.name) || (me.assigned_classes || []).includes(c.id);
              const isAdmin = user.role === 'admin';
              const isGeneralAccess = isAdmin || isDirectClassTeacher || isLegacyClassTeacher;

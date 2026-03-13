@@ -610,7 +610,7 @@
             assignedClasses = await fetchTeacherData('classes') || [];
 
             // Populate Records Dropdown (ONLY classes where teacher is Class Teacher aka Form Master)
-            const formMasterClasses = (currentUser.role === 'admin') ? assignedClasses : assignedClasses.filter(c => c.class_teacher_id === currentUser.id);
+            const formMasterClasses = (currentUser.role === 'admin') ? assignedClasses : assignedClasses.filter(c => c.class_teacher_id == currentUser.id);
             const recordsSelect = document.getElementById('records-class-select');
             
             if(recordsSelect) {
@@ -625,9 +625,13 @@
             }
 
             // Enhanced Classes Grid with Form Master label
-            grid.innerHTML = assignedClasses.map(c => {
+            const grid = document.getElementById('assigned-classes-grid');
+            if (assignedClasses.length === 0) {
+                 grid.innerHTML = `<div class="col-span-full py-20 text-center text-slate-300 font-medium">No classes assigned. Please contact Administrator.</div>`;
+            } else {
+                 grid.innerHTML = assignedClasses.map(c => {
                 const subjects = c.subjects || [];
-                const isFormMaster = c.class_teacher_id === currentUser.id;
+                const isFormMaster = c.class_teacher_id == currentUser.id;
                 return `
                     <div class="bg-white p-6 rounded-xl border ${isFormMaster ? 'border-indigo-200 bg-indigo-50/5' : 'border-gray-100'} shadow-sm hover:shadow-md transition group cursor-pointer" onclick="goToEntry('${c.name}')">
                         <div class="flex justify-between items-start mb-4">
@@ -650,6 +654,7 @@
                     </div>
                 `;
             }).join('');
+            }
 
             // Restore Entry Dropdown
             const entrySelect = document.getElementById('entry-class-select');
@@ -1130,7 +1135,7 @@
             const cls = assignedClasses.find(c => c.id == classId);
             
             // Security Check: Ensure user is Form Master or Admin
-            if (currentUser.role !== 'admin' && cls?.class_teacher_id !== currentUser.id) {
+            if (currentUser.role !== 'admin' && cls?.class_teacher_id != currentUser.id) {
                 alert("Unauthorized: You are not the Form Master for this class.");
                 return;
             }
