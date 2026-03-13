@@ -73,30 +73,62 @@
             .record-textarea { min-height: 30px !important; padding: 4px 8px !important; }
         }
 
-        /* Result Entry Input Styling */
+        /* Result Entry Input Styling - Premium */
         .score-input {
-            width: 100%;
-            max-width: 50px;
-            padding: 8px 4px;
+            width: 50px;
+            height: 42px;
             text-align: center;
             font-family: 'JetBrains Mono', 'Outfit', monospace;
-            font-weight: 600;
-            font-size: 14px;
-            border: 1.5px solid #e2e8f0;
-            border-radius: 8px;
+            font-weight: 800;
+            font-size: 15px;
+            color: #1e293b;
+            border: 2px solid #f1f5f9;
             background: #ffffff;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 12px;
             outline: none;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
         }
 
         .score-input:focus {
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
-            transform: translateY(-1px);
-            background: #fff;
-            min-width: 60px; /* Expand slightly on focus for better visibility */
+            border-color: #6366f1;
+            background: #ffffff;
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15), 0 4px 12px rgba(99, 102, 241, 0.08);
+            transform: scale(1.1) translateY(-2px);
+            z-index: 10;
+            position: relative;
         }
 
+        .score-input:disabled {
+            background: #f8fafc;
+            color: #94a3b8;
+            border-color: #f1f5f9;
+            cursor: not-allowed;
+        }
+
+        /* Sticky Column Enhancements */
+        .sticky-col {
+            position: sticky;
+            left: 0;
+            z-index: 5;
+            background: white !important;
+        }
+
+        .sticky-col::after {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            width: 1px;
+            background: linear-gradient(to bottom, transparent, #e2e8f0, transparent);
+            box-shadow: 4px 0 12px rgba(0,0,0,0.05);
+        }
+
+        thead .sticky-col {
+            z-index: 20;
+            background: #f8fafc !important;
+        }
         .remark-input {
             width: 100%;
             min-width: 140px;
@@ -135,13 +167,47 @@
             background: #fff;
         }
 
-        .score-input:hover:not(:disabled) {
-            border-color: #94a3b8;
+        .score-input {
+            width: 50px;
+            height: 40px;
+            text-align: center;
+            font-family: 'JetBrains Mono', 'Outfit', monospace;
+            font-weight: 800;
+            font-size: 15px;
+            color: #1e293b;
+            border: 2px solid #f1f5f9;
+            background: #ffffff;
+            border-radius: 12px;
+            outline: none;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
         }
 
-        .score-input::-webkit-outer-spin-button {
-            -webkit-appearance: none;
-            margin: 0;
+        .score-input:focus {
+            border-color: #6366f1;
+            background: #ffffff;
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15), 0 4px 12px rgba(99, 102, 241, 0.08);
+            transform: scale(1.05) translateY(-2px);
+            z-index: 10;
+            position: relative;
+        }
+
+        .score-input:disabled {
+            background: #f8fafc;
+            color: #94a3b8;
+            border-color: #f1f5f9;
+            cursor: not-allowed;
+        }
+
+        .sticky-col {
+            position: sticky;
+            left: 0;
+            z-index: 5;
+            box-shadow: 10px 0 15px -10px rgba(0,0,0,0.1);
+        }
+
+        thead .sticky-col {
+            z-index: 20;
         }
 
         .btn-smart-remark {
@@ -317,26 +383,51 @@
                 <!-- VIEW: RESULT ENTRY -->
                 <div id="view-entry" class="hidden max-w-full mx-auto h-full flex flex-col">
                     
-                    <!-- Controls -->
-                    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-3 md:p-4 mb-4 md:mb-6 sticky top-0 z-20">
-                        <div class="grid grid-cols-1 md:grid-cols-4 gap-3 md:gap-4 items-end">
+                    <!-- Controls Header -->
+                    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 md:p-6 mb-6 animate-fade-in">
+                        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
                             <div>
-                                <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Class</label>
-                                <select id="entry-class-select" onchange="loadEntrySubjects()" class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-primary text-sm"></select>
+                                <h1 class="text-2xl font-black text-gray-900 tracking-tight">Results Entry</h1>
+                                <p class="text-sm text-slate-400 font-medium mt-1">Select a class and subject to manage academic records.</p>
                             </div>
-                            <div>
-                                <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Subject</label>
-                                <select id="entry-subject-select" onchange="loadGradebook()" disabled class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-primary disabled:opacity-50 text-sm"></select>
-                            </div>
-                            <div class="md:col-span-2 flex items-center justify-end gap-2 mt-4 md:mt-0">
-                                <label class="flex-1 md:flex-none justify-center bg-green-50 text-green-600 px-3 md:px-4 py-2 md:py-2.5 rounded-xl font-bold hover:bg-green-100 cursor-pointer flex items-center gap-2 border border-green-200 text-[10px] md:text-sm transition-all active:scale-95">
+                            <div class="flex items-center gap-3">
+                                <label class="flex-1 md:flex-none justify-center bg-emerald-50 text-emerald-600 px-4 py-2.5 rounded-xl font-bold hover:bg-emerald-100 cursor-pointer flex items-center gap-2 border border-emerald-100 text-sm transition-all active:scale-95 shadow-sm">
                                     <input type="file" id="import_csv_file" accept=".csv" class="hidden" onchange="importGradesFromCSV(this)">
-                                    <ion-icon name="cloud-upload" class="text-base md:text-lg"></ion-icon> <span>Import</span>
+                                    <ion-icon name="cloud-upload" class="text-lg"></ion-icon> <span>Import CSV</span>
                                 </label>
-                                
-                                <button onclick="saveAllGrades()" id="btn-save-all" disabled class="flex-1 md:flex-none justify-center px-4 md:px-6 py-2 md:py-2.5 bg-primary text-white rounded-xl font-bold shadow-lg shadow-blue-900/10 opacity-50 cursor-not-allowed flex items-center gap-2 transition-all hover:bg-blue-800 active:scale-95 text-[10px] md:text-sm">
-                                    <ion-icon name="save" class="text-base md:text-lg"></ion-icon> <span>Save</span>
+                                <button onclick="saveAllGrades()" id="btn-save-all" disabled class="flex-1 md:flex-none justify-center px-6 py-2.5 bg-primary text-white rounded-xl font-bold shadow-lg shadow-blue-900/20 opacity-50 cursor-not-allowed flex items-center gap-2 transition-all hover:bg-black active:scale-95 text-sm">
+                                    <ion-icon name="save" class="text-lg"></ion-icon> <span>Save All</span>
                                 </button>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            <div class="space-y-1.5">
+                                <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Academic Class</label>
+                                <div class="relative">
+                                    <select id="entry-class-select" onchange="loadEntrySubjects()" 
+                                        class="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent text-sm font-semibold transition-all appearance-none">
+                                    </select>
+                                    <ion-icon name="easel-outline" class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-lg"></ion-icon>
+                                </div>
+                            </div>
+                            <div class="space-y-1.5">
+                                <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Subject Area</label>
+                                <div class="relative">
+                                    <select id="entry-subject-select" onchange="loadGradebook()" disabled 
+                                        class="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent disabled:opacity-50 text-sm font-semibold transition-all appearance-none">
+                                    </select>
+                                    <ion-icon name="book-outline" class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-lg"></ion-icon>
+                                </div>
+                            </div>
+                            <div id="subject-info-card" class="bg-blue-50/50 border border-blue-100 rounded-xl p-3 flex items-center gap-4 hidden md:flex animate-fade-in">
+                                <div class="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center flex-shrink-0">
+                                    <ion-icon name="information-circle" class="text-xl"></ion-icon>
+                                </div>
+                                <div>
+                                    <p class="text-[10px] font-bold text-blue-400 uppercase tracking-wider">Status</p>
+                                    <p class="text-sm font-bold text-blue-900" id="subject-status-label">Ready to load</p>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -373,30 +464,38 @@
                         </div>
                     </div>
 
-                    <!-- Gradebook Table -->
-                    <div class="bg-white rounded-xl shadow-sm border border-gray-100 flex-1 overflow-hidden flex flex-col table-container relative">
-                        <div class="overflow-auto flex-1">
-                            <table class="w-full text-left border-collapse">
-                                <thead class="bg-gray-50 text-gray-500 font-bold uppercase text-xs sticky top-0 z-10 shadow-sm border-b border-gray-200">
+                    <!-- Gradebook Table Container -->
+                    <div class="bg-white rounded-2xl shadow-lg border border-gray-100 flex-1 overflow-hidden flex flex-col table-container relative mb-6">
+                        <div class="overflow-auto flex-1 scroll-smooth">
+                            <table class="w-full text-left border-collapse min-w-[1000px]">
+                                <thead class="bg-gray-50/50 backdrop-blur-md text-slate-500 font-bold uppercase text-[10px] tracking-widest sticky top-0 z-10 shadow-sm border-b border-gray-100">
                                     <tr>
-                                        <th class="px-4 py-3 grade-header sticky-col min-w-[160px] text-left">Student Name</th>
-                                        <th class="px-4 py-3 grade-header w-12 text-center">#</th>
-                                        <th class="px-4 py-3 grade-header hidden md:table-cell">Index ID</th>
-                                        <th class="px-2 py-3 grade-header text-center accent">Proj<br><span class="opacity-50 font-medium">(10)</span></th>
-                                        <th class="px-2 py-3 grade-header text-center accent">Indiv<br><span class="opacity-50 font-medium">(15)</span></th>
-                                        <th class="px-2 py-3 grade-header text-center accent">Test<br><span class="opacity-50 font-medium">(15)</span></th>
-                                        <th class="px-2 py-3 grade-header text-center accent">H.W<br><span class="opacity-50 font-medium">(10)</span></th>
-                                        <th class="px-2 py-3 grade-header text-center bg-blue-50/10 text-primary font-black">Class<br>(50)</th>
-                                        <th class="px-4 py-3 grade-header text-center bg-amber-50/50 text-amber-900 border-b-2 border-amber-400">Exam<br>(50)</th>
-                                        <th class="px-4 py-3 grade-header text-center font-black text-slate-800">Total</th>
-                                        <th class="px-4 py-3 grade-header text-center">Grade</th>
-                                        <th class="px-4 py-3 grade-header text-right">Remarks</th>
+                                        <th class="px-6 py-4 sticky-col bg-gray-50/50 z-20 min-w-[220px]">Student Name</th>
+                                        <th class="px-4 py-4 w-12 text-center text-slate-300">#</th>
+                                        <th class="px-4 py-4 hidden md:table-cell text-slate-300">ID</th>
+                                        <th class="px-2 py-4 text-center accent border-b-2 border-accent">Proj<br><span class="opacity-50 text-[9px]">(10)</span></th>
+                                        <th class="px-2 py-4 text-center accent border-b-2 border-accent">Indiv<br><span class="opacity-50 text-[9px]">(15)</span></th>
+                                        <th class="px-2 py-4 text-center accent border-b-2 border-accent">Test<br><span class="opacity-50 text-[9px]">(15)</span></th>
+                                        <th class="px-2 py-4 text-center accent border-b-2 border-accent">H.W<br><span class="opacity-50 text-[9px]">(10)</span></th>
+                                        <th class="px-4 py-4 text-center bg-blue-50/10 text-accent font-black">Class<br>(50)</th>
+                                        <th class="px-4 py-4 text-center bg-amber-50/30 text-amber-900">Exam<br>(50)</th>
+                                        <th class="px-4 py-4 text-center font-black text-gray-900 bg-gray-50/30">Total</th>
+                                        <th class="px-4 py-4 text-center">Grade</th>
+                                        <th class="px-6 py-4 text-right">Academic Remark</th>
                                     </tr>
                                 </thead>
-                                <tbody id="gradebook-body" class="divide-y divide-gray-100 text-sm">
+                                <tbody id="gradebook-body" class="divide-y divide-gray-50 text-sm">
                                     <tr>
-                                        <td colspan="8" class="text-center py-20 text-slate-200 italic">
-                                            Select a Class and Subject to load the gradebook.
+                                        <td colspan="12" class="text-center py-32 group">
+                                            <div class="flex flex-col items-center justify-center space-y-4 opacity-40 group-hover:opacity-60 transition-opacity">
+                                                <div class="w-16 h-16 rounded-3xl bg-gray-100 flex items-center justify-center text-4xl text-gray-400">
+                                                    <ion-icon name="school-outline"></ion-icon>
+                                                </div>
+                                                <div>
+                                                    <p class="text-lg font-bold text-gray-900">Nothing to display yet</p>
+                                                    <p class="text-xs text-slate-400 font-medium">Select a class and subject above to begin entry.</p>
+                                                </div>
+                                            </div>
                                         </td>
                                     </tr>
                                 </tbody>
@@ -588,14 +687,25 @@
 
             // Show loading
             const tbody = document.getElementById('gradebook-body');
-            tbody.innerHTML = `<tr><td colspan="8" class="text-center py-20 text-slate-200">Loading students...</td></tr>`;
+            document.getElementById('subject-info-card').classList.remove('hidden');
+            document.getElementById('subject-status-label').innerText = 'Syncing data...';
+            
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="12" class="text-center py-32">
+                        <div class="flex flex-col items-center justify-center space-y-4">
+                            <div class="w-12 h-12 border-4 border-indigo-100 border-t-indigo-600 rounded-full animate-spin"></div>
+                            <p class="text-sm font-bold text-gray-400 uppercase tracking-widest animate-pulse">Fetching students...</p>
+                        </div>
+                    </td>
+                </tr>
+            `;
 
             // Fetch Students from API
-            // Local engine 'students' action maps students of that class, and merges existing grades if any
             currentStudents = await fetchTeacherData('students', { class_id: classId, subject_id: subjectId }) || [];
-
+            
             if(currentStudents.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="8" class="text-center py-20 text-slate-200">No students found.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="12" class="text-center py-20 text-slate-200">No students found.</td></tr>`;
                 return;
             }
 
@@ -614,53 +724,66 @@
                 const gradeInfo = calculateGrade(total);
                 const formatVal = (v) => (!v || v == 0) ? '' : v;
 
+                const displayName = s.name || s.student_name || '---';
+                const initial = displayName.charAt(0);
+
                 return `
-                    <tr class="hover:bg-blue-50/20 transition-colors group border-b border-gray-100/50" data-student-id="${s.id}">
-                        <td class="px-4 py-3 font-bold text-gray-800 sticky-col transition-colors group-hover:bg-blue-50/50 bg-white">${s.name || s.student_name || '---'}</td>
-                        <td class="px-4 py-3 font-mono text-slate-300 text-[10px] text-center">${i + 1}</td>
-                        <td class="px-4 py-3 font-mono font-bold text-gray-400 text-xs hidden md:table-cell">${s.id}</td>
+                    <tr class="hover:bg-blue-50/5 transition-all group border-b border-gray-50" data-student-id="${s.id}">
+                        <td class="px-6 py-4 sticky-col transition-colors group-hover:bg-blue-50/80 bg-white z-0">
+                            <div class="flex items-center gap-3">
+                                <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-50 to-blue-50 text-indigo-600 flex items-center justify-center font-bold text-xs shadow-inner border border-white group-hover:scale-110 transition-transform">
+                                    ${initial}
+                                </div>
+                                <div class="min-w-0">
+                                    <p class="font-bold text-gray-900 text-sm truncate leading-tight">${displayName}</p>
+                                    <p class="text-[10px] text-slate-300 font-bold uppercase tracking-wider mt-0.5">${s.id}</p>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-4 py-4 font-mono text-slate-200 text-[10px] text-center">${i + 1}</td>
+                        <td class="px-4 py-4 font-mono font-medium text-slate-300 text-xs hidden md:table-cell group-hover:text-gray-900 transition-colors">${s.id}</td>
                         
-                        <td class="px-2 py-3 text-center bg-blue-50/5">
+                        <td class="px-2 py-4 text-center bg-blue-50/5">
                             <input type="text" inputmode="decimal" placeholder="-" value="${formatVal(s.project_score)}" 
                                 onchange="calculateRow(this)" data-type="project"
                                 ${isLocked ? 'disabled' : ''}
                                 class="score-input mobile-input">
                         </td>
-                        <td class="px-2 py-3 text-center bg-blue-50/10">
+                        <td class="px-2 py-4 text-center bg-blue-50/5">
                             <input type="text" inputmode="decimal" placeholder="-" value="${formatVal(s.individual_score)}" 
                                 onchange="calculateRow(this)" data-type="individual"
                                 ${isLocked ? 'disabled' : ''}
                                 class="score-input mobile-input">
                         </td>
-                        <td class="px-2 py-3 text-center bg-blue-50/15">
+                        <td class="px-2 py-4 text-center bg-blue-50/5">
                             <input type="text" inputmode="decimal" placeholder="-" value="${formatVal(s.class_test)}" 
                                 onchange="calculateRow(this)" data-type="test"
                                 ${isLocked ? 'disabled' : ''}
                                 class="score-input mobile-input">
                         </td>
-                        <td class="px-2 py-3 text-center bg-blue-50/20">
+                        <td class="px-2 py-4 text-center bg-blue-50/5">
                             <input type="text" inputmode="decimal" placeholder="-" value="${formatVal(s.homework_score)}" 
                                 onchange="calculateRow(this)" data-type="homework"
                                 ${isLocked ? 'disabled' : ''}
                                 class="score-input mobile-input">
                         </td>
                         
-                        <td class="px-2 py-3 text-center bg-blue-50/30 p-0 font-bold text-blue-800 cell-class-total">
+                        <td class="px-4 py-4 text-center bg-blue-50/20 font-black text-blue-800 cell-class-total">
                             ${classScore || '-'}
                         </td>
                         
-                        <td class="px-4 py-3 text-center bg-amber-50/20">
+                        <td class="px-4 py-4 text-center bg-amber-50/20">
                             <input type="text" inputmode="decimal" placeholder="-" value="${formatVal(examScore)}" 
                                 onchange="calculateRow(this)" data-type="exam"
                                 ${isLocked ? 'disabled' : ''}
                                 class="score-input exam-input mobile-input">
                         </td>
                         
-                        <td class="px-4 py-3 text-center font-black text-gray-900 text-lg cell-total">${total || '-'}</td>
-                        <td class="px-4 py-3 text-center">
+                        <td class="px-4 py-4 text-center font-black text-gray-900 bg-gray-50/20 cell-total">${total || '-'}</td>
+                        <td class="px-4 py-4 text-center">
                             <span class="cell-grade inline-block w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ${gradeInfo.bg} ${gradeInfo.color} shadow-sm border border-black/5">${total > 0 ? gradeInfo.grade : '-'}</span>
                         </td>
-                        <td class="px-4 py-3 relative">
+                        <td class="px-6 py-4 relative">
                             <div class="relative flex items-center">
                                 <input type="text" value="${s.remark || gradeInfo.remark || ''}" 
                                     placeholder="${gradeInfo.remark || 'Remark'}" data-type="remark"

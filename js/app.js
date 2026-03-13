@@ -665,7 +665,8 @@ async function fetchTeacherData(action, params = {}) {
                 const score = (s.scores||[]).find(sc => sc.subject_id == params.subject_id) || {};
                 return {
                     id: s.id,
-                    name: s.name,
+                    name: s.name || s.student_name || '---',
+                    student_name: s.name || s.student_name || '---',
                     project_score: score.project_score || 0,
                     individual_score: score.individual_score || 0,
                     class_test: score.class_test || 0,
