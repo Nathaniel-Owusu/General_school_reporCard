@@ -60,7 +60,7 @@
 
         <main class="flex-1 max-w-7xl mx-auto w-full p-6">
             <!-- Instructions -->
-            <div class="mb-10 text-center max-w-2xl mx-auto mt-6">
+            <div id="instructions-box" class="mb-10 text-center max-w-2xl mx-auto mt-6">
                 <h2 class="text-3xl font-black text-slate-900 mb-2">Select Your Class</h2>
                 <p class="text-slate-500 font-medium">Please select the class you wish to enter results for. You will then be able to choose specific subjects.</p>
             </div>
@@ -83,6 +83,36 @@
                 </div>
                 <h3 class="text-xl font-black text-slate-900 mb-1">No Classes Assigned</h3>
                 <p class="text-slate-400 text-sm max-w-xs">It seems you haven't been assigned to any classes yet. Please contact the administrator.</p>
+            </div>
+
+            <!-- View: Student List -->
+            <div id="view-students" class="hidden animate-fade-in">
+                <div class="flex items-center justify-between mb-8">
+                    <button onclick="showClasses()" class="flex items-center gap-2 text-indigo-600 font-black text-xs uppercase tracking-widest hover:text-indigo-800 transition-colors group">
+                        <ion-icon name="chevron-back-outline" class="text-lg group-hover:-translate-x-1 transition-transform"></ion-icon>
+                        Back to Classes
+                    </button>
+                    <div class="text-right">
+                        <h2 class="text-2xl font-black text-slate-900" id="selected-class-name">Class Name</h2>
+                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest" id="student-count-label">0 Students Found</p>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-[2.5rem] border border-slate-100 shadow-xl shadow-indigo-900/5 overflow-hidden">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-slate-50/50">
+                                <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100">#</th>
+                                <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100">Student Identity</th>
+                                <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100">Index Number</th>
+                                <th class="px-8 py-5 text-right text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="students-body" class="divide-y divide-slate-50">
+                            <!-- Students injected here -->
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </main>
 
@@ -128,7 +158,7 @@
                     const isFormMaster = c.class_teacher_id == currentUser.id;
                     
                     return `
-                        <div class="group bg-white p-6 rounded-[2.5rem] border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-indigo-900/5 hover:-translate-y-1 transition-all cursor-pointer relative overflow-hidden">
+                        <div onclick="selectClass('${c.id}', '${c.name}')" class="group bg-white p-6 rounded-[2.5rem] border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-indigo-900/5 hover:-translate-y-1 transition-all cursor-pointer relative overflow-hidden">
                             <!-- Background Accent -->
                             <div class="absolute -right-6 -bottom-6 w-24 h-24 bg-indigo-50 rounded-full opacity-20 group-hover:scale-150 transition-transform duration-700"></div>
                             
@@ -175,6 +205,66 @@
                     </div>
                 `;
             }
+        }
+
+        async function selectClass(classId, className) {
+            document.getElementById('classes-grid').classList.add('hidden');
+            document.getElementById('instructions-box').classList.add('hidden');
+            document.getElementById('loader').classList.remove('hidden');
+            document.getElementById('loader').querySelector('p').textContent = `Loading ${className}...`;
+
+            try {
+                // Fetch students for this class
+                const students = await fetchTeacherData('students', { class_id: classId }) || [];
+                
+                document.getElementById('loader').classList.add('hidden');
+                document.getElementById('view-students').classList.remove('hidden');
+                document.getElementById('selected-class-name').textContent = className;
+                document.getElementById('student-count-label').textContent = `${students.length} Students Found`;
+                
+                const tbody = document.getElementById('students-body');
+                if (students.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="4" class="px-8 py-20 text-center text-slate-400 italic">No students found in this class.</td></tr>`;
+                    return;
+                }
+
+                tbody.innerHTML = students.map((s, i) => `
+                    <tr class="group hover:bg-indigo-50/30 transition-colors">
+                        <td class="px-8 py-5 text-xs font-mono text-slate-300">${i + 1}</td>
+                        <td class="px-8 py-5">
+                            <div class="flex items-center gap-4">
+                                <div class="w-10 h-10 rounded-xl bg-slate-100 group-hover:bg-white text-slate-400 group-hover:text-indigo-600 flex items-center justify-center font-black transition-all">
+                                    ${(s.name || '?').charAt(0)}
+                                </div>
+                                <div>
+                                    <p class="font-black text-slate-900">${s.name || 'Unknown Student'}</p>
+                                    <p class="text-[9px] font-black text-indigo-400 uppercase tracking-widest">${s.id}</p>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-8 py-5 font-mono text-sm text-slate-600 font-bold">
+                            ${s.index_number || 'N/A'}
+                        </td>
+                        <td class="px-8 py-5 text-right">
+                            <button class="px-4 py-2 bg-slate-50 text-indigo-600 text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-indigo-600 hover:text-white transition-all">
+                                View History
+                            </button>
+                        </td>
+                    </tr>
+                `).join('');
+
+            } catch (err) {
+                console.error(err);
+                alert('Connection error. Failed to load students.');
+                showClasses();
+            }
+        }
+
+        function showClasses() {
+            document.getElementById('view-students').classList.add('hidden');
+            document.getElementById('loader').classList.add('hidden');
+            document.getElementById('classes-grid').classList.remove('hidden');
+            document.getElementById('instructions-box').classList.remove('hidden');
         }
 
         init();
