@@ -1865,10 +1865,10 @@
                  return;
              }
 
-             // Duplicate Detection in View
+             // Duplicate Detection in View (Case-Insensitive)
              const resNameCounts = {};
              filtered.forEach(r => {
-                 const n = (r.student_name || r.name || '').trim();
+                 const n = (r.student_name || r.name || '').trim().toLowerCase();
                  if(n) resNameCounts[n] = (resNameCounts[n] || 0) + 1;
              });
 
@@ -1877,7 +1877,7 @@
                  if(r.status === 'Approved') statusColor = 'bg-green-50 text-green-600';
                  if(r.status === 'Rejected') statusColor = 'bg-red-50 text-red-600';
 
-                 const isDupName = resNameCounts[(r.student_name || r.name || '').trim()] > 1;
+                 const isDupName = resNameCounts[(r.student_name || r.name || '').trim().toLowerCase()] > 1;
 
                  const tr = document.createElement('tr');
                  tr.className = "border-b border-gray-100 hover:bg-gray-50 transition";
@@ -2101,11 +2101,11 @@
 
             const nameCounts = {};
             allStudents.forEach(s => {
-                const n = s.name.trim();
+                const n = s.name.trim().toLowerCase();
                 nameCounts[n] = (nameCounts[n] || 0) + 1;
             });
 
-            const duplicates = Object.keys(nameCounts).filter(name => nameCounts[name] > 1);
+            const duplicates = Object.keys(nameCounts).filter(n => nameCounts[n] > 1);
 
             if (duplicates.length > 0) {
                 let html = duplicates.slice(0, 5).map(name => `
@@ -2142,7 +2142,7 @@
 
             const nameGroups = {};
             allStudents.forEach(s => {
-                const n = s.name.trim();
+                const n = s.name.trim().toLowerCase();
                 if (!nameGroups[n]) nameGroups[n] = [];
                 nameGroups[n].push(s);
             });
@@ -2154,12 +2154,13 @@
                 return;
             }
 
-            listEl.innerHTML = duplicates.map(name => {
-                const group = nameGroups[name];
+            listEl.innerHTML = duplicates.map(key => {
+                const group = nameGroups[key];
+                const displayName = group[0].name; // Use original casing for header
                 return `
                     <div class="bg-gray-50 rounded-2xl border border-gray-100 p-4">
                         <div class="flex items-center justify-between mb-4 border-b border-gray-200 pb-2">
-                             <h3 class="font-black text-slate-800 uppercase tracking-tight">${name}</h3>
+                             <h3 class="font-black text-slate-800 uppercase tracking-tight">${displayName}</h3>
                              <span class="px-2 py-0.5 bg-amber-100 text-amber-700 rounded text-[10px] font-bold">${group.length} Records</span>
                         </div>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
