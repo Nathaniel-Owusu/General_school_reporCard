@@ -767,7 +767,7 @@
                 const gradeInfo = calculateGrade(total);
                 const formatVal = (v) => (!v || v == 0) ? '' : v;
 
-                const displayName = s.name || s.student_name || '---';
+                const displayName = s.name || `Student (${s.id})`;
                 const initial = displayName.charAt(0);
 
                 return `
@@ -1092,7 +1092,7 @@
                     <tr class="hover:bg-blue-50/10 transition border-b border-gray-50" data-student-id="${s.id}">
                         <td class="px-4 py-3 font-mono text-slate-200 text-xs">${i + 1}</td>
                         <td class="px-4 py-3 font-mono font-bold text-gray-600 text-xs hidden md:table-cell">${s.id}</td>
-                        <td class="px-4 py-3 font-bold text-gray-800 sticky-col transition-colors group-hover:bg-blue-50/10">${s.name}</td>
+                        <td class="px-4 py-3 font-bold text-gray-800 sticky-col transition-colors group-hover:bg-blue-50/10">${s.name || `Student (${s.id})`}</td>
                         
                         <!-- Attendance -->
                         <td class="px-4 py-3 bg-blue-50/10 text-center">

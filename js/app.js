@@ -639,9 +639,9 @@ async function fetchTeacherData(action, params = {}) {
         });
         const subjectsCount = uniqueSubjects.size;
         
-        // Count unique students
-        const classNames = enrichedClasses.map(c => c.name);
-        const myStudents = db.students.filter(s => s.school_id === schoolId && classNames.includes(s.class));
+        // Count unique students (Optimized with Set)
+        const classNameSet = new Set(enrichedClasses.map(c => c.name));
+        const myStudents = db.students.filter(s => s.school_id === schoolId && classNameSet.has(s.class));
         
         let pending = 0;
         myStudents.forEach(s => {
@@ -664,12 +664,11 @@ async function fetchTeacherData(action, params = {}) {
             result = students.map(s => {
                 const scoresArr = Array.isArray(s.scores) ? s.scores : [];
                 const score = scoresArr.find(sc => sc.subject_id == params.subject_id) || {};
-                const rawName = s.name || s.student_name || s.full_name || s.fullName || '';
-                const finalName = rawName.trim() || `Student (${s.id})`;
+                const studentName = (s.name || s.student_name || s.full_name || s.fullName || '').trim() || `Student (${s.id})`;
                 return {
                     id: s.id,
-                    name: finalName,
-                    student_name: finalName,
+                    name: studentName,
+                    student_name: studentName,
                     project_score: score.project_score || 0,
                     individual_score: score.individual_score || 0,
                     class_test: score.class_test || 0,
