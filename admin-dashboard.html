@@ -1866,10 +1866,14 @@
              }
 
              // Duplicate Detection in View (Case-Insensitive)
-             const resNameCounts = {};
+             // We check if multiple DIFFERENT student IDs share the same name
+             const nameToIds = new Map();
              filtered.forEach(r => {
                  const n = (r.student_name || r.name || '').trim().toLowerCase();
-                 if(n) resNameCounts[n] = (resNameCounts[n] || 0) + 1;
+                 if(n) {
+                     if(!nameToIds.has(n)) nameToIds.set(n, new Set());
+                     nameToIds.get(n).add(r.student_id);
+                 }
              });
 
              filtered.forEach(r => {
@@ -1877,7 +1881,8 @@
                  if(r.status === 'Approved') statusColor = 'bg-green-50 text-green-600';
                  if(r.status === 'Rejected') statusColor = 'bg-red-50 text-red-600';
 
-                 const isDupName = resNameCounts[(r.student_name || r.name || '').trim().toLowerCase()] > 1;
+                 const nameKey = (r.student_name || r.name || '').trim().toLowerCase();
+                 const isDupName = nameToIds.get(nameKey)?.size > 1;
 
                  const tr = document.createElement('tr');
                  tr.className = "border-b border-gray-100 hover:bg-gray-50 transition";
@@ -2201,6 +2206,7 @@
                 // Refresh Background
                 if(typeof initDashboard === 'function') initDashboard();
                 if(typeof renderStudents === 'function') renderStudents();
+                if(typeof renderResults === 'function') renderResults();
             } else {
                 alert('Deletion failed: ' + (result?.message || 'Unknown error'));
             }
@@ -2249,6 +2255,7 @@
                 alert(`Success! We have automatically removed ${count} redundant student records.`);
                 initDashboard();
                 if(typeof renderStudents === 'function') renderStudents();
+                if(typeof renderResults === 'function') renderResults();
             } catch (err) {
                 console.error(err);
                 alert('An error occurred during the quick fix.');
